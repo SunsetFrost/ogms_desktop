@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/font">
+        <file>font/Cabin-Bold.ttf</file>
+        <file>font/fontawesome-webfont.ttf</file>
+        <file>font/opensans.ttf</file>
+    </qresource>
+    <qresource prefix="/css">
+        <file>css/uiCss.css</file>
+    </qresource>
+    <qresource prefix="/png">
+        <file>png/ProgramIcon.png</file>
+        <file>png/UserIcon.png</file>
+    </qresource>
+</RCC>
