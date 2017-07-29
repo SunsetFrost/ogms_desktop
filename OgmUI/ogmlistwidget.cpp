@@ -2,6 +2,7 @@
 
 #include "OgmCommon/ogmuihelper.h"
 #include "OgmCommon/ogmlisthelper.h"
+#include "OgmCommon/ogmprogressbar.h"
 
 #include "OgmUI/ogmpopwidget.h"
 
@@ -10,11 +11,12 @@
 
 OgmListWidget::OgmListWidget(QWidget *parent) : QWidget(parent)
 {
-    _modelServiceBLL=  QSharedPointer<ModelServiceBLL>(new ModelServiceBLL);
+    _modelServiceBLL= QSharedPointer<ModelServiceBLL>(new ModelServiceBLL);
     _dataServiceBLL=  QSharedPointer<DataServiceBLL>(new DataServiceBLL);
     _dataMappingBLL=  QSharedPointer<DataMappingBLL>(new DataMappingBLL);
     _dataRefactorBLL= QSharedPointer<DataRefactorBLL>(new DataRefactorBLL);
     _dataFileBLL=     QSharedPointer<DataFileBll>(new DataFileBll);
+    _taskBLL=         QSharedPointer<TaskBLL>(new TaskBLL);
 
     initWidget();
 }
@@ -27,194 +29,41 @@ void OgmListWidget::changeModelListUI(QString serverId)
 
 void OgmListWidget::changeModelListUI(QList<ModelService *> modelList)
 {
-    //clear list
-    while (_widgetTurnPage->layout()->count()>0) {
-        QWidget *widgetDel=_widgetTurnPage->layout()->itemAt(0)->widget();
-        _widgetTurnPage->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
-    while(_widgetList->layout()->count()>0){
-        QWidget *widgetDel= _widgetList->layout()->itemAt(0)->widget();
-        _widgetList->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
+    _listType="Model";
+    clearList();
 
-    int modelCount=modelList.count();
-    QVBoxLayout *layoutList=qobject_cast<QVBoxLayout*>(_widgetList->layout());
+    QList<QVariant> varList=OgmHelper::toVarList(modelList);
 
-    //add data widget
-    if(modelCount==0){
-        layoutList->addStretch();
-    }
-    else if(modelCount<=25){
-        for(int i=0; i<modelCount; ++i){
-            if(i%2==0){
-                addOneModelServiceOnUI(modelList[i], "btn-model-dark");
-            }
-            else{
-                addOneModelServiceOnUI(modelList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-    }
-    else{
-        for(int i=0; i<25; ++i){
-            if(i%2==0){
-                addOneModelServiceOnUI(modelList[i], "btn-model-dark");
-            }
-            else{
-                addOneModelServiceOnUI(modelList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-
-        //build turn page ui
-        initTurnPage();
-    }
+    listPaging(varList, 25);
 }
 
 void OgmListWidget::changeDataListUI(QList<DataService *> dataList)
 {
-    //clear list
-    while (_widgetTurnPage->layout()->count()>0) {
-        QWidget *widgetDel=_widgetTurnPage->layout()->itemAt(0)->widget();
-        _widgetTurnPage->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
-    while(_widgetList->layout()->count()>0){
-        QWidget *widgetDel= _widgetList->layout()->itemAt(0)->widget();
-        _widgetList->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
+    _listType="Data";
+    clearList();
 
-    int dataCount=dataList.count();
-    QVBoxLayout *layoutList=qobject_cast<QVBoxLayout*>(_widgetList->layout());
+    QList<QVariant> varList=OgmHelper::toVarList(dataList);
 
-    //add data widget
-    if(dataCount==0){
-        layoutList->addStretch();
-    }
-    else if(dataCount<=25){
-        for(int i=0; i<dataCount; ++i){
-            if(i%2==0){
-                addOneDataOnUI(dataList[i], "btn-model-dark");
-            }
-            else{
-                addOneDataOnUI(dataList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-    }
-    else{
-        for(int i=0; i<dataCount; ++i){
-            if(i%2==0){
-                addOneDataOnUI(dataList[i], "btn-model-dark");
-            }
-            else{
-                addOneDataOnUI(dataList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-
-        //build turn page ui
-        initTurnPage();
-    }
+    listPaging(varList, 25);
 }
 
 void OgmListWidget::changeDataListUI(QList<DataMapping *> dataMappingList)
 {
-    //clear list
-    while (_widgetTurnPage->layout()->count()>0) {
-        QWidget *widgetDel=_widgetTurnPage->layout()->itemAt(0)->widget();
-        _widgetTurnPage->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
-    while(_widgetList->layout()->count()>0){
-        QWidget *widgetDel= _widgetList->layout()->itemAt(0)->widget();
-        _widgetList->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
+    _listType="DataMapping";
+    clearList();
 
-    int dataCount=dataMappingList.count();
-    QVBoxLayout *layoutList=qobject_cast<QVBoxLayout*>(_widgetList->layout());
+    QList<QVariant> varList=OgmHelper::toVarList(dataMappingList);
 
-    //add data widget
-    if(dataCount==0){
-        layoutList->addStretch();
-    }
-    else if(dataCount<=25){
-        for(int i=0; i<dataCount; ++i){
-            if(i%2==0){
-                addOneDataMappingOnUI(dataMappingList[i], "btn-model-dark");
-            }
-            else{
-                addOneDataMappingOnUI(dataMappingList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-    }
-    else{
-        for(int i=0; i<dataCount; ++i){
-            if(i%2==0){
-                addOneDataMappingOnUI(dataMappingList[i], "btn-model-dark");
-            }
-            else{
-                addOneDataMappingOnUI(dataMappingList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-
-        //build turn page ui
-        initTurnPage();
-    }
+    listPaging(varList, 25);
 }
 
 void OgmListWidget::changeDataListUI(QList<DataRefactor *> dataRefactorList)
 {
-    //clear list
-    while (_widgetTurnPage->layout()->count()>0) {
-        QWidget *widgetDel=_widgetTurnPage->layout()->itemAt(0)->widget();
-        _widgetTurnPage->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
-    while(_widgetList->layout()->count()>0){
-        QWidget *widgetDel= _widgetList->layout()->itemAt(0)->widget();
-        _widgetList->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
+    _listType="DataRefactor";
+    clearList();
 
-    int dataCount=dataRefactorList.count();
-    QVBoxLayout *layoutList=qobject_cast<QVBoxLayout*>(_widgetList->layout());
-
-    //add data widget
-    if(dataCount==0){
-        layoutList->addStretch();
-    }
-    else if(dataCount<=25){
-        for(int i=0; i<dataCount; ++i){
-            if(i%2==0){
-                addOneDataRefactorOnUI(dataRefactorList[i], "btn-model-dark");
-            }
-            else{
-                addOneDataRefactorOnUI(dataRefactorList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-    }
-    else{
-        for(int i=0; i<dataCount; ++i){
-            if(i%2==0){
-                addOneDataRefactorOnUI(dataRefactorList[i], "btn-model-dark");
-            }
-            else{
-                addOneDataRefactorOnUI(dataRefactorList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-
-        //build turn page ui
-        initTurnPage();
-    }
+    QList<QVariant> varList=OgmHelper::toVarList(dataRefactorList);
+    listPaging(varList, 25);
 }
 
 void OgmListWidget::changeDataListUI(QString serverId, QString type)
@@ -237,50 +86,12 @@ void OgmListWidget::changeDataListUI(QString serverId, QString type)
 
 void OgmListWidget::changeFileListUI(QList<DataFile *> dataFileList)
 {
-    //clear list
-    while (_widgetTurnPage->layout()->count()>0) {
-        QWidget *widgetDel=_widgetTurnPage->layout()->itemAt(0)->widget();
-        _widgetTurnPage->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
-    while(_widgetList->layout()->count()>0){
-        QWidget *widgetDel= _widgetList->layout()->itemAt(0)->widget();
-        _widgetList->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
+    _listType="File";
+    clearList();
 
-    int dataCount=dataFileList.count();
-    QVBoxLayout *layoutList=qobject_cast<QVBoxLayout*>(_widgetList->layout());
+    QList<QVariant> varList=OgmHelper::toVarList(dataFileList);
 
-    //add data widget
-    if(dataCount==0){
-        layoutList->addStretch();
-    }
-    else if(dataCount<=25){
-        for(int i=0; i<dataCount; ++i){
-            if(i%2==0){
-                addOneDataFileOnUI(dataFileList[i], "btn-model-dark");
-            }
-            else{
-                addOneDataFileOnUI(dataFileList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-    }
-    else{
-        for(int i=0; i<dataCount; ++i){
-            if(i%2==0){
-                addOneDataFileOnUI(dataFileList[i], "btn-model-dark");
-            }
-            else{
-                addOneDataFileOnUI(dataFileList[i], "btn-model-light");
-            }
-        }
-        layoutList->addStretch();
-
-        //build turn page ui
-        initTurnPage();
-    }
+    listPaging(varList, 25);
 }
 
 void OgmListWidget::changeFileListUI(QString serverId, QString type)
@@ -330,82 +141,18 @@ QVariant OgmListWidget::getCheckFileInfo()
 
 void OgmListWidget::changeTaskListUI(QList<Task *> taskList, QString taskRunState)
 {
-    //clear list
-    while (_widgetTurnPage->layout()->count()>0) {
-        QWidget *widgetDel=_widgetTurnPage->layout()->itemAt(0)->widget();
-        _widgetTurnPage->layout()->removeWidget(widgetDel);
-        delete widgetDel;
-    }
-
-    //delete or hide exist widget
-    for(int i=(_widgetList->layout()->count()-1); i>=0; --i){
-        QWidget* widgetDel=_widgetList->layout()->itemAt(i)->widget();
-        if(widgetDel){
-            if(widgetDel->accessibleDescription()=="progressBar"){
-                if(taskRunState=="Running"){
-                    widgetDel->setHidden(false);
-                }
-                else{
-                    widgetDel->setHidden(true);
-                }
-            }
-            else if(widgetDel->accessibleDescription()=="btn"){
-                _widgetList->layout()->removeWidget(widgetDel);
-                delete widgetDel;
-            }
-        }
-        else{
-            QSpacerItem *space=_widgetList->layout()->itemAt(i)->spacerItem();
-            _widgetList->layout()->removeItem(space);
-            delete space;
-        }
-    }
+    _listType=taskRunState;
+    clearList();
 
     if(taskRunState!="Running"){
-        int dataCount=taskList.count();
-        QVBoxLayout *layoutList=qobject_cast<QVBoxLayout*>(_widgetList->layout());
-
-        //add data widget
-        if(dataCount==0){
-            layoutList->addStretch();
-        }
-        else if(dataCount<=25){
-
-            int num=0;
-
-            for(int i=0; i<dataCount; ++i){
-                if(taskList.at(i)->runstate==taskRunState){
-                    if(num%2==0){
-                        addOneTaskOnUI(taskList[i], "btn-model-dark", taskRunState);
-                    }
-                    else{
-                        addOneTaskOnUI(taskList[i], "btn-model-light", taskRunState);
-                    }
-                }
-                num++;
-            }
-            layoutList->addStretch();
-        }
-        else{
-
-            int num=0;
-
-            for(int i=0; i<dataCount; ++i){
-                if(taskList.at(i)->runstate==taskRunState){
-                    if(num%2==0){
-                        addOneTaskOnUI(taskList[i], "btn-model-dark", taskRunState);
-                    }
-                    else{
-                        addOneTaskOnUI(taskList[i], "btn-model-light", taskRunState);
-                    }
-                }
-            }
-            layoutList->addStretch();
-
-            //build turn page ui
-            initTurnPage();
-        }
+        QList<QVariant> varList=OgmHelper::toVarList(taskList);
+        listPaging(varList, 25);
     }
+}
+
+void OgmListWidget::changeRefactorMethodListUI(QString refactorId)
+{
+
 }
 
 void OgmListWidget::initWidget()
@@ -429,6 +176,109 @@ void OgmListWidget::initWidget()
 
     QHBoxLayout *layoutTurnPage=new QHBoxLayout();
     _widgetTurnPage->setLayout(layoutTurnPage);
+}
+
+void OgmListWidget::clearList()
+{
+    //clear list
+    while (_widgetTurnPage->layout()->count()>0) {
+        QWidget *widgetDel=_widgetTurnPage->layout()->itemAt(0)->widget();
+        _widgetTurnPage->layout()->removeWidget(widgetDel);
+        delete widgetDel;
+    }
+
+    //delete or hide exist widget
+    for(int i=(_widgetList->layout()->count()-1); i>=0; --i){
+        QWidget* widgetDel=_widgetList->layout()->itemAt(i)->widget();
+        if(widgetDel){
+            if(widgetDel->accessibleDescription()=="progressBar"){
+                if(_listType=="Running"){
+                    widgetDel->setHidden(false);
+                }
+                else{
+                    widgetDel->setHidden(true);
+                }
+            }
+            else if(widgetDel->accessibleDescription()=="btn"){
+                _widgetList->layout()->removeWidget(widgetDel);
+                delete widgetDel;
+            }
+        }
+        else{
+            QSpacerItem *space=_widgetList->layout()->itemAt(i)->spacerItem();
+            _widgetList->layout()->removeItem(space);
+            delete space;
+        }
+    }
+}
+
+void OgmListWidget::listPaging(QList<QVariant> varList, int pageAmount)
+{
+    int count=varList.count();
+    QVBoxLayout *layoutList=qobject_cast<QVBoxLayout*>(_widgetList->layout());
+
+    if(count==0){
+        layoutList->addStretch();
+    }
+    else if(count<=pageAmount){
+        for(int i=0; i<count; ++i){
+            if(i%2==0){
+                addListIntelligent(varList[i], "btn-model-dark");
+            }
+            else{
+                addListIntelligent(varList[i], "btn-model-light");
+            }
+        }
+        layoutList->addStretch();
+    }
+    else{
+        for(int i=0; i<count; ++i){
+            if(i%2==0){
+                addListIntelligent(varList[i], "btn-model-dark");
+            }
+            else{
+                addListIntelligent(varList[i], "btn-model-light");
+            }
+        }
+        layoutList->addStretch();
+
+        //build turn page ui
+        initTurnPage();
+    }
+
+}
+
+void OgmListWidget::addListIntelligent(QVariant var, QString style)
+{
+    QString typeName=var.typeName();
+    if(typeName=="ModelService*"){
+        ModelService *model=var.value<ModelService*>();
+        addOneModelServiceOnUI(model, style);
+    }
+    else if(typeName=="DataService*"){
+        DataService *data=var.value<DataService*>();
+        addOneDataOnUI(data, style);
+    }
+    else if(typeName=="DataMapping*"){
+        DataMapping *datamap=var.value<DataMapping*>();
+        addOneDataMappingOnUI(datamap, style);
+    }
+    else if(typeName=="DataRefactor*"){
+        DataRefactor *dataRefactor=var.value<DataRefactor*>();
+        addOneDataRefactorOnUI(dataRefactor, style);
+    }
+    else if(typeName=="DataRefactorMethod*"){
+        DataRefactorMethod *dataMehtod=var.value<DataRefactorMethod*>();
+        addOneDataMethodOnUI(dataMehtod, style);
+    }
+    else if(typeName=="DataFile*"){
+        DataFile *dataFile=var.value<DataFile*>();
+        addOneDataFileOnUI(dataFile, style);
+    }
+    else if(typeName=="Task*"){
+        Task *task=var.value<Task*>();
+        addOneTaskOnUI(task, style);
+    }
 }
 
 void OgmListWidget::addOneDataOnUI(DataService *data, QString style)
@@ -555,7 +405,7 @@ void OgmListWidget::addOneDataMappingOnUI(DataMapping *data, QString style)
     QToolButton *btnInvoke=_widgetList->findChild<QToolButton*>(listItemBtnInvoke.objectName);
     connect(btnInvoke, &QToolButton::clicked, [=](){
         emit signalSwitchPage("DataMapTaskConfig");
-        emit signalChangeDataMapTaskConfigUI(data->id);
+        emit signalChangeDataMapTaskConfigUI(data->serverId, data->id);
     });
 }
 
@@ -618,6 +468,11 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
     connect(btn, &QToolButton::clicked, [=](){
         emit signalAddFavorSidebar(data->serverId, data->id, "DataRefactor");
     });
+}
+
+void OgmListWidget::addOneDataMethodOnUI(DataRefactorMethod *dataMethod, QString style)
+{
+
 }
 
 void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
@@ -787,7 +642,7 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
     });
 }
 
-void OgmListWidget::addOneTaskOnUI(Task *task, QString style, QString type)
+void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
 {
     QList<LISTITEM> listItemList;
 
@@ -818,7 +673,7 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style, QString type)
     listItemSpaceA.typeValue=ItemType::SpaceItem;
     listItemList.append(listItemSpaceA);
 
-    if(type=="ToRun"){
+    if(task->runstate=="ToRun"){
         LISTITEM listItemBtnRun;
         listItemBtnRun.typeValue=ItemType::ToolButton;
         listItemBtnRun.iconValue=0xf04b;
@@ -844,7 +699,7 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style, QString type)
     listItemBtnDelete.objectName="btnTaskDel|"+task->uid;
     listItemList.append(listItemBtnDelete);
 
-    if(type=="Finish"){
+    if(task->runstate=="Finish"){
         LISTITEM listItemBtnVisual;
         listItemBtnVisual.typeValue=ItemType::ToolButton;
         listItemBtnVisual.iconValue=0xf0ac;
@@ -877,12 +732,88 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style, QString type)
     OgmListHelper::addListItem(_widgetList, "btnTaskList|"+task->uid, style, "btn", listItemList);
 
     //btn function
+    QToolButton *btnTask=_widgetList->findChild<QToolButton*>("btnTaskCal|"+task->uid);
+
+    if(task->type=="DataMap"){
+        connect(btnTask, &QToolButton::clicked, [=](){
+            //change run state
+            _taskBLL.data()->changeTaskRunState(task->uid, "Running");
+
+            addRunningTaskOnUI(task);
+
+            changeTaskListUI(_taskBLL.data()->getAllTask(), "ToRun");
+
+            _taskBLL.data()->runDatamapTask(task);
+
+            for(int i=0; i<_widgetList->layout()->count(); ++i){
+                QWidget *widgetPro=_widgetList->layout()->itemAt(i)->widget();
+                if(widgetPro){
+                    if(widgetPro->accessibleDescription()=="progressBar"){
+                        OgmProgressBar *pro=qobject_cast<OgmProgressBar*>(widgetPro);
+                        if(pro->getTaskId()==task->uid){
+                            pro->setIsFinished(true);
+                        }
+                    }
+                }
+            }
+        });
+    }
+
 //    QToolButton *btnFolder=_widgetList->findChild<QToolButton*>("btnDataFileName|"+file->id);
 //    connect(btnFolder, &QToolButton::clicked, [=](){
 //        QList<DataFile*> fileList=_dataFileBLL.data()->getFilesByParent(_dataServerId, file->id);
 //        changeFileListUI(fileList);
 //        emit signalAddFolderOnFileLink(file->id, file->name);
-//    });
+    //    });
+}
+
+void OgmListWidget::addRunningTaskOnUI(Task *task)
+{
+    OgmProgressBar *proBar=new OgmProgressBar(task->uid);
+    proBar->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    proBar->setFixedHeight(35);
+    connect(proBar, &OgmProgressBar::signalProgressBarFinish, [=](){
+        _taskBLL.data()->changeTaskRunState(proBar->getTaskId(), "Finish");
+        _widgetList->layout()->removeWidget(proBar);
+        delete proBar;
+
+        changeTaskListUI(_taskBLL.data()->getAllTask(), "Running");
+    });
+
+    _widgetList->layout()->addWidget(proBar);
+
+    QHBoxLayout *layoutTask=new QHBoxLayout();
+    proBar->setLayout(layoutTask);
+
+    QLabel *lblName=new QLabel();
+    lblName->setText(task->name);
+    lblName->setWindowTitle("lbl-lightdark");
+    lblName->setFixedWidth(220);
+    layoutTask->addWidget(lblName);
+    layoutTask->addStretch();
+
+    QToolButton *btnDel=new QToolButton();
+    OgmUiHelper::Instance()->setIcon(btnDel, QChar(0xf1f8));
+    btnDel->setObjectName("btnTaskDel|"+task->uid);
+    btnDel->setWindowTitle("btn-light");
+    btnDel->setToolTip("delete task");
+    layoutTask->addWidget(btnDel);
+
+    layoutTask->addStretch();
+
+    QLabel *lblTaskTag=new QLabel();
+    lblTaskTag->setText("taskTag");
+    lblTaskTag->setFixedWidth(100);
+    lblTaskTag->setWindowTitle("lbl-light");
+    layoutTask->addWidget(lblTaskTag);
+    layoutTask->addStretch();
+
+    QLabel *lblTaskTime=new QLabel();
+    lblTaskTime->setText(task->createTime);
+    lblTaskTime->setFixedWidth(80);
+    lblTaskTime->setWindowTitle("lbl-light");
+    layoutTask->addWidget(lblTaskTime);
+    layoutTask->addSpacing(5);
 }
 
 void OgmListWidget::initTurnPage()

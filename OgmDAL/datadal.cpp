@@ -281,6 +281,15 @@ int DataRefactorDAL::getDataRefactorCount(DataServer *server)
     return count;
 }
 
+QList<DataRefactorMethod *> DataRefactorDAL::getDataRefactorMethodList(DataServer *server, QString refactorId)
+{
+    QString ip=server->ip;
+    QString request="http://"+ip+"/refactor/methods?id="+refactorId;
+    QByteArray result=OgmNetWork::get(request);
+
+    return json2dataRefactorMethodList(result, server->id);
+}
+
 QList<DataRefactor *> DataRefactorDAL::json2dataRefactorList(QByteArray dataStr, QString serverId)
 {
     QJsonParseError jsonError;
@@ -313,4 +322,45 @@ QList<DataRefactor *> DataRefactorDAL::json2dataRefactorList(QByteArray dataStr,
     else{
         return listData;
     }
+}
+
+QList<DataRefactorMethod *> DataRefactorDAL::json2dataRefactorMethodList(QByteArray byte, QString serverId)
+{
+    QJsonParseError jsonError;
+    QJsonObject jsonObj=QJsonDocument::fromJson(byte, &jsonError).object();
+
+    QList<DataRefactorMethod*> methodList;
+
+    if(jsonError.error==QJsonParseError::NoError){
+        QJsonObject jsonReInfo=jsonObj.value("RefactorMethodInfo").toObject();
+        QJsonArray jsonMethodArray=jsonReInfo.value("Method").toArray();
+        for(int i=0; i<jsonMethodArray.size(); ++i){
+            QJsonObject jsonMethod=jsonMethodArray.at(i).toObject();
+
+            DataRefactorMethod *method=new DataRefactorMethod();
+            method->name=jsonMethod.value("@name").toString();
+            method->methodClass=jsonMethod.value("@class").toString();
+            method->description=jsonMethod.value("@description").toString();
+
+            QList<DataRefactorMethodParam*> paramList;
+            method->paramList=paramList;
+
+            QJsonArray jsonParamArray=jsonMethod.value("Params").toArray();
+            for(int j=0; j<jsonParamArray.size(); ++j){
+                QJsonObject jsonParam=jsonParamArray.at(i).toObject();
+
+                DataRefactorMethodParam *param=new DataRefactorMethodParam();
+                param->dataType=jsonParam.value("@datatype").toString();
+                param->type=jsonParam.value("@type").toString();
+                param->name=jsonParam.value("@name").toString();
+                param->description=jsonParam.value("@description").toString();
+                param->schema=jsonParam.value("@schema").toString();
+
+                paramList.append(param);
+            }
+
+            methodList.append(method);
+        }
+    }
+    return methodList;
 }

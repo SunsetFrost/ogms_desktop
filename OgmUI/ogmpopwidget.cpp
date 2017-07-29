@@ -91,6 +91,15 @@ void OgmPopWidget::initChooseDataFile()
     connect(_ui->btnPopB, &QToolButton::clicked, this, &OgmPopWidget::close);
 }
 
+void OgmPopWidget::initChooseRefactorMethod()
+{
+    this->setFixedSize(800, 600);
+    _ui->widgetPopChooseFile->setHidden(false);
+    _ui->widgetPopBtnGroup->setHidden(true);
+
+    _ui->lblPopTitle->setText("Choose refactor method");
+}
+
 void OgmPopWidget::initSaveTask()
 {
     this->setFixedHeight(400);

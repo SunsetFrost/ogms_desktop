@@ -2,6 +2,7 @@
 #define FILE_H
 
 #include <QString>
+#include <QList>
 
 class DataFile
 {
@@ -17,6 +18,8 @@ public:
     QString parentId;
 };
 
+Q_DECLARE_METATYPE(DataFile*)
+
 ///////////////////////////////
 class ModelFile
 {
@@ -24,5 +27,7 @@ public:
     ModelFile();
 
 };
+
+
 
 #endif // FILE_H

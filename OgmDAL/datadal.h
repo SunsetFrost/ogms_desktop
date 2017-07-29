@@ -54,8 +54,12 @@ public:
 
     int getDataRefactorCount(DataServer *server);
 
+    QList<DataRefactorMethod *> getDataRefactorMethodList(DataServer *server, QString refactorId);
+
 private:
     QList<DataRefactor*> json2dataRefactorList(QByteArray dataStr, QString serverId);
+
+    QList<DataRefactorMethod*> json2dataRefactorMethodList(QByteArray byte, QString serverId);
 };
 
 /////////////////////////////////////////////////

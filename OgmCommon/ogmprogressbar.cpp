@@ -6,6 +6,7 @@ OgmProgressBar::OgmProgressBar(QString id, QWidget *parent):_id(id)
     connect(_timer, &QTimer::timeout, this, &OgmProgressBar::progressBarChange);
     _timer->start(20);
 
+    this->_isFinished=false;
     this->setRange(0, 1000);
     this->setValue(0);
     this->setAccessibleDescription("progressBar");

@@ -9,14 +9,14 @@ DataFileBll::DataFileBll()
 QList<DataFile *> DataFileBll::getAllFiles(QString serverId)
 {
     DataServer* server=_dataServerDAL.data()->getServerById(serverId);
-    QList<DataFile*> fileList=_dataFileDAL.data()->getFiles(server, "-1", "admin", 10, 0);
+    QList<DataFile*> fileList=_dataFileDAL.data()->getFiles(server, "-1", "admin", 18, 0);
     return fileList;
 }
 
 QList<DataFile *> DataFileBll::getFilesByParent(QString serverId, QString parentId)
 {
     DataServer* server=_dataServerDAL.data()->getServerById(serverId);
-    QList<DataFile*> fileList=_dataFileDAL.data()->getFiles(server, parentId, "admin", 10, 0);
+    QList<DataFile*> fileList=_dataFileDAL.data()->getFiles(server, parentId, "admin", 18, 0);
 
     return fileList;
 }

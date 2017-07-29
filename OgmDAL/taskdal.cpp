@@ -1,5 +1,7 @@
 #include "taskdal.h"
 
+#include "OgmCommon/ogmnetwork.h"
+
 QString TaskDAL::taskPath=QDir::currentPath()+"/task";
 
 TaskDAL::TaskDAL()
@@ -81,6 +83,32 @@ void TaskDAL::changeTaskRunState(QString taskId, QString taskRunState)
     saveTask(task);
 }
 
+QString TaskDAL::runDatamapTask(QString serverIp, QString datamapId, QString inputId, QString inputName, QString outputPId, QString outputName, QString callType)
+{
+    QString request="http://"+serverIp+"/datamap/use/call?id="+datamapId+"&in_oid="+inputId+"&in_filename="+inputName+"&out_dir="+outputPId+"&out_filename="+outputName+"&callType="+callType+"&username=admin";
+    QByteArray result=OgmNetWork::get(request);
+
+    QString strResult=result;
+    return strResult;
+}
+
+QVariant TaskDAL::getDataTaskRecords(QString serverIp, QString instanceId, QString type)
+{
+    QString request="http://"+serverIp+"/common/records?guid="+instanceId+"&type="+type;
+    QByteArray result=OgmNetWork::get(request);
+    QString strResult=result;
+
+    if(strResult=="[]"){
+        bool isFinish=false;
+        QVariant varResult(isFinish);
+        return varResult;
+    }
+    else{
+        QVariant varResult(strResult);
+        return varResult;
+    }
+}
+
 void TaskDAL::task2xml(Task *task, QDomDocument *doc)
 {
     QDomAttr attr;
@@ -112,6 +140,10 @@ void TaskDAL::task2xml(Task *task, QDomDocument *doc)
 
         attr=doc->createAttribute("id");
         attr.setValue(dataMapTask->id);
+        elementDataTaskConfig.setAttributeNode(attr);
+
+        attr=doc->createAttribute("serverId");
+        attr.setValue(dataMapTask->serverId);
         elementDataTaskConfig.setAttributeNode(attr);
 
         attr=doc->createAttribute("callType");
@@ -162,6 +194,7 @@ void TaskDAL::xml2task(QDomDocument *doc, Task *task)
 
         QDomElement elementDataMapConfig=elementTask.firstChildElement();
         dataMapTask->id=elementDataMapConfig.attributeNode("id").value();
+        dataMapTask->serverId=elementDataMapConfig.attributeNode("serverId").value();
         dataMapTask->calltype=elementDataMapConfig.attributeNode("callType").value();
 
         QDomElement elementInput=elementDataMapConfig.firstChildElement("Input");

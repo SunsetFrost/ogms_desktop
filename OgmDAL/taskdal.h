@@ -25,6 +25,13 @@ public:
 
     void changeTaskRunState(QString taskId, QString taskRunState);
 
+    //run
+    QString runDatamapTask(QString serverIp, QString datamapId, QString inputId, QString inputName, QString outputPId, QString outputName, QString callType);
+
+    QVariant getDataTaskRecords(QString serverIp, QString instanceId, QString type);
+
+
+
 private:
     void task2xml(Task *task, QDomDocument *doc);
 
@@ -33,5 +40,7 @@ private:
 private:
     static QString taskPath;
 };
+
+
 
 #endif // TASKDAL_H

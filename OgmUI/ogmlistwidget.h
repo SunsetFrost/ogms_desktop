@@ -36,20 +36,28 @@ public:
 //    void changeTaskListUI(QString taskType);
     void changeTaskListUI(QList<Task*> taskList, QString taskRunState);
 
+    void changeRefactorMethodListUI(QString refactorId);
+
 
 
 private:
     void initWidget();
+    void clearList();
+
+    void listPaging(QList<QVariant> varList, int pageAmount);
+    void addListIntelligent(QVariant var, QString style);
 
     void addOneDataOnUI(DataService *data, QString style);
     void addOneDataMappingOnUI(DataMapping *data, QString style);
     void addOneDataRefactorOnUI(DataRefactor *data, QString style);
+    void addOneDataMethodOnUI(DataRefactorMethod *dataMethod, QString style);
 
     void addOneModelServiceOnUI(ModelService *model, QString style);
 
     void addOneDataFileOnUI(DataFile *file, QString style);
 
-    void addOneTaskOnUI(Task *task, QString style, QString type);
+    void addOneTaskOnUI(Task *task, QString style);
+    void addRunningTaskOnUI(Task *task);
 
 
     void initTurnPage();
@@ -61,6 +69,7 @@ private:
 private:
     QString _dataServerId;
     QString _fileId;
+    QString _listType;
 
     bool _isCheckable;
 
@@ -72,6 +81,7 @@ private:
     QSharedPointer<DataMappingBLL> _dataMappingBLL;
     QSharedPointer<DataRefactorBLL> _dataRefactorBLL;
     QSharedPointer<DataFileBll> _dataFileBLL;
+    QSharedPointer<TaskBLL> _taskBLL;
 
 
 
@@ -82,7 +92,7 @@ signals:
 
     void signalSwitchPage(QString pageType);
 
-    void signalChangeDataMapTaskConfigUI(QString dataMapId);
+    void signalChangeDataMapTaskConfigUI(QString serverId, QString dataMapId);
 
 
 

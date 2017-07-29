@@ -17,13 +17,20 @@ class OgmPopWidget : public OgmWidget
 public:
     OgmPopWidget(QString widgetType, QWidget *parent=0);
 
+    void changeChooseRefactorMethod(QString serverId, QString refactorId);
+
+private:
     void initNewFileWidget();
 
     void initDeleteFileWidget();
 
     void initChooseDataFile();
 
+    void initChooseRefactorMethod();
+
     void initSaveTask();
+
+
 
 
 private:

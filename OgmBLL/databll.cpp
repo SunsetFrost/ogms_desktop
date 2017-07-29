@@ -118,3 +118,10 @@ int DataRefactorBLL::getDataRefactorCount(QString serverId)
     int count=_dataRefactorDAL.data()->getDataRefactorCount(dataServer);
     return count;
 }
+
+QList<DataRefactorMethod *> DataRefactorBLL::getAllDataRefactorMethodByRefactorId(QString serverId, QString refactorId)
+{
+    DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
+    QList<DataRefactorMethod*> methodList=_dataRefactorDAL.data()->getDataRefactorMethodList(dataServer, refactorId);
+    return methodList;
+}

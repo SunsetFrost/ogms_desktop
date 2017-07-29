@@ -4,6 +4,7 @@ FORMS += \
     $$PWD/ogmminitopwidget.ui \
     $$PWD/ogmpopwidget.ui \
     $$PWD/ogmdataserviceconfig.ui \
+    $$PWD/ogmrefactortaskconfigui.ui \
 
 HEADERS += \
     $$PWD/ogmmainwidget.h \

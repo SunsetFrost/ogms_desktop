@@ -24,4 +24,6 @@ public:
     QList<SERVICEITEM> serviceList;
 };
 
+Q_DECLARE_METATYPE(Favor*)
+
 #endif // FAVOR_H

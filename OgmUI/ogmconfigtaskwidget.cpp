@@ -22,9 +22,10 @@ OgmConfigTaskWidget::OgmConfigTaskWidget(QString taskType, QWidget *parent)
     }
 }
 
-void OgmConfigTaskWidget::changeDataMapTask(QString dataMapId)
+void OgmConfigTaskWidget::changeDataMapTask(QString serverId, QString dataMapId)
 {
     _task->getDataMapTaskConfig()->id=dataMapId;
+    _task->getDataMapTaskConfig()->serverId=serverId;
 }
 
 void OgmConfigTaskWidget::initDataMapTaskConfig()

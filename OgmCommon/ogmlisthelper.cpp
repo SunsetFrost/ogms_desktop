@@ -19,6 +19,7 @@ void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemS
     item->setFixedHeight(35);
     item->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     item->setWindowTitle(itemStyle);
+    item->setAccessibleDescription("btn");
     parent->layout()->addWidget(item);
 
     QHBoxLayout *layoutItem=new QHBoxLayout();
@@ -187,3 +188,112 @@ QString OgmHelper::createUId()
     strUId=strUId.remove("}");
     return strUId;
 }
+
+QList<QVariant> OgmHelper::toVarList(QList<ModelService *> modelList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<modelList.count(); ++i){
+        QVariant var;
+        var.setValue(modelList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<DataService *> dataList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<dataList.count(); ++i){
+        QVariant var;
+        var.setValue(dataList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<DataMapping *> datamapList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<datamapList.count(); ++i){
+        QVariant var;
+        var.setValue(datamapList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<DataRefactor *> refactorList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<refactorList.count(); ++i){
+        QVariant var;
+        var.setValue(refactorList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<DataRefactorMethod *> methodList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<methodList.count(); ++i){
+        QVariant var;
+        var.setValue(methodList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<DataFile *> dataFileList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<dataFileList.count(); ++i){
+        QVariant var;
+        var.setValue(dataFileList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<Favor *> favorList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<favorList.count(); ++i){
+        QVariant var;
+        var.setValue(favorList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<Task *> taskList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<taskList.count(); ++i){
+        QVariant var;
+        var.setValue(taskList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

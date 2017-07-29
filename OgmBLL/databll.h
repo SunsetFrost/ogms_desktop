@@ -56,6 +56,8 @@ public:
 
     int getDataRefactorCount(QString serverId);
 
+    QList<DataRefactorMethod*> getAllDataRefactorMethodByRefactorId(QString serverId, QString refactorId);
+
 private:
     QSharedPointer<DataRefactorDAL> _dataRefactorDAL;
     QSharedPointer<DataServerDAL> _dataServerDAL;

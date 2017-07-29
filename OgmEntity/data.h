@@ -67,6 +67,29 @@ public:
 
 Q_DECLARE_METATYPE(DataRefactor*)
 
+class DataRefactorMethodParam
+{
+public:
+    QString dataType;
+    QString type;
+    QString name;
+    QString description;
+    QString schema;
+};
+
+
+class DataRefactorMethod
+{
+public:
+    QString name;
+    QString methodClass;
+    QString description;
+    QList<DataRefactorMethodParam*> paramList;
+};
+
+Q_DECLARE_METATYPE(DataRefactorMethod*)
+
+
 /////////////////////////////////////////
 class DataServer
 {

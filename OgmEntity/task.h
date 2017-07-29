@@ -19,6 +19,7 @@ public:
 
 public:
     QString id;
+    QString serverId;
     QString calltype;
     QString inputId;
     QString inputFilename;
@@ -65,5 +66,7 @@ private:
     DataMapTaskConfig *_dataMapTaskConfig;
     DataRefactorTaskConfig *_dataRefactorConfig;
 };
+
+Q_DECLARE_METATYPE(Task*)
 
 #endif // TASK_H

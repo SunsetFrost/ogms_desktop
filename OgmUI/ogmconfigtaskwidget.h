@@ -20,7 +20,7 @@ class OgmConfigTaskWidget : public QWidget
 public:
     explicit OgmConfigTaskWidget(QString taskType, QWidget *parent = 0);
 
-    void changeDataMapTask(QString dataMapId);
+    void changeDataMapTask(QString serverId, QString dataMapId);
 
 private:
     void initDataMapTaskConfig();
