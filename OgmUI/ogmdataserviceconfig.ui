@@ -331,6 +331,9 @@
            <property name="statusTip">
             <string>txt-ConfigDataTask</string>
            </property>
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
            <property name="placeholderText">
             <string>Please choose the input file.</string>
            </property>
@@ -472,7 +475,11 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QTextEdit" name="txtDatamapTaskXML"/>
+          <widget class="QTextEdit" name="txtDatamapTaskXML">
+           <property name="readOnly">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>

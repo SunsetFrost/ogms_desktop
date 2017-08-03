@@ -125,3 +125,31 @@ QList<DataRefactorMethod *> DataRefactorBLL::getAllDataRefactorMethodByRefactorI
     QList<DataRefactorMethod*> methodList=_dataRefactorDAL.data()->getDataRefactorMethodList(dataServer, refactorId);
     return methodList;
 }
+
+DataRefactorMethod *DataRefactorBLL::getDataRefactorByMethodName(QString serverId, QString refactorId, QString methodName)
+{
+    DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
+    QList<DataRefactorMethod*> methodList=_dataRefactorDAL.data()->getDataRefactorMethodList(dataServer, refactorId);
+
+    DataRefactorMethod *method=0;
+    for(int i=0; i<methodList.count(); ++i){
+        if(methodList[i]->name==methodName){
+            return methodList[i];
+        }
+    }
+    return method;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -28,7 +28,10 @@ public:
     //run
     QString runDatamapTask(QString serverIp, QString datamapId, QString inputId, QString inputName, QString outputPId, QString outputName, QString callType);
 
+    QString runDataRefactorTask(QString serverIp, Task *task);
+
     QVariant getDataTaskRecords(QString serverIp, QString instanceId, QString type);
+
 
 
 

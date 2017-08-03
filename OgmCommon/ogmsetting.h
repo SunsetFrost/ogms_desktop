@@ -2,6 +2,7 @@
 #define OGMSETTING_H
 
 #include <QString>
+#include <QDir>
 
 class OgmSetting
 {
@@ -11,6 +12,9 @@ public:
     static QString defaultModelServerId;
     static QString defaultDataServerId;
     static QString defaultFavorId;
+
+    static QString udxToolPath;
+    static QString omsToolPath;
 };
 
 #endif // OGMSETTING_H

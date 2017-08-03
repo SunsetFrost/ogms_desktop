@@ -12,7 +12,7 @@ OgmListHelper::OgmListHelper()
 
 }
 
-void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemStyle, QList<LISTITEM> itemList)
+void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemStyle, QList<LISTCHILD> itemList)
 {
     QToolButton *item=new QToolButton(parent);
     item->setObjectName(itemName);
@@ -31,7 +31,7 @@ void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemS
     }
 }
 
-void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTITEM> itemList)
+void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTCHILD> itemList)
 {
     QToolButton *item=new QToolButton(parent);
     item->setObjectName(itemName);
@@ -50,7 +50,7 @@ void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemS
     }
 }
 
-void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTITEM> itemList, bool checkable)
+void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTCHILD> itemList, bool checkable)
 {
     QToolButton *item=new QToolButton(parent);
     item->setObjectName(itemName);
@@ -73,6 +73,47 @@ void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemS
     for(int i=0; i<itemList.count(); ++i){
         addItemChildrenByItemStruct(item, itemList[i]);
     }
+}
+
+LISTCHILD OgmListHelper::createLableChild(QString style, int iconValue)
+{
+    LISTCHILD lbl;
+    lbl.typeValue=ItemType::Label;
+    lbl.styleName=style;
+    lbl.iconValue=iconValue;
+
+    return lbl;
+}
+
+LISTCHILD OgmListHelper::createLableChild(QString style, int width, QString text)
+{
+    LISTCHILD lbl;
+    lbl.typeValue=ItemType::Label;
+    lbl.styleName=style;
+    lbl.textValue=text;
+    lbl.fixWidth=width;
+    lbl.iconValue=0;
+
+    return lbl;
+}
+
+LISTCHILD OgmListHelper::createButtonChild(int iconValue, QString objectName, QString styleName, QString toolTip)
+{
+    LISTCHILD btn;
+    btn.typeValue=ItemType::ToolButton;
+    btn.iconValue=iconValue;
+    btn.styleName=styleName;
+    btn.toolTipValue=toolTip;
+    btn.objectName=objectName;
+
+    return btn;
+}
+
+LISTCHILD OgmListHelper::createSpaceChild()
+{
+    LISTCHILD space;
+    space.typeValue=ItemType::SpaceItem;
+    return space;
 }
 
 void OgmListHelper::addInfoItem(QWidget *parent, QString itemName, QString itemStyle, QList<INFOITEM> infoList)
@@ -115,7 +156,7 @@ void OgmListHelper::addInfoItem(QWidget *parent, QString itemName, QString itemS
     }
 }
 
-void OgmListHelper::addItemChildrenByItemStruct(QWidget *parent, LISTITEM item)
+void OgmListHelper::addItemChildrenByItemStruct(QWidget *parent, LISTCHILD item)
 {
     if(item.typeValue==ItemType::Label){
         QLabel *lbl=new QLabel(parent);
@@ -239,6 +280,28 @@ QList<QVariant> OgmHelper::toVarList(QList<DataRefactorMethod *> methodList)
     for(int i=0; i<methodList.count(); ++i){
         QVariant var;
         var.setValue(methodList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<ModelServer *> modelServerList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<modelServerList.count(); ++i){
+        QVariant var;
+        var.setValue(modelServerList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<DataServer *> dataServerList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<dataServerList.count(); ++i){
+        QVariant var;
+        var.setValue(dataServerList[i]);
         varList.append(var);
     }
     return varList;

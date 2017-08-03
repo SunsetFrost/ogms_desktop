@@ -13,6 +13,7 @@
 #include "OgmUI/ogmfavorsidebarwidget.h"
 #include "OgmUI/ogmminitopwidget.h"
 #include "OgmUI/ogmconfigtaskwidget.h"
+#include "OgmUI/ogmtoolwidget.h"
 
 namespace Ui {
 class OgmMainWidget;
@@ -50,11 +51,15 @@ private:
     OgmServerTopWidget *_widgetFavorTop;
 
     OgmMiniTopWidget *_widgetTaskTop;
+    OgmMiniTopWidget *_widgetServerTop;
 
     OgmServerSidebarWidget *_widgetServerSidebar;
     OgmFavorSidebarWidget *_widgetFavorSidebar;
 
     OgmConfigTaskWidget *_widgetDataMapTaskConfig;
+    OgmConfigTaskWidget *_widgetDataRefactorTaskConfig;
+
+    OgmToolWidget *_widgetTool;
 
     QSharedPointer<FavorBLL> _favorBLL;
     QSharedPointer<TaskBLL> _taskBLL;

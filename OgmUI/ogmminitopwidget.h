@@ -17,19 +17,24 @@ class OgmMiniTopWidget : public QWidget
 public:
     explicit OgmMiniTopWidget(QString widgetType, QWidget *parent = 0);
 
+    void taskBtnCheckStateManage(QString taskType);
+
 public:
 
 private:
-    void initWidget();
+    void initTaskWidget();
+
+    void initServerWidget();
 
 private:
     Ui::OgmMiniTopWidget *_ui;
-    QString _widgetType;
 
     QSharedPointer<TaskBLL> _taskBLL;
 
 signals:
     void signalChangeTaskList(QList<Task*> taskList, QString taskRunState);
+
+    void signalChangeServerList(QString serverType);
 };
 
 #endif // OGMMINITOPWIDGET_H

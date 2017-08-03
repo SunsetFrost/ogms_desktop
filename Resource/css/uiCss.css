@@ -100,6 +100,19 @@ QWidget[statusTip="widget-miniTop"]{
     border-color: #e1e1e2;
 }
 
+QWidget[statusTip="widget-tool-top"]{
+    background: #66cc99;
+    border:1px solid #fafafa;
+    border-top-left-radius: 10px;
+    border-top-right-radius:  10px;
+}
+QWidget[statusTip="widget-tool-bottom"]{
+    background: #ffffff;
+    border:1px solid #fafafa;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius:  10px;
+}
+
 QDialog#NjLoginDialog QLineEdit {
     color: #a8adb3;
     border:1px solid #d9dcde;
@@ -107,6 +120,10 @@ QDialog#NjLoginDialog QLineEdit {
 }
 
 /***********************************************************************************Label**********************************************************************************/
+QLabel[statusTip="lbl-light"]{
+    font-size: 14px;
+    color: #999999;
+}
 QLabel[windowTitle="lbl-light"]{
     font-size: 14px;
     color: #999999;
@@ -164,6 +181,17 @@ QLabel[statusTip="lbl-f16-normal"]{
     color: #666666;
 }
 
+QLabel[windowTitle="lbl-f16-normal"]{
+    font-size: 16px;
+    color: #666666;
+}
+
+QLabel[statusTip="lbl-f18-title"]{
+    font-size: 20px;
+    color: #666666;
+    /*font-weight: bold;*/
+}
+
 QLabel[windowTitle="lbl-split"]{
     font-size: 16px;
     color: #666666;
@@ -187,11 +215,16 @@ QLabel[windowTitle="lbl-ServerPic"]{
     background: rgb(0, 177, 125);
     font-size: 90px;
 }
-
 QLabel[statusTip="lbl-ServerPic"]{
     color: #ffffff;
     background: rgb(0, 177, 125);
     font-size: 90px;
+}
+
+QLabel[statusTip="lbl-tool-icon"]{
+    color: #ffffff;
+    background: #66cc99;
+    font-size: 70px;
 }
 
 QLabel[windowTitle="lbl-ServerPicSmall"]{
@@ -206,6 +239,11 @@ QLabel[statusTip="lbl-ServerPicSmall"]{
     background: #47a4e9;
     font-size: 12px;
     border-radius: 3px;
+}
+
+QLabel[statusTip="lbl-tool-name"]{
+    color: #ffffff;
+    font-size: 18px;
 }
 
 QLabel[windowTitle="lbl-ServerName"]{
@@ -311,6 +349,10 @@ QToolButton[windowTitle="btn-normal"] {
     font-size: 14px;
     color: #666666;
 }
+QToolButton[statusTip="btn-normal"] {
+    font-size: 14px;
+    color: #666666;
+}
 
 QToolButton[windowTitle="btn-dark"] {
     font-size: 14px;
@@ -322,6 +364,11 @@ QToolButton[windowTitle="btn-lightdark"] {
     color: #5c5c5c;
 }
 
+QToolButton[statusTip="btn-tool"] {
+    font-size: 20px;
+    color: #999999;
+}
+
 QToolButton[statusTip="btn-miniTopLeft"]{
     font-size: 16px;
     color: #666666;
@@ -329,6 +376,18 @@ QToolButton[statusTip="btn-miniTopLeft"]{
 QToolButton[statusTip="btn-miniTopLeft"]:pressed,
 QToolButton[statusTip="btn-miniTopLeft"]:hover,
 QToolButton[statusTip="btn-miniTopLeft"]:checked{
+    color:#47a4e9;
+    border-style: solid;
+    border-width: 0px 0px 3px 0px;
+    border-color: #47a4e9;
+}
+QToolButton[windowTitle="btn-miniTopLeft"]{
+    font-size: 16px;
+    color: #666666;
+}
+QToolButton[windowTitle="btn-miniTopLeft"]:pressed,
+QToolButton[windowTitle="btn-miniTopLeft"]:hover,
+QToolButton[windowTitle="btn-miniTopLeft"]:checked{
     color:#47a4e9;
     border-style: solid;
     border-width: 0px 0px 3px 0px;

@@ -82,6 +82,8 @@ class DataRefactorMethod
 {
 public:
     QString name;
+    QString serverId;
+    QString refactorId;
     QString methodClass;
     QString description;
     QList<DataRefactorMethodParam*> paramList;

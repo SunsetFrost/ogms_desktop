@@ -8,28 +8,99 @@
 
 OgmConfigTaskWidget::OgmConfigTaskWidget(QString taskType, QWidget *parent)
     : QWidget(parent)
+    , _taskType(taskType)
 {
     _taskBLL=QSharedPointer<TaskBLL>(new TaskBLL);
-
-    _task=new Task();
-    DataMapTaskConfig *dataMapConfig=new DataMapTaskConfig();
-    _task->setTaskConfig(dataMapConfig);
-
+    _dataRefactorBLL=QSharedPointer<DataRefactorBLL>(new DataRefactorBLL);
 
     if(taskType=="DataMap"){
-        _task->type="DataMap";
+
         initDataMapTaskConfig();
+    }
+    else if(taskType=="DataRefactor"){
+
+
+        initDataRefctorTaskConfig();
     }
 }
 
 void OgmConfigTaskWidget::changeDataMapTask(QString serverId, QString dataMapId)
 {
+    //init task
+    _task=new Task();
+    DataMapTaskConfig *dataMapConfig=new DataMapTaskConfig();
+    _task->setTaskConfig(dataMapConfig);
+    _task->type="DataMap";
+
     _task->getDataMapTaskConfig()->id=dataMapId;
     _task->getDataMapTaskConfig()->serverId=serverId;
+
+}
+
+void OgmConfigTaskWidget::changeDataRefactorTask(QString serverId, QString dataRefactorId, QString methodName)
+{
+    //clear btn
+    while (_uiDataRefactor->widgetBtnParamsGroup->layout()->count()>0) {
+        QWidget *widgetDel=_uiDataRefactor->widgetBtnParamsGroup->layout()->itemAt(0)->widget();
+        _uiDataRefactor->widgetBtnParamsGroup->layout()->removeWidget(widgetDel);
+        delete widgetDel;
+    }
+    DataRefactorMethod *method=_dataRefactorBLL.data()->getDataRefactorByMethodName(serverId, dataRefactorId, methodName);
+
+    //init task
+    _task=new Task();
+    DataRefactorTaskConfig *dataRefactorConfig=new DataRefactorTaskConfig();
+    dataRefactorConfig->id=dataRefactorId;
+    dataRefactorConfig->serverId=serverId;
+    dataRefactorConfig->methodName=methodName;
+
+    _task->type="DataRefactor";
+    QList<TASKREFACTORPARAM> paramList;
+    for(int j=0; j<method->paramList.count(); ++j){
+        TASKREFACTORPARAM param;
+        paramList.append(param);
+    }
+    dataRefactorConfig->paramList=paramList;
+    _task->setTaskConfig(dataRefactorConfig);
+
+    //ui
+    _uiDataRefactor->lblRefactorName->setText(method->name);
+    _uiDataRefactor->lblRefactorDesc->setText(method->description);
+
+    for(int i=0; i<method->paramList.count(); ++i){
+        QToolButton *btnParam=new QToolButton(_uiDataRefactor->widgetBtnParamsGroup);
+        btnParam->setText(method->paramList.at(i)->name);
+        btnParam->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        btnParam->setWindowTitle("btn-miniTopLeft");
+        btnParam->setCheckable(true);
+        btnParam->setAccessibleDescription(QString::number(i));
+
+        connect(btnParam, &QToolButton::clicked, [=](){
+            //btn check state
+            _paramIndex=btnParam->accessibleDescription();
+            _uiDataRefactor->txtRefactorTaskConfigInput->setText(QString());
+
+            QList<QToolButton*> btns=_uiDataRefactor->widgetBtnParamsGroup->findChildren<QToolButton*>();
+            foreach(QToolButton *mBtn, btns){
+                if(mBtn==btnParam){
+                    mBtn->setChecked(true);
+                }
+                else{
+                    mBtn->setChecked(false);
+                }
+            }
+
+            changeMethodParamUI(method->paramList.at(i));
+        });
+        _uiDataRefactor->widgetBtnParamsGroup->layout()->addWidget(btnParam);
+    }
+    //init param
+    changeMethodParamUI(method->paramList.at(0));
 }
 
 void OgmConfigTaskWidget::initDataMapTaskConfig()
 {
+    //init ui
     _uiDataMap=new Ui::DataMapTaskConfigUI();
     _uiDataMap->setupUi(this);
 
@@ -38,8 +109,25 @@ void OgmConfigTaskWidget::initDataMapTaskConfig()
     OgmUiHelper::Instance()->setButtonIcon(_uiDataMap->btnDataMapTaskSave, 0xf0c2, "Save", 6);
     OgmUiHelper::Instance()->setButtonIcon(_uiDataMap->btnDataMapTaskSaveAs, 0xf02e, "Save as", 6);
 
+    //init function
     connect(_uiDataMap->btnDataMapTaskChooseInput, &QToolButton::clicked, this, &OgmConfigTaskWidget::chooseFile);
     connect(_uiDataMap->btnDataMapTaskSave, &QToolButton::clicked, this, &OgmConfigTaskWidget::saveTask);
+}
+
+void OgmConfigTaskWidget::initDataRefctorTaskConfig()
+{
+    //init ui
+    _uiDataRefactor=new Ui::DataRefactorTaskConfigUI();
+    _uiDataRefactor->setupUi(this);
+
+    OgmUiHelper::Instance()->setButtonIcon(_uiDataRefactor->btnRefactorTaskConfigInput, 0xf07c, "Choose", 6);
+
+    OgmUiHelper::Instance()->setButtonIcon(_uiDataRefactor->btnRefactorTaskConfigSaveTask, 0xf0c2, "Save", 6);
+    OgmUiHelper::Instance()->setButtonIcon(_uiDataRefactor->btnRefactorTaskConfigSaveAsTask, 0xf02e, "Save as", 6);
+
+    //init function
+    connect(_uiDataRefactor->btnRefactorTaskConfigInput, &QToolButton::clicked, this, &OgmConfigTaskWidget::chooseFile);
+    connect(_uiDataRefactor->btnRefactorTaskConfigSaveTask, &QToolButton::clicked, this, &OgmConfigTaskWidget::saveTask);
 }
 
 void OgmConfigTaskWidget::uiInfo2task()
@@ -62,15 +150,24 @@ void OgmConfigTaskWidget::saveTask()
        _task->runstate="ToRun";
        _task->createTime=QDateTime::currentDateTime().toString("yyyy-MM-dd");
 
-       //ui
-       if(_uiDataMap->radioButtonSrc2Udx->isChecked()){
-           _task->getDataMapTaskConfig()->calltype="src2udx";
+       if(_taskType=="DataMap"){
+           if(_uiDataMap->radioButtonSrc2Udx->isChecked()){
+               _task->getDataMapTaskConfig()->calltype="src2udx";
+           }
+           else if(_uiDataMap->radioButtonUdx2Src->isChecked()){
+               _task->getDataMapTaskConfig()->calltype="udx2src";
+           }
+           _task->getDataMapTaskConfig()->outputFilename=_uiDataMap->txtDatamapTaskOutput->text();
        }
-       else if(_uiDataMap->radioButtonUdx2Src->isChecked()){
-           _task->getDataMapTaskConfig()->calltype="udx2src";
+       else if(_taskType=="DataRefactor"){
+           int paramsCount= _task->getDataRefactorTaskConfig()->paramList.count();
+           _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].oid=QString();
+           _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].fileName=_uiDataRefactor->txtRefactorTaskConfigInput->text();
+           _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].pid=_task->getDataRefactorTaskConfig()->paramList[paramsCount-2].pid;
+           _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].ioType="out";
        }
-       _task->getDataMapTaskConfig()->outputDirId="-1";
-       _task->getDataMapTaskConfig()->outputFilename=_uiDataMap->txtDatamapTaskOutput->text();
+
+
 
        _taskBLL.data()->saveTask(_task);
        emit signalSwitchPage("TaskList");
@@ -82,10 +179,42 @@ void OgmConfigTaskWidget::chooseFile()
     OgmPopWidget *widgetPop=new OgmPopWidget("ChooseFile");
     widgetPop->show();
     connect(widgetPop, &OgmPopWidget::signalOperationResult, [=](QVariant varFileInfo){
-        QStringList strList=varFileInfo.toStringList();
-        _task->getDataMapTaskConfig()->inputId=strList[0];
-        _task->getDataMapTaskConfig()->inputFilename=strList[1];
+        if(_taskType=="DataMap"){
+            QStringList strList=varFileInfo.toStringList();
+            _task->getDataMapTaskConfig()->inputId=strList[0];
+            _task->getDataMapTaskConfig()->inputFilename=strList[1];
+            _task->getDataMapTaskConfig()->outputDirId=strList[2];
+            _uiDataMap->txtDatamapTaskInput->setText(strList[1]);
+        }
+        else if(_taskType=="DataRefactor"){
+            QStringList strList=varFileInfo.toStringList();
+            _task->getDataRefactorTaskConfig()->paramList[_paramIndex.toInt()].oid=strList[0];
+            _task->getDataRefactorTaskConfig()->paramList[_paramIndex.toInt()].fileName=strList[1];
+            _task->getDataRefactorTaskConfig()->paramList[_paramIndex.toInt()].pid=strList[2];
+            _task->getDataRefactorTaskConfig()->paramList[_paramIndex.toInt()].ioType="in";
+
+            _uiDataRefactor->txtRefactorTaskConfigInput->setText(strList[1]);
+        }
     });
+}
+
+void OgmConfigTaskWidget::changeMethodParamUI(DataRefactorMethodParam *param)
+{
+    _uiDataRefactor->lblParamName->setText(param->name);
+    _uiDataRefactor->lblParamType->setText(param->type);
+    _uiDataRefactor->lblParamDescription->setText(param->description);
+    _uiDataRefactor->txtRefactorTaskConfigInput->setText(QString());
+
+    if(param->type=="in"){
+        _uiDataRefactor->lblMethodParamType->setText("Input data");
+        _uiDataRefactor->txtRefactorTaskConfigInput->setReadOnly(true);
+        _uiDataRefactor->btnRefactorTaskConfigInput->setHidden(false);
+    }
+    else if(param->type=="out"){
+        _uiDataRefactor->lblMethodParamType->setText("Output data");
+        _uiDataRefactor->txtRefactorTaskConfigInput->setReadOnly(false);
+        _uiDataRefactor->btnRefactorTaskConfigInput->setHidden(true);
+    }
 }
 
 //Task *OgmConfigTaskWidget::uiInfo2task()

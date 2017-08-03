@@ -73,17 +73,17 @@ QList<ModelService *> ModelServiceDAL::json2modelServiceList(QByteArray modelLis
 ModelServerDAL::ModelServerDAL()
 {
     ModelServer *modelServerA=new ModelServer();       modelServerA->id="0000";
-    modelServerA->name="ServerAlpha";           modelServerA->system="Windows";
+    modelServerA->name="ModelServerAlpha";           modelServerA->system="Windows";
     modelServerA->modelNum="78";                modelServerA->location="NJ,China";
     modelServerA->ip="127.0.0.1";               modelServerA->isConnect=true;
 
     ModelServer *modelServerB=new ModelServer();       modelServerB->id="0001";
-    modelServerB->name="ServerBeta";            modelServerB->system="Windows";
+    modelServerB->name="ModelServerBeta";            modelServerB->system="Windows";
     modelServerB->modelNum="142";               modelServerB->location="NJ,China";
     modelServerB->ip="223.2.41.140";            modelServerB->isConnect=true;
 
     ModelServer *modelServerC=new ModelServer();       modelServerC->id="0002";
-    modelServerC->name="ServerGamma";           modelServerC->system="Windows";
+    modelServerC->name="ModelServerGamma";           modelServerC->system="Windows";
     modelServerC->modelNum="158";               modelServerC->location="NJ,China";
     modelServerC->ip="222.192.7.75";            modelServerC->isConnect=true;
 

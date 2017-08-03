@@ -85,6 +85,9 @@ void OgmMainWidget::initFunction()
     //model top
     connect(_widgetModelServerTop, &OgmServerTopWidget::signalChangeModelServer, _widgetServerSidebar, &OgmServerSidebarWidget::changeModelServerUI);
 
+    //server top
+    connect(_widgetServerTop, &OgmMiniTopWidget::signalChangeServerList, _widgetList, &OgmListWidget::changeServerListUI);
+
     //file top
     connect(_widgetFileServerTop, &OgmServerTopWidget::signalChangeDataFileByParentId, _widgetList, &OgmListWidget::changeFileListUIByParentId);
 
@@ -111,6 +114,7 @@ void OgmMainWidget::initFunction()
     connect(_widgetList, &OgmListWidget::signalAddFolderOnFileLink, _widgetFileServerTop, &OgmServerTopWidget::addOneFileLinkOnUI);
     connect(_widgetList, &OgmListWidget::signalAddFavorSidebar, _widgetFavorSidebar, &OgmFavorSidebarWidget::changeChooseFavorUI);
     connect(_widgetList, &OgmListWidget::signalChangeDataMapTaskConfigUI, _widgetDataMapTaskConfig, &OgmConfigTaskWidget::changeDataMapTask);
+    connect(_widgetList, &OgmListWidget::signalChangeDataRefactorTaskConfigUI, _widgetDataRefactorTaskConfig, &OgmConfigTaskWidget::changeDataRefactorTask);
     connect(_widgetList, &OgmListWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
 
     //server sidebar
@@ -153,14 +157,20 @@ void OgmMainWidget::initChildWidget()
     _scrollArea->setWidgetResizable(widgetListPage);
 
     QVBoxLayout *layoutListPage=new QVBoxLayout();
-    layoutListPage->setMargin(0);
+    layoutListPage->setContentsMargins(10, 0, 10, 10);
     layoutListPage->setSpacing(0);
     widgetListPage->setLayout(layoutListPage);
 
     //init taskConfig
     _widgetDataMapTaskConfig=new OgmConfigTaskWidget("DataMap", widgetListPage);
     _ui->widgetContent->layout()->addWidget(_widgetDataMapTaskConfig);
-    _widgetDataMapTaskConfig->setHidden(true);
+
+    _widgetDataRefactorTaskConfig=new OgmConfigTaskWidget("DataRefactor", widgetListPage);
+    _ui->widgetContent->layout()->addWidget(_widgetDataRefactorTaskConfig);
+
+    //init tool
+    _widgetTool=new OgmToolWidget(_ui->widgetContent);
+    _ui->widgetContent->layout()->addWidget(_widgetTool);
 
     //init serverTop
     _widgetDataServerTop=new OgmServerTopWidget("Data", widgetListPage);
@@ -182,6 +192,9 @@ void OgmMainWidget::initChildWidget()
     _widgetTaskTop=new OgmMiniTopWidget("Task", widgetListPage);
     layoutListPage->addWidget(_widgetTaskTop);
 
+    _widgetServerTop=new OgmMiniTopWidget("Server", widgetListPage);
+    layoutListPage->addWidget(_widgetServerTop);
+
     //init list
     _widgetList=new OgmListWidget(widgetListPage);
     layoutListPage->addWidget(_widgetList);
@@ -200,6 +213,12 @@ void OgmMainWidget::btnSideBarClicked()
     }
     else if(btnName=="btnHomeData"){
         switchPage("DataList");
+    }
+    else if(btnName=="btnHomeServer"){
+        switchPage("ServerList");
+    }
+    else if(btnName=="btnHomeTool"){
+        switchPage("Tool");
     }
     else if(btnName=="btnSpaceTask"){
         switchPage("TaskList");
@@ -240,17 +259,24 @@ void OgmMainWidget::switchPage(QString type)
     _widgetServerSidebar->setHidden(true);
     _widgetFavorSidebar->setHidden(true);
     _scrollArea->setHidden(true);
+    _widgetTool->setHidden(true);
 
     _widgetDataServerTop->setHidden(true);
     _widgetModelServerTop->setHidden(true);
     _widgetFileServerTop->setHidden(true);
     _widgetFavorTop->setHidden(true);
     _widgetTaskTop->setHidden(true);
+    _widgetServerTop->setHidden(true);
+
     _widgetDataMapTaskConfig->setHidden(true);
+    _widgetDataRefactorTaskConfig->setHidden(true);
 
     _widgetList->setHidden(true);
 
     if(type=="Home"){
+    }
+    else if(type=="Tool"){
+        _widgetTool->setHidden(false);
     }
     else if(type=="DataList"){
         _widgetList->changeDataListUI(_widgetDataServerTop->getCurrentId(), "Data");
@@ -263,6 +289,14 @@ void OgmMainWidget::switchPage(QString type)
         _widgetList->changeModelListUI(_widgetModelServerTop->getCurrentId());
 
         _widgetModelServerTop->setHidden(false);
+        _widgetList->setHidden(false);
+        _scrollArea->setHidden(false);
+    }
+    else if(type=="ServerList"){
+        _widgetList->changeServerListUI("ModelServer");
+        _widgetServerTop->taskBtnCheckStateManage("ModelServer");
+
+        _widgetServerTop->setHidden(false);
         _widgetList->setHidden(false);
         _scrollArea->setHidden(false);
     }
@@ -287,11 +321,15 @@ void OgmMainWidget::switchPage(QString type)
         _widgetList->changeTaskListUI(taskList, "ToRun");
 
         _widgetTaskTop->setHidden(false);
+        _widgetTaskTop->taskBtnCheckStateManage("ToRun");
         _widgetList->setHidden(false);
         _scrollArea->setHidden(false);
     }
     else if(type=="DataMapTaskConfig"){
         _widgetDataMapTaskConfig->setHidden(false);
+    }
+    else if(type=="DataRefactorTaskConfig"){
+        _widgetDataRefactorTaskConfig->setHidden(false);
     }
 }
 

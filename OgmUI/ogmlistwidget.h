@@ -18,6 +18,8 @@ public:
     explicit OgmListWidget(QWidget *parent = 0);
 
 public:
+    QString getServerId();
+
     void changeModelListUI(QString serverId);
     void changeModelListUI(QList<ModelService*> modelList);
 
@@ -29,6 +31,10 @@ public:
     void changeFileListUI(QList<DataFile*> dataFileList);
     void changeFileListUI(QString serverId, QString type);
     void changeFileListUIByParentId(QString serverId, QString parentId);
+
+    void changeServerListUI(QString serverType);
+
+
     //data file choose
     void setFileListState(QString state);
     QVariant getCheckFileInfo();
@@ -36,17 +42,19 @@ public:
 //    void changeTaskListUI(QString taskType);
     void changeTaskListUI(QList<Task*> taskList, QString taskRunState);
 
-    void changeRefactorMethodListUI(QString refactorId);
+    void changeRefactorMethodListUI(QString serverId, QString refactorId);
 
 
 
 private:
     void initWidget();
-    void clearList();
 
+    void clearList();
     void listPaging(QList<QVariant> varList, int pageAmount);
     void addListIntelligent(QVariant var, QString style);
+    void setAllBtnUnCheck();
 
+    //add list
     void addOneDataOnUI(DataService *data, QString style);
     void addOneDataMappingOnUI(DataMapping *data, QString style);
     void addOneDataRefactorOnUI(DataRefactor *data, QString style);
@@ -59,12 +67,14 @@ private:
     void addOneTaskOnUI(Task *task, QString style);
     void addRunningTaskOnUI(Task *task);
 
+    void addOneServerOnUI(ModelServer *modelServer, QString style);
+    void addOneServerOnUI(DataServer *dataServer, QString style);
 
     void initTurnPage();
-
     void btnTurnPageClicked();
 
-    void setAllBtnUnCheck();
+    void popChooseDataMethodWidget();
+
 
 private:
     QString _dataServerId;
@@ -77,6 +87,8 @@ private:
     QWidget *_widgetTurnPage;
 
     QSharedPointer<ModelServiceBLL> _modelServiceBLL;
+    QSharedPointer<ModelServerBLL> _modelServerBLL;
+    QSharedPointer<DataServerBLL> _dataServerBLL;
     QSharedPointer<DataServiceBLL> _dataServiceBLL;
     QSharedPointer<DataMappingBLL> _dataMappingBLL;
     QSharedPointer<DataRefactorBLL> _dataRefactorBLL;
@@ -93,6 +105,7 @@ signals:
     void signalSwitchPage(QString pageType);
 
     void signalChangeDataMapTaskConfigUI(QString serverId, QString dataMapId);
+    void signalChangeDataRefactorTaskConfigUI(QString serverId, QString refactorId, QString methodName);
 
 
 

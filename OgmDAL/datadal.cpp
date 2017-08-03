@@ -110,8 +110,8 @@ QList<DataService *> DataServiceDAL::json2dataServiceList(QByteArray dataStr, QS
 DataServerDAL::DataServerDAL()
 {
     DataServer *dataServerA=new DataServer();
-    dataServerA->id="1000";      dataServerA->ip="223.2.47.235:8899";
-    dataServerA->name="ServerAlpha";  dataServerA->system="Windows";
+    dataServerA->id="1000";      dataServerA->ip="223.2.35.240:8899";
+    dataServerA->name="DataServerAlpha";  dataServerA->system="Windows";
     dataServerA->location="NJ,China";
 
     DataServer *dataServerB=new DataServer();
@@ -287,7 +287,7 @@ QList<DataRefactorMethod *> DataRefactorDAL::getDataRefactorMethodList(DataServe
     QString request="http://"+ip+"/refactor/methods?id="+refactorId;
     QByteArray result=OgmNetWork::get(request);
 
-    return json2dataRefactorMethodList(result, server->id);
+    return json2dataRefactorMethodList(result, server->id, refactorId);
 }
 
 QList<DataRefactor *> DataRefactorDAL::json2dataRefactorList(QByteArray dataStr, QString serverId)
@@ -324,7 +324,7 @@ QList<DataRefactor *> DataRefactorDAL::json2dataRefactorList(QByteArray dataStr,
     }
 }
 
-QList<DataRefactorMethod *> DataRefactorDAL::json2dataRefactorMethodList(QByteArray byte, QString serverId)
+QList<DataRefactorMethod *> DataRefactorDAL::json2dataRefactorMethodList(QByteArray byte, QString serverId, QString refactorId)
 {
     QJsonParseError jsonError;
     QJsonObject jsonObj=QJsonDocument::fromJson(byte, &jsonError).object();
@@ -338,16 +338,18 @@ QList<DataRefactorMethod *> DataRefactorDAL::json2dataRefactorMethodList(QByteAr
             QJsonObject jsonMethod=jsonMethodArray.at(i).toObject();
 
             DataRefactorMethod *method=new DataRefactorMethod();
+            method->serverId=serverId;
+            method->refactorId=refactorId;
+
             method->name=jsonMethod.value("@name").toString();
             method->methodClass=jsonMethod.value("@class").toString();
             method->description=jsonMethod.value("@description").toString();
 
             QList<DataRefactorMethodParam*> paramList;
-            method->paramList=paramList;
 
             QJsonArray jsonParamArray=jsonMethod.value("Params").toArray();
             for(int j=0; j<jsonParamArray.size(); ++j){
-                QJsonObject jsonParam=jsonParamArray.at(i).toObject();
+                QJsonObject jsonParam=jsonParamArray.at(j).toObject();
 
                 DataRefactorMethodParam *param=new DataRefactorMethodParam();
                 param->dataType=jsonParam.value("@datatype").toString();
@@ -358,6 +360,7 @@ QList<DataRefactorMethod *> DataRefactorDAL::json2dataRefactorMethodList(QByteAr
 
                 paramList.append(param);
             }
+            method->paramList=paramList;
 
             methodList.append(method);
         }

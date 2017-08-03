@@ -5,6 +5,7 @@ FORMS += \
     $$PWD/ogmpopwidget.ui \
     $$PWD/ogmdataserviceconfig.ui \
     $$PWD/ogmrefactortaskconfigui.ui \
+    $$PWD/ogmtoolui.ui \
 
 HEADERS += \
     $$PWD/ogmmainwidget.h \
@@ -15,6 +16,7 @@ HEADERS += \
     $$PWD/ogmminitopwidget.h \
     $$PWD/ogmpopwidget.h \
     $$PWD/ogmconfigtaskwidget.h \
+    $$PWD/ogmtoolwidget.h \
 
 SOURCES += \
     $$PWD/ogmmainwidget.cpp \
@@ -25,4 +27,5 @@ SOURCES += \
     $$PWD/ogmminitopwidget.cpp \
     $$PWD/ogmpopwidget.cpp \
     $$PWD/ogmconfigtaskwidget.cpp \
+    $$PWD/ogmtoolwidget.cpp \
 

@@ -30,14 +30,25 @@ private:
 
     void initSaveTask();
 
+    //file
+    void addOneFileLinkOnUI(QString fileId, QString fileName);
+    void removeNextAllFileLink(QString fileId, QString fileName);
+
 
 
 
 private:
     Ui::OgmPopUI *_ui;
 
+    //file
+    QString _currentFileId;
+    QList<QString> _fileLinkList;
+
 signals:
     void signalOperationResult(QVariant result);
+
+    void signalSwitchPage(QString pageType);
+    void signalChangeDataRefactorConfigUI(QString serverId, QString refactorId, QString methodName);
 };
 
 #endif // OGMPOPWIDGET_H

@@ -22,6 +22,9 @@ public:
     static QList<QVariant> toVarList(QList<DataRefactor *> refactorList);
     static QList<QVariant> toVarList(QList<DataRefactorMethod*> methodList);
 
+    static QList<QVariant> toVarList(QList<ModelServer *> modelServerList);
+    static QList<QVariant> toVarList(QList<DataServer *> dataServerList);
+
     static QList<QVariant> toVarList(QList<DataFile*> dataFileList);
 
     static QList<QVariant> toVarList(QList<Favor*> favorList);
@@ -40,7 +43,7 @@ enum ItemType{
     ToolButtonWithText
 };
 
-struct LISTITEM{
+struct LISTCHILD{
     QString objectName;
     QString styleName;
     int iconValue;
@@ -54,7 +57,7 @@ struct LISTITEM{
 
 struct INFOITEM{
     QString itemName;
-    QList<LISTITEM> listItemList;
+    QList<LISTCHILD> listItemList;
 };
 
 class OgmListHelper
@@ -62,16 +65,19 @@ class OgmListHelper
 public:
     OgmListHelper();
 
-    static void addListItem(QWidget *parent, QString itemName, QString itemStyle, QList<LISTITEM> itemList);
+    static void addListItem(QWidget *parent, QString itemName, QString itemStyle, QList<LISTCHILD> itemList);
+    static void addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTCHILD> itemList);
+    static void addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTCHILD> itemList, bool checkable);
 
-    static void addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTITEM> itemList);
-
-    static void addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTITEM> itemList, bool checkable);
+    static LISTCHILD createLableChild(QString style, int iconValue);
+    static LISTCHILD createLableChild(QString style, int width, QString text);
+    static LISTCHILD createButtonChild(int iconValue, QString objectName, QString styleName, QString toolTip);
+    static LISTCHILD createSpaceChild();
 
     static void addInfoItem(QWidget *parent, QString itemName, QString itemStyle, QList<INFOITEM> infoList);
 
 private:
-    static void addItemChildrenByItemStruct(QWidget *parent, LISTITEM item);
+    static void addItemChildrenByItemStruct(QWidget *parent, LISTCHILD item);
 };
 
 #endif // OGMLISTHELPER_H

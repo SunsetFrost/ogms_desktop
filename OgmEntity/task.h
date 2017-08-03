@@ -30,11 +30,23 @@ public:
 };
 
 ///////////////////////////
+struct TASKREFACTORPARAM{
+    QString oid;
+    QString fileName;
+    QString pid;
+    QString ioType;
+};
+
 class DataRefactorTaskConfig
 {
 public:
     DataRefactorTaskConfig();
 
+public:
+    QString id;
+    QString serverId;
+    QString methodName;
+    QList<TASKREFACTORPARAM> paramList;
 };
 
 ////////////////////////////////

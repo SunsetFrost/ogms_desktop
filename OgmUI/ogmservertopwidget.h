@@ -50,7 +50,7 @@ private:
     QSharedPointer<FavorBLL> _favorBLL;
     QSharedPointer<DataFileBll> _dataFileBLL;
 
-    QString _id;
+    QString _serverId;
     QString _currentFileId;
 
     QList<QString> _fileLinkList;

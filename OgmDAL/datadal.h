@@ -59,7 +59,7 @@ public:
 private:
     QList<DataRefactor*> json2dataRefactorList(QByteArray dataStr, QString serverId);
 
-    QList<DataRefactorMethod*> json2dataRefactorMethodList(QByteArray byte, QString serverId);
+    QList<DataRefactorMethod*> json2dataRefactorMethodList(QByteArray byte, QString serverId, QString refactorId);
 };
 
 /////////////////////////////////////////////////

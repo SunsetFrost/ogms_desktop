@@ -41,6 +41,23 @@ void TaskBLL::changeTaskRunState(QString taskId, QString taskRunState)
     _taskDAL.data()->changeTaskRunState(taskId, taskRunState);
 }
 
+QList<Task *> TaskBLL::getSpecificTaskListFromTaskList(QList<Task *> taskList, QString taskRunState, QString taskType)
+{
+    QList<Task*> specificList;
+    for(int i=0; i<taskList.count(); ++i){
+        if(!taskRunState.isEmpty()){
+            if(taskList.at(i)->runstate!=taskRunState)
+                continue;
+        }
+        if(!taskType.isEmpty()){
+            if(taskList.at(i)->type!=taskType)
+                continue;
+        }
+        specificList.append(taskList.at(i));
+    }
+    return specificList;
+}
+
 QString TaskBLL::runDatamapTask(Task *task)
 {
     DataServer *server=_dataServerDAL.data()->getServerById(task->getDataMapTaskConfig()->serverId);
@@ -57,6 +74,25 @@ QString TaskBLL::runDatamapTask(Task *task)
     }
 
     QString result=_taskDAL.data()->getDataTaskRecords(server->ip, instanceId, "datamap").toString();
+    return result;
+}
+
+QString TaskBLL::runDataRefactorTask(Task *task)
+{
+    DataServer *server=_dataServerDAL.data()->getServerById(task->getDataRefactorTaskConfig()->serverId);
+
+    QString instanceId=_taskDAL.data()->runDataRefactorTask(server->ip, task);
+
+    //polling model run info until model run finish
+    bool isFinish=false;
+    while(isFinish==false){
+        QEventLoop timeLoop;
+        QTimer::singleShot(3000, &timeLoop, SLOT(quit()));
+        timeLoop.exec();
+        isFinish=isTaskFinish(server->ip, instanceId, "refactor");
+    }
+
+    QString result=_taskDAL.data()->getDataTaskRecords(server->ip, instanceId, "refactor").toString();
     return result;
 }
 

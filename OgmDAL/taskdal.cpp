@@ -92,6 +92,19 @@ QString TaskDAL::runDatamapTask(QString serverIp, QString datamapId, QString inp
     return strResult;
 }
 
+QString TaskDAL::runDataRefactorTask(QString serverIp, Task *task)
+{
+    QString request="http://"+serverIp+"/refactor/call?id="+task->getDataRefactorTaskConfig()->id+"&method="+task->getDataRefactorTaskConfig()->methodName+"&username=admin";
+    for(int i=0; i<task->getDataRefactorTaskConfig()->paramList.count(); ++i){
+        request.append("&params[]={\"oid\":\""+task->getDataRefactorTaskConfig()->paramList[i].oid+"\",\"filename\":\""+task->getDataRefactorTaskConfig()->paramList.at(i).fileName+"\",\"pid\":\""+task->getDataRefactorTaskConfig()->paramList.at(i).pid+"\",\"iotype\":\""+task->getDataRefactorTaskConfig()->paramList.at(i).ioType+"\"}");
+    }
+
+    QByteArray result=OgmNetWork::get(request);
+
+    QString strResult=result;
+    return strResult;
+}
+
 QVariant TaskDAL::getDataTaskRecords(QString serverIp, QString instanceId, QString type)
 {
     QString request="http://"+serverIp+"/common/records?guid="+instanceId+"&type="+type;
@@ -134,8 +147,9 @@ void TaskDAL::task2xml(Task *task, QDomDocument *doc)
     elementTask.setAttributeNode(attr);
     doc->appendChild(elementTask);
 
-    DataMapTaskConfig *dataMapTask=task->getDataMapTaskConfig();
-    if(!dataMapTask->id.isEmpty()){
+    if(task->type=="DataMap"){
+        DataMapTaskConfig *dataMapTask=task->getDataMapTaskConfig();
+
         QDomElement elementDataTaskConfig=doc->createElement("DataMapConfig");
 
         attr=doc->createAttribute("id");
@@ -176,6 +190,49 @@ void TaskDAL::task2xml(Task *task, QDomDocument *doc)
 
         elementDataTaskConfig.appendChild(elementOutput);
     }
+    else if(task->type=="DataRefactor"){
+        DataRefactorTaskConfig *dataRefactorTask=task->getDataRefactorTaskConfig();
+
+        QDomElement elementRefactorConfig=doc->createElement("DataRefactorConfig");
+
+        attr=doc->createAttribute("id");
+        attr.setValue(dataRefactorTask->id);
+        elementRefactorConfig.setAttributeNode(attr);
+
+        attr=doc->createAttribute("serverId");
+        attr.setValue(dataRefactorTask->serverId);
+        elementRefactorConfig.setAttributeNode(attr);
+
+        attr=doc->createAttribute("methodName");
+        attr.setValue(dataRefactorTask->methodName);
+        elementRefactorConfig.setAttributeNode(attr);
+
+        elementTask.appendChild(elementRefactorConfig);
+
+        for(int i=0; i<dataRefactorTask->paramList.count(); ++i){
+            QDomElement elementParam=doc->createElement("RefactorParam");
+
+            attr=doc->createAttribute("oid");
+            attr.setValue(dataRefactorTask->paramList[i].oid);
+            elementParam.setAttributeNode(attr);
+
+            attr=doc->createAttribute("filename");
+            attr.setValue(dataRefactorTask->paramList[i].fileName);
+            elementParam.setAttributeNode(attr);
+
+            attr=doc->createAttribute("pid");
+            attr.setValue(dataRefactorTask->paramList[i].pid);
+            elementParam.setAttributeNode(attr);
+
+            attr=doc->createAttribute("iotype");
+            attr.setValue(dataRefactorTask->paramList[i].ioType);
+            elementParam.setAttributeNode(attr);
+
+            elementRefactorConfig.appendChild(elementParam);
+        }
+    }
+
+
 
 }
 
@@ -192,7 +249,7 @@ void TaskDAL::xml2task(QDomDocument *doc, Task *task)
     if(task->type=="DataMap"){
         DataMapTaskConfig *dataMapTask=new DataMapTaskConfig();
 
-        QDomElement elementDataMapConfig=elementTask.firstChildElement();
+        QDomElement elementDataMapConfig=elementTask.firstChildElement("DataMapConfig");
         dataMapTask->id=elementDataMapConfig.attributeNode("id").value();
         dataMapTask->serverId=elementDataMapConfig.attributeNode("serverId").value();
         dataMapTask->calltype=elementDataMapConfig.attributeNode("callType").value();
@@ -206,6 +263,29 @@ void TaskDAL::xml2task(QDomDocument *doc, Task *task)
         dataMapTask->outputFilename=elementOutput.attributeNode("filename").value();
 
         task->setTaskConfig(dataMapTask);
+    }
+    else if(task->type=="DataRefactor"){
+        DataRefactorTaskConfig *refactorTask=new DataRefactorTaskConfig();
+
+        QDomElement elementReafactorConfig=elementTask.firstChildElement("DataRefactorConfig");
+        refactorTask->id=elementReafactorConfig.attributeNode("id").value();
+        refactorTask->serverId=elementReafactorConfig.attributeNode("serverId").value();
+        refactorTask->methodName=elementReafactorConfig.attributeNode("methodName").value();
+
+        QDomNodeList nodeParamList=elementReafactorConfig.childNodes();
+        QList<TASKREFACTORPARAM> paramList;
+        for(int i=0; i<nodeParamList.size(); ++i){
+            TASKREFACTORPARAM param;
+            param.oid=nodeParamList.at(i).toElement().attributeNode("oid").value();
+            param.fileName=nodeParamList.at(i).toElement().attributeNode("filename").value();
+            param.pid=nodeParamList.at(i).toElement().attributeNode("pid").value();
+            param.ioType=nodeParamList.at(i).toElement().attributeNode("iotype").value();
+
+            paramList.append(param);
+        }
+        refactorTask->paramList=paramList;
+
+        task->setTaskConfig(refactorTask);
     }
 }
 
