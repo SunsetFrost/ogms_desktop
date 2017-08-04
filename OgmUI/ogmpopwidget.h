@@ -22,7 +22,11 @@ public:
 private:
     void initNewFileWidget();
 
+    void initNewFavorGroupWidget();
+
     void initDeleteFileWidget();
+
+    void initDeleteFavorWidget();
 
     void initChooseDataFile();
 

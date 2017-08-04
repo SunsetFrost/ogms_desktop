@@ -73,13 +73,13 @@ void OgmMainWidget::initFunction()
 
     //data top
     connect(_widgetDataServerTop, &OgmServerTopWidget::signalChangeDataList, [=](QString serverId){
-        _widgetList->changeDataListUI(serverId, "Data");
+        _widgetList->changeDataListUI(serverId, "Data", 0);
     });
     connect(_widgetDataServerTop, &OgmServerTopWidget::signalChangeDataMappingList, [=](QString serverId){
-        _widgetList->changeDataListUI(serverId, "DataMapping");
+        _widgetList->changeDataListUI(serverId, "DataMapping", 0);
     });
     connect(_widgetDataServerTop, &OgmServerTopWidget::signalChangeDataRefactorList, [=](QString serverId){
-        _widgetList->changeDataListUI(serverId, "DataRefactor");
+        _widgetList->changeDataListUI(serverId, "DataRefactor", 0);
     });
 
     //model top
@@ -120,7 +120,7 @@ void OgmMainWidget::initFunction()
     //server sidebar
     connect(_widgetServerSidebar, &OgmServerSidebarWidget::signalChangeModelList, [=](QString serverId){
         _widgetModelServerTop->changeModelServer(serverId);
-        _widgetList->changeModelListUI(serverId);
+        _widgetList->changeModelListUIByPage(serverId, 0);
     });
 
     //favor sidebar
@@ -144,6 +144,10 @@ void OgmMainWidget::initChildWidget()
     //init favor sidebar
     _widgetFavorSidebar=new OgmFavorSidebarWidget(_ui->widgetContent);
     _ui->widgetContent->layout()->addWidget(_widgetFavorSidebar);
+
+    //init visual
+    _widgetVisual=new OgmVisualWidget(_ui->widgetContent);
+    _ui->widgetContent->layout()->addWidget(_widgetVisual);
 
     //init listPage
     _scrollArea=new QScrollArea(_ui->widgetContent);
@@ -239,7 +243,7 @@ void OgmMainWidget::btnSideBarClicked()
         switchPage("DataFileList");
     }
     else if(btnName=="btnSpaceVisual"){
-
+        switchPage("Visual");
     }
 
     //btnCheckState
@@ -258,6 +262,7 @@ void OgmMainWidget::switchPage(QString type)
 {
     _widgetServerSidebar->setHidden(true);
     _widgetFavorSidebar->setHidden(true);
+    _widgetVisual->setHidden(true);
     _scrollArea->setHidden(true);
     _widgetTool->setHidden(true);
 
@@ -279,14 +284,14 @@ void OgmMainWidget::switchPage(QString type)
         _widgetTool->setHidden(false);
     }
     else if(type=="DataList"){
-        _widgetList->changeDataListUI(_widgetDataServerTop->getCurrentId(), "Data");
+        _widgetList->changeDataListUI(_widgetDataServerTop->getCurrentId(), "Data", 0);
 
         _widgetDataServerTop->setHidden(false);
         _widgetList->setHidden(false);
         _scrollArea->setHidden(false);
     }
     else if(type=="ModelList"){
-        _widgetList->changeModelListUI(_widgetModelServerTop->getCurrentId());
+        _widgetList->changeModelListUIByPage(_widgetModelServerTop->getCurrentId(), 0);
 
         _widgetModelServerTop->setHidden(false);
         _widgetList->setHidden(false);
@@ -301,7 +306,7 @@ void OgmMainWidget::switchPage(QString type)
         _scrollArea->setHidden(false);
     }
     else if(type=="DataFileList"){
-        _widgetList->changeFileListUIByParentId(_widgetFileServerTop->getCurrentId(), _widgetFileServerTop->getCurrentFileId());
+        _widgetList->changeFileListUIByParentId(_widgetFileServerTop->getCurrentId(), _widgetFileServerTop->getCurrentFileId(), "File");
 
         _widgetFileServerTop->setHidden(false);
         _widgetList->setHidden(false);
@@ -330,6 +335,9 @@ void OgmMainWidget::switchPage(QString type)
     }
     else if(type=="DataRefactorTaskConfig"){
         _widgetDataRefactorTaskConfig->setHidden(false);
+    }
+    else if(type=="Visual"){
+        _widgetVisual->setHidden(false);
     }
 }
 

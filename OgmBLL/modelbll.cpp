@@ -1,4 +1,5 @@
 #include "modelbll.h"
+#include "OgmCommon/ogmlisthelper.h"
 
 ModelServiceBLL::ModelServiceBLL()
 {
@@ -10,6 +11,15 @@ QList<ModelService *> ModelServiceBLL::getAllModelService(QString serverId)
 {
     ModelServer *modelServer=_modelServerDAL.data()->getServerById(serverId);
     QList<ModelService*> msList=_modelServiceDAL.data()->getAllModelService(modelServer);
+    return msList;
+}
+
+QList<ModelService *> ModelServiceBLL::getModelServiceListByPage(QString serverId, int pageIndex)
+{
+    ModelServer *modelServer=_modelServerDAL.data()->getServerById(serverId);
+
+    int start=OgmListHelper::pageAmount*pageIndex+1;
+    QList<ModelService*> msList=_modelServiceDAL.data()->getModelServiceListByNumber(modelServer, start, OgmListHelper::pageAmount);
     return msList;
 }
 

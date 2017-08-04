@@ -7,6 +7,8 @@
 
 #include "ogmuihelper.h"
 
+int OgmListHelper::pageAmount=20;
+
 OgmListHelper::OgmListHelper()
 {
 

@@ -76,6 +76,8 @@ public:
 
     static void addInfoItem(QWidget *parent, QString itemName, QString itemStyle, QList<INFOITEM> infoList);
 
+    static int pageAmount;
+
 private:
     static void addItemChildrenByItemStruct(QWidget *parent, LISTCHILD item);
 };

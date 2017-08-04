@@ -30,8 +30,9 @@ void FavorBLL::addOneFavorGroup(Favor *favor)
     _favorDAL.data()->addOneFavor(favor);
 }
 
-bool FavorBLL::deleteOneFavorGroup(Favor *favor)
+bool FavorBLL::deleteOneFavorGroup(QString favorId)
 {
+    Favor *favor=getFavorGroupById(favorId);
     bool isSuccess=_favorDAL.data()->deleteOneFavor(favor);
     return isSuccess;
 }

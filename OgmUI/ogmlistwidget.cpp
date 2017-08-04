@@ -23,9 +23,10 @@ OgmListWidget::OgmListWidget(QWidget *parent) : QWidget(parent)
     initWidget();
 }
 
-void OgmListWidget::changeModelListUI(QString serverId)
+void OgmListWidget::changeModelListUIByPage(QString serverId, int pageIndex)
 {
-    QList<ModelService*> modelList=_modelServiceBLL.data()->getAllModelService(serverId);
+    _serverId=serverId;
+    QList<ModelService*> modelList=_modelServiceBLL.data()->getModelServiceListByPage(serverId, pageIndex);
     changeModelListUI(modelList);
 }
 
@@ -68,27 +69,28 @@ void OgmListWidget::changeDataListUI(QList<DataRefactor *> dataRefactorList)
     listPaging(varList, 25);
 }
 
-void OgmListWidget::changeDataListUI(QString serverId, QString type)
+void OgmListWidget::changeDataListUI(QString serverId, QString type, int pageIndex)
 {
-    _dataServerId=serverId;
+    _serverId=serverId;
+    _currentPageIndex=pageIndex;
 
     if(type=="Data"){
-        QList<DataService*> dataList=_dataServiceBLL.data()->getAllData(serverId);
+        QList<DataService*> dataList=_dataServiceBLL.data()->getDataListByPage(serverId, pageIndex);
         changeDataListUI(dataList);
     }
     else if(type=="DataMapping"){
-        QList<DataMapping*> dataMappingList=_dataMappingBLL.data()->getAllDataMapping(serverId);
+        QList<DataMapping*> dataMappingList=_dataMappingBLL.data()->getDataMappingByPage(serverId, pageIndex);
         changeDataListUI(dataMappingList);
     }
     else if(type=="DataRefactor"){
-        QList<DataRefactor*> dataRefactorList=_dataRefactorBLL.data()->getAllDataRefactor(serverId);
+        QList<DataRefactor*> dataRefactorList=_dataRefactorBLL.data()->getDataRefactorByPage(serverId, pageIndex);
         changeDataListUI(dataRefactorList);
     }
 }
 
-void OgmListWidget::changeFileListUI(QList<DataFile *> dataFileList)
+void OgmListWidget::changeFileListUI(QList<DataFile *> dataFileList, QString checkType)
 {
-    _listType="File";
+    _listType=checkType;
     clearList();
 
     QList<QVariant> varList=OgmHelper::toVarList(dataFileList);
@@ -96,22 +98,22 @@ void OgmListWidget::changeFileListUI(QList<DataFile *> dataFileList)
     listPaging(varList, 25);
 }
 
-void OgmListWidget::changeFileListUI(QString serverId, QString type)
+void OgmListWidget::changeFileListUI(QString serverId, QString fileType, QString checkType)
 {
-    _dataServerId=serverId;
+    _serverId=serverId;
 
-    if(type=="Data"){
+    if(fileType=="Data"){
         QList<DataFile*> fileList=_dataFileBLL.data()->getAllFiles(serverId);
-        changeFileListUI(fileList);
+        changeFileListUI(fileList, checkType);
     }
 }
 
-void OgmListWidget::changeFileListUIByParentId(QString serverId, QString parentId)
+void OgmListWidget::changeFileListUIByParentId(QString serverId, QString parentId, QString checkType)
 {
-    _dataServerId=serverId;
+    _serverId=serverId;
 
     QList<DataFile*> fileList=_dataFileBLL.data()->getFilesByParent(serverId, parentId);
-    changeFileListUI(fileList);
+    changeFileListUI(fileList, checkType);
 }
 
 void OgmListWidget::changeServerListUI(QString serverType)
@@ -185,9 +187,14 @@ void OgmListWidget::changeRefactorMethodListUI(QString serverId, QString refacto
     listPaging(varList, 25);
 }
 
+void OgmListWidget::setPageIndex(int pageIndex)
+{
+    _currentPageIndex=pageIndex;
+}
+
 void OgmListWidget::initWidget()
 {
-    _dataServerId="1001";
+    _currentPageIndex=0;
 
     QVBoxLayout *layoutMain=new QVBoxLayout();
     //layoutMain->setContentsMargins(15, 3, 15, 15);
@@ -205,7 +212,7 @@ void OgmListWidget::initWidget()
 
     _widgetTurnPage=new QWidget(this);
     layoutMain->addWidget(_widgetTurnPage);
-    _widgetTurnPage->setHidden(true);
+    //_widgetTurnPage->setHidden(true);
 
     QHBoxLayout *layoutTurnPage=new QHBoxLayout();
     _widgetTurnPage->setLayout(layoutTurnPage);
@@ -253,7 +260,7 @@ void OgmListWidget::listPaging(QList<QVariant> varList, int pageAmount)
     if(count==0){
         layoutList->addStretch();
     }
-    else if(count<=pageAmount){
+    else if(count<OgmListHelper::pageAmount){
         for(int i=0; i<count; ++i){
             if(i%2==0){
                 addListIntelligent(varList[i], "btn-model-dark");
@@ -263,9 +270,15 @@ void OgmListWidget::listPaging(QList<QVariant> varList, int pageAmount)
             }
         }
         layoutList->addStretch();
+
+        if(_currentPageIndex==0){
+            initTurnPage("first");
+        }
+        else
+            initTurnPage("last");
     }
     else{
-        for(int i=0; i<count; ++i){
+        for(int i=0; i<OgmListHelper::pageAmount; ++i){
             if(i%2==0){
                 addListIntelligent(varList[i], "btn-model-dark");
             }
@@ -275,10 +288,12 @@ void OgmListWidget::listPaging(QList<QVariant> varList, int pageAmount)
         }
         layoutList->addStretch();
 
-        //build turn page ui
-        initTurnPage();
+        if(_currentPageIndex==0){
+            initTurnPage("firstFull");
+        }
+        else
+            initTurnPage("middle");
     }
-
 }
 
 void OgmListWidget::addListIntelligent(QVariant var, QString style)
@@ -513,7 +528,7 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
     QToolButton *btnRun=_widgetList->findChild<QToolButton*>(listItemBtnDownload.objectName);
     connect(btnRun, &QToolButton::clicked, [=](){
         OgmPopWidget *pop=new OgmPopWidget("ChooseRefactorMethod");
-        pop->changeChooseRefactorMethod(_dataServerId, data->id);
+        pop->changeChooseRefactorMethod(_serverId, data->id);
         connect(pop, &OgmPopWidget::signalSwitchPage, [=](QString pageType){
             emit signalSwitchPage(pageType);
         });
@@ -685,7 +700,12 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
     listItemList.append(listItemFileSize);
 
     if(file->type=="file"){
-        OgmListHelper::addListItem(_widgetList, "btnDataFileList|"+file->id+"|"+file->name+"|"+file->parentId, style, "btn", listItemList, true);
+        if(_listType=="FileCheck"){
+             OgmListHelper::addListItem(_widgetList, "btnDataFileList|"+file->id+"|"+file->name+"|"+file->parentId, style, "btn", listItemList, true);
+        }
+        else
+             OgmListHelper::addListItem(_widgetList, "btnDataFileList|"+file->id+"|"+file->name+"|"+file->parentId, style, "btn", listItemList, false);
+
     }
     else if(file->type=="folder"){
         OgmListHelper::addListItem(_widgetList, "btnDataFileList|"+file->id+"|"+file->name+"|"+file->parentId, style, "btn", listItemList);
@@ -694,8 +714,8 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
     //btn function
     QToolButton *btnFolder=_widgetList->findChild<QToolButton*>("btnDataFileName|"+file->id);
     connect(btnFolder, &QToolButton::clicked, [=](){
-        QList<DataFile*> fileList=_dataFileBLL.data()->getFilesByParent(_dataServerId, file->id);
-        changeFileListUI(fileList);
+        QList<DataFile*> fileList=_dataFileBLL.data()->getFilesByParent(_serverId, file->id);
+        changeFileListUI(fileList, _listType);
         emit signalAddFolderOnFileLink(file->id, file->name);
     });
 
@@ -705,9 +725,9 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
         connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varIsDelete){
             bool isDelete=varIsDelete.toBool();
             if(isDelete){
-                _dataFileBLL.data()->deleteData(_dataServerId, file->id, file->type);
+                _dataFileBLL.data()->deleteData(_serverId, file->id, file->type);
 
-                changeFileListUIByParentId(_dataServerId, file->parentId);
+                changeFileListUIByParentId(_serverId, file->parentId, _listType);
             }
         });
         popWidget->show();
@@ -945,41 +965,59 @@ void OgmListWidget::addOneServerOnUI(DataServer *dataServer, QString style)
     OgmListHelper::addListItem(_widgetList, "btnListModelServer"+dataServer->id, style, "btn", list);
 }
 
-void OgmListWidget::initTurnPage()
+void OgmListWidget::initTurnPage(QString turnPageType)
 {
     QHBoxLayout *layoutTurnPage=qobject_cast<QHBoxLayout*>(_widgetTurnPage->layout());
 
-    layoutTurnPage->addStretch();
+    QLabel *lblPageIndex=new QLabel(_widgetTurnPage);
+    lblPageIndex->setObjectName("lblPageIndex");
+    lblPageIndex->setText(QString::number(_currentPageIndex+1));
+    lblPageIndex->setWindowTitle("lbl-normal");
 
     QToolButton *btnPrevPage=new QToolButton(_widgetTurnPage);
     OgmUiHelper::Instance()->setIcon(btnPrevPage, QChar(0xf053));
-    connect(btnPrevPage, SIGNAL(clicked()), this, SLOT(onTurnPage()));
+    connect(btnPrevPage, &QToolButton::clicked, this, &OgmListWidget::btnTurnPageClicked);
     btnPrevPage->setObjectName("btnPrevPage");
-    btnPrevPage->setWindowTitle("btn-normal");
-    layoutTurnPage->addWidget(btnPrevPage);
-
-    layoutTurnPage->addSpacing(30);
-
-    QLabel *lblPageIndex=new QLabel(_widgetTurnPage);
-    lblPageIndex->setObjectName("lblPageIndex");
-    lblPageIndex->setText("1");
-    lblPageIndex->setWindowTitle("lbl-normal");
-    layoutTurnPage->addWidget(lblPageIndex);
-
-    layoutTurnPage->addSpacing(30);
+    btnPrevPage->setWindowTitle("btn-normal");  
+    if(turnPageType=="firstFull")
+        btnPrevPage->setEnabled(false);
 
     QToolButton *btnNextPage=new QToolButton(_widgetTurnPage);
     OgmUiHelper::Instance()->setIcon(btnNextPage, QChar(0xf054));
-    connect(btnNextPage, SIGNAL(clicked()), this, SLOT(onTurnPage()));
+    connect(btnNextPage, &QToolButton::clicked, this, &OgmListWidget::btnTurnPageClicked);
     btnNextPage->setObjectName("btnNextPage");
     btnNextPage->setWindowTitle("btn-normal");
-    layoutTurnPage->addWidget(btnNextPage);
+    if(turnPageType=="last"){
+        btnNextPage->setEnabled(false);
+    }
+    if(turnPageType=="first"){
+        btnPrevPage->setEnabled(false);
+        btnNextPage->setEnabled(false);
+    }
 
+    layoutTurnPage->addStretch();
+    layoutTurnPage->addWidget(btnPrevPage);
+    layoutTurnPage->addSpacing(30);
+    layoutTurnPage->addWidget(lblPageIndex);
+    layoutTurnPage->addSpacing(30);
+    layoutTurnPage->addWidget(btnNextPage);
     layoutTurnPage->addStretch();
 }
 
 void OgmListWidget::btnTurnPageClicked()
 {
+    QToolButton *btn=(QToolButton*)sender();
+    if(btn->objectName()=="btnPrevPage")
+        _currentPageIndex--;
+    else if(btn->objectName()=="btnNextPage")
+        _currentPageIndex++;
+
+    if(_listType=="Model"){
+        changeModelListUIByPage(_serverId, _currentPageIndex);
+    }
+    else if(_listType=="Data"){
+        changeDataListUI(_serverId, "Data", _currentPageIndex);
+    }
 
 }
 
@@ -1004,7 +1042,7 @@ void OgmListWidget::setAllBtnUnCheck()
 
 QString OgmListWidget::getServerId()
 {
-    return _dataServerId;
+    return _serverId;
 }
 
 

@@ -15,7 +15,7 @@ public:
 
     QList<DataService*> getAllData(QString serverId);
 
-    QList<DataService*> getDataListByPage(QString serverId, int pageAmount, int pageIndex);
+    QList<DataService*> getDataListByPage(QString serverId, int pageIndex);
 
     int getDataCount(QString serverId);
 
@@ -34,7 +34,7 @@ public:
 
     QList<DataMapping*> getAllDataMapping(QString serverId);
 
-    QList<DataMapping*> getDataMappingByPage(QString serverId, int pageAmount, int pageIndex);
+    QList<DataMapping*> getDataMappingByPage(QString serverId, int pageIndex);
 
     int getDataMappingCount(QString serverId);
 
@@ -52,7 +52,7 @@ public:
 
     QList<DataRefactor*> getAllDataRefactor(QString serverId);
 
-    QList<DataRefactor*> getDataRefactorByPage(QString serverId, int pageAmount, int pageIndex);
+    QList<DataRefactor*> getDataRefactorByPage(QString serverId, int pageIndex);
 
     int getDataRefactorCount(QString serverId);
 

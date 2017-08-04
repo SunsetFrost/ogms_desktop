@@ -18,7 +18,7 @@ public:
 
     void addOneFavorGroup(Favor *favor);
 
-    bool deleteOneFavorGroup(Favor *favor);
+    bool deleteOneFavorGroup(QString favorId);
 
     bool addOneFavorService(SERVICEITEM service, QString favorId);
     //trans

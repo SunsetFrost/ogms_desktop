@@ -70,7 +70,7 @@ signals:
 
     void signalChangeFavor();
 
-    void signalChangeDataFileByParentId(QString serverId, QString parentId);
+    void signalChangeDataFileByParentId(QString serverId, QString parentId, QString checkType);
 
     void signalSwitchPage(QString pageType);
 };

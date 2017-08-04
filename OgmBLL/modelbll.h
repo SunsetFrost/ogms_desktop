@@ -11,6 +11,7 @@ public:
     ModelServiceBLL();
 
     QList<ModelService*> getAllModelService(QString serverId);
+    QList<ModelService*> getModelServiceListByPage(QString serverId, int pageIndex);
 
     ModelService* getOneModelServiceById(QString serverId, QString modelId);
 

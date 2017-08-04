@@ -20,17 +20,17 @@ public:
 public:
     QString getServerId();
 
-    void changeModelListUI(QString serverId);
+    void changeModelListUIByPage(QString serverId, int pageIndex);
     void changeModelListUI(QList<ModelService*> modelList);
 
     void changeDataListUI(QList<DataService*> dataList);
     void changeDataListUI(QList<DataMapping*> dataMappingList);
     void changeDataListUI(QList<DataRefactor*> dataRefactorList);
-    void changeDataListUI(QString serverId, QString type);
+    void changeDataListUI(QString serverId, QString type, int pageIndex);
 
-    void changeFileListUI(QList<DataFile*> dataFileList);
-    void changeFileListUI(QString serverId, QString type);
-    void changeFileListUIByParentId(QString serverId, QString parentId);
+    void changeFileListUI(QList<DataFile*> dataFileList, QString checkType);
+    void changeFileListUI(QString serverId, QString fileType, QString checkType);
+    void changeFileListUIByParentId(QString serverId, QString parentId, QString checkType);
 
     void changeServerListUI(QString serverType);
 
@@ -44,7 +44,7 @@ public:
 
     void changeRefactorMethodListUI(QString serverId, QString refactorId);
 
-
+    void setPageIndex(int pageIndex);
 
 private:
     void initWidget();
@@ -70,16 +70,18 @@ private:
     void addOneServerOnUI(ModelServer *modelServer, QString style);
     void addOneServerOnUI(DataServer *dataServer, QString style);
 
-    void initTurnPage();
+    //turn page type first firstFull last middle
+    void initTurnPage(QString turnPageType);
     void btnTurnPageClicked();
 
     void popChooseDataMethodWidget();
 
 
 private:
-    QString _dataServerId;
+    QString _serverId;
     QString _fileId;
     QString _listType;
+    int _currentPageIndex;
 
     bool _isCheckable;
 

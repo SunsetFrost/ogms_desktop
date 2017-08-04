@@ -1,4 +1,5 @@
 #include "databll.h"
+#include "OgmCommon/ogmlisthelper.h"
 
 DataServiceBLL::DataServiceBLL()
 {
@@ -20,10 +21,10 @@ QList<DataService *> DataServiceBLL::getAllData(QString serverId)
     return dsList;
 }
 
-QList<DataService *> DataServiceBLL::getDataListByPage(QString serverId, int pageAmount, int pageIndex)
+QList<DataService *> DataServiceBLL::getDataListByPage(QString serverId, int pageIndex)
 {
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
-    QList<DataService*> dsList=_dataServiceDAL.data()->getDataListByPage(dataServer, pageAmount, pageIndex);
+    QList<DataService*> dsList=_dataServiceDAL.data()->getDataListByPage(dataServer, OgmListHelper::pageAmount, pageIndex);
     return dsList;
 }
 
@@ -71,10 +72,10 @@ QList<DataMapping *> DataMappingBLL::getAllDataMapping(QString serverId)
     return dsList;
 }
 
-QList<DataMapping *> DataMappingBLL::getDataMappingByPage(QString serverId, int pageAmount, int pageIndex)
+QList<DataMapping *> DataMappingBLL::getDataMappingByPage(QString serverId, int pageIndex)
 {
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
-    QList<DataMapping*> dsList=_dataMappingDAL.data()->getDataMappingListByPage(dataServer, pageAmount, pageIndex);
+    QList<DataMapping*> dsList=_dataMappingDAL.data()->getDataMappingListByPage(dataServer, OgmListHelper::pageAmount, pageIndex);
     return dsList;
 }
 
@@ -105,10 +106,10 @@ QList<DataRefactor *> DataRefactorBLL::getAllDataRefactor(QString serverId)
     return dsList;
 }
 
-QList<DataRefactor *> DataRefactorBLL::getDataRefactorByPage(QString serverId, int pageAmount, int pageIndex)
+QList<DataRefactor *> DataRefactorBLL::getDataRefactorByPage(QString serverId, int pageIndex)
 {
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
-    QList<DataRefactor*> dsList=_dataRefactorDAL.data()->getDataRefactorListByPage(dataServer, pageAmount, pageIndex);
+    QList<DataRefactor*> dsList=_dataRefactorDAL.data()->getDataRefactorListByPage(dataServer, OgmListHelper::pageAmount, pageIndex);
     return dsList;
 }
 

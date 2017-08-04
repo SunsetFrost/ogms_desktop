@@ -14,6 +14,7 @@
 #include "OgmUI/ogmminitopwidget.h"
 #include "OgmUI/ogmconfigtaskwidget.h"
 #include "OgmUI/ogmtoolwidget.h"
+#include "OgmUI/ogmvisualwidget.h"
 
 namespace Ui {
 class OgmMainWidget;
@@ -60,6 +61,9 @@ private:
     OgmConfigTaskWidget *_widgetDataRefactorTaskConfig;
 
     OgmToolWidget *_widgetTool;
+
+    OgmVisualWidget *_widgetVisual;
+
 
     QSharedPointer<FavorBLL> _favorBLL;
     QSharedPointer<TaskBLL> _taskBLL;

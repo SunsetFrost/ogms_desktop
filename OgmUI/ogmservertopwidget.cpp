@@ -1,6 +1,8 @@
 #include "ogmservertopwidget.h"
 
 #include "OgmCommon/ogmuihelper.h"
+#include "OgmCommon/ogmlisthelper.h"
+#include "OgmCommon/ogmsetting.h"
 #include "OgmUI/ogmpopwidget.h"
 
 #include <QDateTime>
@@ -101,6 +103,18 @@ void OgmServerTopWidget::changeFavorManager(QString favorId)
         _ui->widgetTopDes->setHidden(false);
         _ui->lblServerDesContent->setHidden(true);
     }
+
+    if(favorId==OgmSetting::defaultFavorId){
+        _ui->btnTopDeleteFavor->setHidden(true);
+    }
+    else
+        _ui->btnTopDeleteFavor->setHidden(false);
+
+
+    //change list
+    QList<ModelService*> msList=_favorBLL.data()->favor2modelServiceList(favor);
+
+    emit signalChangeModelListByList(msList);
 }
 
 QString OgmServerTopWidget::getCurrentId()
@@ -193,6 +207,28 @@ void OgmServerTopWidget::initFavorWidget()
     connect(_ui->btnTopSwitchFavor, &QToolButton::clicked, [=](){
         emit signalChangeFavor();
     });
+    connect(_ui->btnTopNewFavor, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("NewFavorGroup");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            Favor *addFavor=new Favor();
+            addFavor->id=OgmHelper::createUId();
+            addFavor->name=varResult.toStringList().at(0);
+            addFavor->des=varResult.toStringList().at(1);
+
+            _favorBLL.data()->addOneFavorGroup(addFavor);
+        });
+    });
+    connect(_ui->btnTopDeleteFavor, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("DeleteFavorGroup");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            if(varResult.toBool()){
+                _favorBLL.data()->deleteOneFavorGroup(_serverId);
+                changeFavorManager(OgmSetting::defaultFavorId);
+            }
+        });
+    });
 
     //favor function
     connect(_ui->btnFavorToolModel, &QToolButton::clicked, [=](){
@@ -253,7 +289,7 @@ void OgmServerTopWidget::initFileWidget()
     btnFileLinkAll->setAccessibleDescription("-1");
     connect(btnFileLinkAll, &QToolButton::clicked, [=](){
         _currentFileId="-1";
-        emit signalChangeDataFileByParentId(_serverId, "-1");
+        emit signalChangeDataFileByParentId(_serverId, "-1", "File");
         removeNextAllFileLink("-1", "All");
     });
     _ui->widgetFileLink->layout()->addWidget(btnFileLinkAll);
@@ -269,7 +305,7 @@ void OgmServerTopWidget::initFileWidget()
             _dataFileBLL.data()->addFolder(_serverId, _currentFileId, folderName, addTime);
 
             //change list
-            emit signalChangeDataFileByParentId(_serverId, _currentFileId);
+            emit signalChangeDataFileByParentId(_serverId, _currentFileId, "File");
         });
         popWidget->show();
     });
@@ -298,7 +334,7 @@ void OgmServerTopWidget::addOneFileLinkOnUI(QString fileId, QString fileName)
     btnLinkIcon->setWindowTitle("btn-split");
     btnLinkIcon->setAccessibleDescription(fileId);
     connect(btnLinkIcon, &QToolButton::clicked, [=](){
-        emit signalChangeDataFileByParentId(_serverId, fileId);
+        emit signalChangeDataFileByParentId(_serverId, fileId, "File");
         removeNextAllFileLink(fileId, fileName);
     });
 

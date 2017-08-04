@@ -26,6 +26,10 @@ OgmPopWidget::OgmPopWidget(QString widgetType, QWidget *parent)
         initChooseRefactorMethod();
     else if(widgetType=="SaveTask")
         initSaveTask();
+    else if(widgetType=="NewFavorGroup")
+        initNewFavorGroupWidget();
+    else if(widgetType=="DeleteFavorGroup")
+        initDeleteFavorWidget();
 
     setDragWidgetName("widgetPopTitle");
     this->setAttribute(Qt::WA_DeleteOnClose);
@@ -59,6 +63,33 @@ void OgmPopWidget::initNewFileWidget()
     connect(_ui->btnPopB, &QToolButton::clicked, this, &OgmPopWidget::close);
 }
 
+void OgmPopWidget::initNewFavorGroupWidget()
+{
+    this->setFixedHeight(250);
+    _ui->widgetPopSaveTask->setHidden(false);
+
+    _ui->lblPopTitle->setText("New Favor Group");
+    _ui->btnPopA->setText("Confirm");
+    _ui->btnPopB->setText("Cancel");
+
+    _ui->txtPopTaskName->setPlaceholderText("Please input group name");
+    _ui->txtPopTaskDesc->setPlaceholderText("Please input group description");
+    _ui->txtPopTaskTag->setHidden(true);
+
+    connect(_ui->btnPopA, &QToolButton::clicked, [=](){
+        QStringList strList;
+
+        strList.append(_ui->txtPopTaskName->text());
+        strList.append(_ui->txtPopTaskDesc->toPlainText());
+
+        QVariant varTaskInfo(strList);
+        emit signalOperationResult(varTaskInfo);
+
+        this->close();
+    });
+    connect(_ui->btnPopB, &QToolButton::clicked, this, &OgmPopWidget::close);
+}
+
 void OgmPopWidget::initDeleteFileWidget()
 {
     //style
@@ -66,6 +97,26 @@ void OgmPopWidget::initDeleteFileWidget()
     _ui->widgetPopDeleteFile->setHidden(false);
 
     _ui->lblPopTitle->setText("Delete File");
+    _ui->btnPopA->setText("Delete");
+    _ui->btnPopB->setText("Cancel");
+
+    //function
+    connect(_ui->btnPopA, &QToolButton::clicked, [=](){
+        bool isConfirm=true;
+        QVariant result(isConfirm);
+        emit signalOperationResult(result);
+        this->close();
+    });
+    connect(_ui->btnPopB, &QToolButton::clicked, this, &OgmPopWidget::close);
+}
+
+void OgmPopWidget::initDeleteFavorWidget()
+{
+    //style
+    this->setFixedHeight(200);
+    _ui->widgetPopDeleteFile->setHidden(false);
+
+    _ui->lblPopTitle->setText("Delete Favor Group");
     _ui->btnPopA->setText("Delete");
     _ui->btnPopB->setText("Cancel");
 
@@ -92,7 +143,7 @@ void OgmPopWidget::initChooseDataFile()
 
     OgmListWidget *listWidget=new OgmListWidget(_ui->widgetPopFileList);
     listWidget->setObjectName("mPopListWidget");
-    listWidget->changeFileListUI(OgmSetting::defaultDataServerId, "Data");
+    listWidget->changeFileListUI(OgmSetting::defaultDataServerId, "Data", "FileCheck");
     listWidget->setFileListState("chooseDataFile");
     connect(listWidget, &OgmListWidget::signalAddFolderOnFileLink, this, &OgmPopWidget::addOneFileLinkOnUI);
     _ui->widgetPopFileList->layout()->addWidget(listWidget);
@@ -110,7 +161,7 @@ void OgmPopWidget::initChooseDataFile()
     btnFileLinkAll->setAccessibleDescription("-1");
     connect(btnFileLinkAll, &QToolButton::clicked, [=](){
         _currentFileId="-1";
-        listWidget->changeFileListUIByParentId(listWidget->getServerId(), "-1");
+        listWidget->changeFileListUIByParentId(listWidget->getServerId(), "-1", "FileCheck");
         removeNextAllFileLink("-1", "All");
     });
     _ui->widgetPopFileLink->layout()->addWidget(btnFileLinkAll);
@@ -193,7 +244,7 @@ void OgmPopWidget::addOneFileLinkOnUI(QString fileId, QString fileName)
     btnLinkIcon->setAccessibleDescription(fileId);
     connect(btnLinkIcon, &QToolButton::clicked, [=](){
         OgmListWidget *widgetPopListWidget=_ui->widgetPopFileList->findChild<OgmListWidget*>("mPopListWidget");
-        widgetPopListWidget->changeFileListUIByParentId(widgetPopListWidget->getServerId(), fileId);
+        widgetPopListWidget->changeFileListUIByParentId(widgetPopListWidget->getServerId(), fileId, "FileCheck");
         removeNextAllFileLink(fileId, fileName);
     });
 

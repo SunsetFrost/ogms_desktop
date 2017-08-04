@@ -12,6 +12,8 @@ public:
 
     QList<ModelService*> getAllModelService(ModelServer *server);
 
+    QList<ModelService *> getModelServiceListByNumber(ModelServer *server, int start, int count);
+
     ModelService* getOneModelServiceById(ModelServer *server, QString modelId);
 
 private:

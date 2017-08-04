@@ -17,6 +17,7 @@ HEADERS += \
     $$PWD/ogmpopwidget.h \
     $$PWD/ogmconfigtaskwidget.h \
     $$PWD/ogmtoolwidget.h \
+    $$PWD/ogmvisualwidget.h \
 
 SOURCES += \
     $$PWD/ogmmainwidget.cpp \
@@ -28,4 +29,5 @@ SOURCES += \
     $$PWD/ogmpopwidget.cpp \
     $$PWD/ogmconfigtaskwidget.cpp \
     $$PWD/ogmtoolwidget.cpp \
+    $$PWD/ogmvisualwidget.cpp \
 
