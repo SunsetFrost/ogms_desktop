@@ -44,6 +44,13 @@ bool FavorBLL::addOneFavorService(SERVICEITEM service, QString favorId)
     return isSuccess;
 }
 
+bool FavorBLL::deleteOneFavorService(SERVICEITEM service, QString favorId)
+{
+    Favor *favor=_favorDAL.data()->getFavorById(favorId);
+    bool isSuccess=_favorDAL.data()->deleteOneServiceInOneFavorGroup(service, favor);
+    return isSuccess;
+}
+
 QList<ModelService *> FavorBLL::favor2modelServiceList(Favor *favor)
 {
     QList<ModelService*> listModel;

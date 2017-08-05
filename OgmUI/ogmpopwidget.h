@@ -19,7 +19,11 @@ public:
 
     void changeChooseRefactorMethod(QString serverId, QString refactorId);
 
+    void setCommonWidgetInfo(QString title, QString content, QString btnText);
+
 private:
+    void initCommonWidget();
+
     void initNewFileWidget();
 
     void initNewFavorGroupWidget();
@@ -33,6 +37,10 @@ private:
     void initChooseRefactorMethod();
 
     void initSaveTask();
+
+    void initNewServer();
+
+
 
     //file
     void addOneFileLinkOnUI(QString fileId, QString fileName);

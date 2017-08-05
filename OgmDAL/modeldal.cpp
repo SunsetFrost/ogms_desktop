@@ -1,6 +1,7 @@
 #include "modeldal.h"
 
 #include "OgmCommon/ogmnetwork.h"
+#include "OgmCommon/ogmsetting.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
@@ -102,16 +103,125 @@ ModelServerDAL::ModelServerDAL()
 
 QList<ModelServer *> ModelServerDAL::getAllServer()
 {
-    return _serverList;
+    QDomDocument doc;
+    QFile file(OgmSetting::serverFilePath);
+    file.open(QIODevice::ReadOnly);
+    doc.setContent(&file);
+    file.close();
+
+    QList<ModelServer*> serverList;
+    xml2modelServerList(doc, serverList);
+
+    return serverList;
 }
 
 ModelServer *ModelServerDAL::getServerById(QString serverId)
 {
-    for(int i=0; i<_serverList.count(); ++i){
-        if(_serverList.at(i)->id==serverId){
-            return _serverList.at(i);
+    QList<ModelServer*> serverList=getAllServer();
+    for(int i=0; i<serverList.count(); ++i){
+        if(serverList.at(i)->id==serverId){
+            return serverList.at(i);
         }
     }
     ModelServer *nullServer=new ModelServer();
     return nullServer;
+}
+
+void ModelServerDAL::addServer(ModelServer *server)
+{
+    QList<ModelServer*> serverList=getAllServer();
+    serverList.append(server);
+    setAllModelServerList(serverList);
+}
+
+bool ModelServerDAL::deleteOneServer(ModelServer *server)
+{
+    QList<ModelServer*> serverList=getAllServer();
+    for(int i=0; i<serverList.count(); ++i){
+        if(serverList.at(i)->id==server->id){
+            serverList.removeAt(i);
+            setAllModelServerList(serverList);
+            return true;
+        }
+    }
+    return false;
+}
+
+void ModelServerDAL::modelServerList2xml(QList<ModelServer *> &modelServerList, QDomDocument &doc)
+{
+    QDomAttr attr;
+
+    QDomElement elementConfig=doc.createElement("server");
+    doc.appendChild(elementConfig);
+
+    for(int i=0; i<modelServerList.count(); ++i){
+        QDomElement elementGroup=doc.createElement("modelserver");
+
+        attr=doc.createAttribute("id");
+        attr.setValue(modelServerList.at(i)->id);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("ip");
+        attr.setValue(modelServerList.at(i)->ip);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("name");
+        attr.setValue(modelServerList.at(i)->name);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("system");
+        attr.setValue(modelServerList.at(i)->system);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("location");
+        attr.setValue(modelServerList.at(i)->location);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("connect");
+        if(modelServerList.at(i)->isConnect){
+            attr.setValue("true");
+        }
+        else{
+            attr.setValue("false");
+        }
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("des");
+        attr.setValue(modelServerList.at(i)->desc);
+        elementGroup.setAttributeNode(attr);
+
+        elementConfig.appendChild(elementGroup);
+    }
+}
+
+void ModelServerDAL::xml2modelServerList(QDomDocument &doc, QList<ModelServer *> &modelServerList)
+{
+    QDomElement elementConfig=doc.documentElement();
+    QDomNodeList nodeListGroup=elementConfig.childNodes();
+    for(int i=0; i<nodeListGroup.count(); ++i){
+        QDomNode nodeGroup=nodeListGroup.item(i);
+        if(nodeGroup.nodeName()=="modelserver"){
+            QDomElement elementGroup=nodeGroup.toElement();
+
+            ModelServer *server=new ModelServer();
+            server->id=elementGroup.attributeNode("id").value();
+            server->ip=elementGroup.attributeNode("ip").value();
+            server->name=elementGroup.attributeNode("name").value();
+            server->system=elementGroup.attributeNode("system").value();
+            server->location=elementGroup.attributeNode("location").value();
+
+            modelServerList.append(server);
+        }
+    }
+}
+
+void ModelServerDAL::setAllModelServerList(QList<ModelServer *> modelServerList)
+{
+    QFile file(OgmSetting::serverFilePath);
+    if(!file.open(QIODevice::WriteOnly))
+        return;
+    QTextStream out(&file);
+    QDomDocument doc;
+    modelServerList2xml(modelServerList, doc);
+    doc.save(out, 4);
 }

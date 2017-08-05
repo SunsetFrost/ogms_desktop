@@ -27,6 +27,8 @@ public:
 
     bool addOneServiceToOneFavor(SERVICEITEM service, Favor *favor);
 
+    bool deleteOneServiceInOneFavorGroup(SERVICEITEM service, Favor *favor);
+
 private:
     void setAllFavor(QList<Favor*> favorList);
 

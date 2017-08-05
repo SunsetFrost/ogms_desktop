@@ -139,6 +139,11 @@ DataServer* DataServerDAL::getServerById(QString serverId)
     return nullServer;
 }
 
+void DataServerDAL::addServer(DataServer *server)
+{
+    _serverList.append(server);
+}
+
 DataMappingDAL::DataMappingDAL()
 {
 

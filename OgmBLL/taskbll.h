@@ -26,6 +26,8 @@ public:
 
     bool isTaskFinish(QString serverIp, QString instanceId, QString type);
 
+    bool isTaskInfoComplete(Task *task);
+
 
 private:
     QSharedPointer<TaskDAL> _taskDAL;

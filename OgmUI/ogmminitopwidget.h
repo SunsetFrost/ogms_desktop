@@ -6,6 +6,8 @@
 
 #include "ui_ogmminitopwidget.h"
 #include "OgmBLL/taskbll.h"
+#include "OgmBLL/modelbll.h"
+#include "OgmBLL/databll.h"
 
 namespace Ui{
 class OgmMiniTopWidget;
@@ -30,6 +32,8 @@ private:
     Ui::OgmMiniTopWidget *_ui;
 
     QSharedPointer<TaskBLL> _taskBLL;
+    QSharedPointer<ModelServerBLL> _modelServerBLL;
+    QSharedPointer<DataServerBLL> _dataServerBLL;
 
 signals:
     void signalChangeTaskList(QList<Task*> taskList, QString taskRunState);

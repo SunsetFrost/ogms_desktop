@@ -342,6 +342,18 @@ QList<QVariant> OgmHelper::toVarList(QList<Task *> taskList)
     return varList;
 }
 
+QString OgmHelper::getXmlStringByPath(QString filePath)
+{
+    QDomDocument doc;
+    QFile file(filePath);
+    file.open(QIODevice::ReadOnly);
+    doc.setContent(&file);
+    file.close();
+
+    QString xml= doc.toString();
+    return xml;
+}
+
 
 
 

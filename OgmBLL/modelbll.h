@@ -29,6 +29,10 @@ public:
 
     ModelServer* getServerId(QString serverId);
 
+    void addServer(ModelServer *server);
+
+    bool deleteOneServer(ModelServer *server);
+
 private:
     QSharedPointer<ModelServerDAL> _modelServerDAL;
 };

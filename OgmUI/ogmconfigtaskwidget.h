@@ -22,9 +22,11 @@ class OgmConfigTaskWidget : public QWidget
 public:
     explicit OgmConfigTaskWidget(QString taskType, QWidget *parent = 0);
 
-    void changeDataMapTask(QString serverId, QString dataMapId);
+    void changeDataMapTaskByService(QString serverId, QString dataMapId);
+    void changeDataMapTaskByTask(Task *task);
 
     void changeDataRefactorTask(QString serverId, QString dataRefactorId, QString methodName);
+    void changeDataRefactorTaskByTask(Task *task);
 
 private:
     void initDataMapTaskConfig();
@@ -39,7 +41,7 @@ private:
 
     void chooseFile();
 
-    void changeMethodParamUI(DataRefactorMethodParam *param);
+    void changeMethodParamUI(DataRefactorMethodParam *param, TASKREFACTORPARAM taskParam);
 
 private:
     Ui::DataMapTaskConfigUI *_uiDataMap;

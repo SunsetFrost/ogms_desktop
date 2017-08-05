@@ -46,3 +46,14 @@ ModelServer *ModelServerBLL::getServerId(QString serverId)
     ModelServer *server=_modelServerDAL.data()->getServerById(serverId);
     return server;
 }
+
+void ModelServerBLL::addServer(ModelServer *server)
+{
+    _modelServerDAL.data()->addServer(server);
+}
+
+bool ModelServerBLL::deleteOneServer(ModelServer *server)
+{
+    bool result= _modelServerDAL.data()->deleteOneServer(server);
+    return result;
+}

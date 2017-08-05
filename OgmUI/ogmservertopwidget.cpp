@@ -56,6 +56,14 @@ void OgmServerTopWidget::changeModelServer(QString serverId)
 
     _ui->lblName->setText(server->name);
     _ui->lblServerLocation->setText(server->location);
+
+    if(serverId==OgmSetting::defaultModelServerId){
+        _ui->btnServerDefault->setHidden(true);
+    }
+    else{
+        _ui->btnServerDefault->setHidden(false);
+    }
+
     if(!server->desc.isEmpty() || !server->desc.isNull() || server->desc!=""){
         _ui->widgetTopDes->setHidden(true);
         _ui->lblServerDesContent->setHidden(false);
@@ -149,6 +157,10 @@ void OgmServerTopWidget::initModelWidget()
     //function
     connect(_ui->btnServerChange, &QToolButton::clicked, [=](){
         emit signalChangeModelServer();
+    });
+    connect(_ui->btnServerDefault, &QToolButton::clicked, [=](){
+        OgmSetting::defaultModelServerId=_serverId;
+        _ui->btnServerDefault->setHidden(true);
     });
 }
 

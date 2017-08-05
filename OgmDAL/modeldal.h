@@ -4,6 +4,7 @@
 #include "OgmEntity/model.h"
 
 #include <QList>
+#include <QDomDocument>
 
 class ModelServiceDAL
 {
@@ -27,6 +28,13 @@ public:
 
     QList<ModelServer*> getAllServer();
     ModelServer* getServerById(QString serverId);
+    void addServer(ModelServer *server);
+    bool deleteOneServer(ModelServer *server);
+
+private:
+    void modelServerList2xml(QList<ModelServer*> &modelServerList, QDomDocument &doc);
+    void xml2modelServerList(QDomDocument &doc, QList<ModelServer*> &modelServerList);
+    void setAllModelServerList(QList<ModelServer*> modelServerList);
 
 private:
     QList<ModelServer*> _serverList;

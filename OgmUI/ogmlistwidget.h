@@ -5,10 +5,10 @@
 #include <QSharedPointer>
 #include <QToolButton>
 
-#include "OgmEntity/favor.h"
 #include "OgmBLL/modelbll.h"
 #include "OgmBLL/databll.h"
 #include "OgmBLL/filebll.h"
+#include "OgmBLL/favorbll.h"
 #include "OgmBLL/taskbll.h"
 
 class OgmListWidget : public QWidget
@@ -21,15 +21,16 @@ public:
     QString getServerId();
 
     void changeModelListUIByPage(QString serverId, int pageIndex);
-    void changeModelListUI(QList<ModelService*> modelList);
+    void changeModelListUI(QList<ModelService*> modelList, QString listType);
 
-    void changeDataListUI(QList<DataService*> dataList);
-    void changeDataListUI(QList<DataMapping*> dataMappingList);
-    void changeDataListUI(QList<DataRefactor*> dataRefactorList);
     void changeDataListUI(QString serverId, QString type, int pageIndex);
+    void changeDataListUI(QList<DataService*> dataList, QString listType);
+    void changeDataListUI(QList<DataMapping*> dataMappingList, QString listType);
+    void changeDataListUI(QList<DataRefactor*> dataRefactorList, QString listType);
 
-    void changeFileListUI(QList<DataFile*> dataFileList, QString checkType);
+    //TODO checkType should be deleted.   the chectstateinfo can involved in fileType
     void changeFileListUI(QString serverId, QString fileType, QString checkType);
+    void changeFileListUI(QList<DataFile*> dataFileList, QString checkType);
     void changeFileListUIByParentId(QString serverId, QString parentId, QString checkType);
 
     void changeServerListUI(QString serverType);
@@ -45,6 +46,7 @@ public:
     void changeRefactorMethodListUI(QString serverId, QString refactorId);
 
     void setPageIndex(int pageIndex);
+    void setFavorId(QString favorId);
 
 private:
     void initWidget();
@@ -81,6 +83,7 @@ private:
     QString _serverId;
     QString _fileId;
     QString _listType;
+    QString _favorId;
     int _currentPageIndex;
 
     bool _isCheckable;
@@ -95,6 +98,7 @@ private:
     QSharedPointer<DataMappingBLL> _dataMappingBLL;
     QSharedPointer<DataRefactorBLL> _dataRefactorBLL;
     QSharedPointer<DataFileBll> _dataFileBLL;
+    QSharedPointer<FavorBLL> _favorBLL;
     QSharedPointer<TaskBLL> _taskBLL;
 
 
@@ -105,9 +109,12 @@ signals:
     void signalAddFavorSidebar(QString serverId, QString serviceId, QString serviceType);
 
     void signalSwitchPage(QString pageType);
+    void signalChangeModelServerTopUI(QString serverId);
 
     void signalChangeDataMapTaskConfigUI(QString serverId, QString dataMapId);
+    void signalChangeDataMapTaskConfigUIByTask(Task *task);
     void signalChangeDataRefactorTaskConfigUI(QString serverId, QString refactorId, QString methodName);
+    void signalChangeDataRefactorTaskConfigUIByTask(Task *task);
 
 
 

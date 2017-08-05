@@ -4,19 +4,25 @@
 #include "OgmCommon/ogmsetting.h"
 
 #include <QProcess>
+#include <QDesktopServices>
+#include <QUrl>
 
 OgmToolWidget::OgmToolWidget(QWidget *parent)
     : QWidget(parent)
     , _ui(new Ui::OgmToolUI)
 {
     _ui->setupUi(this);
+
+    _modelServerBLL=QSharedPointer<ModelServerBLL>(new ModelServerBLL);
+    _dataServerBLL=QSharedPointer<DataServerBLL>(new DataServerBLL);
+
     initWidget();
 }
 
 void OgmToolWidget::initWidget()
 {
     OgmUiHelper::Instance()->setIcon(_ui->lblToolUdx, QChar(0xf02d));
-    OgmUiHelper::Instance()->setIcon(_ui->btnToolUdxRun, QChar(0xf144));
+    OgmUiHelper::Instance()->setIcon(_ui->btnToolUdxDataRun, QChar(0xf144));
     OgmUiHelper::Instance()->setIcon(_ui->btnToolUdxInfo, QChar(0xf05a));
 
     OgmUiHelper::Instance()->setIcon(_ui->lblToolOms, QChar(0xf1d0));
@@ -24,7 +30,7 @@ void OgmToolWidget::initWidget()
     OgmUiHelper::Instance()->setIcon(_ui->btnToolOmsInfo, QChar(0xf05a));
 
     OgmUiHelper::Instance()->setIcon(_ui->lblToolA, QChar(0xf1b2));
-    OgmUiHelper::Instance()->setIcon(_ui->btnToolARun, QChar(0xf144));
+    OgmUiHelper::Instance()->setIcon(_ui->btnToolUdxSchemaRun, QChar(0xf144));
     OgmUiHelper::Instance()->setIcon(_ui->btnToolAInfo, QChar(0xf05a));
 
     OgmUiHelper::Instance()->setIcon(_ui->lblToolB, QChar(0xf1b2));
@@ -32,13 +38,21 @@ void OgmToolWidget::initWidget()
     OgmUiHelper::Instance()->setIcon(_ui->btnToolBInfo, QChar(0xf05a));
 
     //function
-    connect(_ui->btnToolUdxRun, &QToolButton::clicked, [=](){
+    connect(_ui->btnToolUdxDataRun, &QToolButton::clicked, [=](){
        QProcess *pro=new QProcess();
-       pro->start(OgmSetting::udxToolPath);
+       pro->start(OgmSetting::udxDataPath);
+    });
+    connect(_ui->btnToolUdxSchemaRun, &QToolButton::clicked, [=](){
+       QProcess *pro=new QProcess();
+       pro->start(OgmSetting::udxSchemaPath);
     });
     connect(_ui->btnToolOmsRun, &QToolButton::clicked, [=](){
        QProcess *pro=new QProcess();
        pro->start(OgmSetting::omsToolPath);
+    });
+    connect(_ui->btnToolBRun, &QToolButton::clicked, [=](){
+        ModelServer *server=_modelServerBLL.data()->getServerId(OgmSetting::defaultModelServerId);
+        QDesktopServices::openUrl(QUrl("http://"+server->ip+":8060/index"));
     });
 }
 

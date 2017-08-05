@@ -21,6 +21,9 @@ public:
     bool deleteOneFavorGroup(QString favorId);
 
     bool addOneFavorService(SERVICEITEM service, QString favorId);
+
+    bool deleteOneFavorService(SERVICEITEM service, QString favorId);
+
     //trans
     QList<ModelService*> favor2modelServiceList(Favor *favor);
 

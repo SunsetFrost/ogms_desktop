@@ -95,17 +95,25 @@ void OgmMainWidget::initFunction()
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeFavor, _widgetFavorSidebar, &OgmFavorSidebarWidget::changeFavorUI);
 
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeModelListByList, [=](QList<ModelService*> msList){
-        _widgetList->changeModelListUI(msList);
+        _widgetList->setFavorId(_widgetFavorTop->getCurrentId());
+        _widgetList->setPageIndex(0);
+        _widgetList->changeModelListUI(msList, "FavorModel");
     });
 
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeDataListByList, [=](QList<DataService*> dsList){
-        _widgetList->changeDataListUI(dsList);
+        _widgetList->setFavorId(_widgetFavorTop->getCurrentId());
+        _widgetList->setPageIndex(0);
+        _widgetList->changeDataListUI(dsList, "FavorData");
     });
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeDataMappingListByList, [=](QList<DataMapping*> mappingList){
-        _widgetList->changeDataListUI(mappingList);
+        _widgetList->setFavorId(_widgetFavorTop->getCurrentId());
+        _widgetList->setPageIndex(0);
+        _widgetList->changeDataListUI(mappingList, "FavorDataMapping");
     });
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeDataRefactorListByList, [=](QList<DataRefactor*> refactorList){
-        _widgetList->changeDataListUI(refactorList);
+        _widgetList->setFavorId(_widgetFavorTop->getCurrentId());
+        _widgetList->setPageIndex(0);
+        _widgetList->changeDataListUI(refactorList, "FavorDataRefactor");
     });
     //task top
     connect(_widgetTaskTop, &OgmMiniTopWidget::signalChangeTaskList, _widgetList, &OgmListWidget::changeTaskListUI);
@@ -113,9 +121,12 @@ void OgmMainWidget::initFunction()
     //list
     connect(_widgetList, &OgmListWidget::signalAddFolderOnFileLink, _widgetFileServerTop, &OgmServerTopWidget::addOneFileLinkOnUI);
     connect(_widgetList, &OgmListWidget::signalAddFavorSidebar, _widgetFavorSidebar, &OgmFavorSidebarWidget::changeChooseFavorUI);
-    connect(_widgetList, &OgmListWidget::signalChangeDataMapTaskConfigUI, _widgetDataMapTaskConfig, &OgmConfigTaskWidget::changeDataMapTask);
+    connect(_widgetList, &OgmListWidget::signalChangeDataMapTaskConfigUI, _widgetDataMapTaskConfig, &OgmConfigTaskWidget::changeDataMapTaskByService);
+    connect(_widgetList, &OgmListWidget::signalChangeDataMapTaskConfigUIByTask, _widgetDataMapTaskConfig, &OgmConfigTaskWidget::changeDataMapTaskByTask);
     connect(_widgetList, &OgmListWidget::signalChangeDataRefactorTaskConfigUI, _widgetDataRefactorTaskConfig, &OgmConfigTaskWidget::changeDataRefactorTask);
+    connect(_widgetList, &OgmListWidget::signalChangeDataRefactorTaskConfigUIByTask, _widgetDataRefactorTaskConfig, &OgmConfigTaskWidget::changeDataRefactorTaskByTask);
     connect(_widgetList, &OgmListWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
+    connect(_widgetList, &OgmListWidget::signalChangeModelServerTopUI, _widgetModelServerTop, &OgmServerTopWidget::changeModelServer);
 
     //server sidebar
     connect(_widgetServerSidebar, &OgmServerSidebarWidget::signalChangeModelList, [=](QString serverId){
@@ -155,7 +166,6 @@ void OgmMainWidget::initChildWidget()
 
     QWidget *widgetListPage=new QWidget(_ui->widgetContent);
     widgetListPage->setWindowTitle("widget-content");
-    //_ui->widgetContent->layout()->addWidget(widgetListPage);
 
     _scrollArea->setWidget(widgetListPage);
     _scrollArea->setWidgetResizable(widgetListPage);
@@ -176,7 +186,7 @@ void OgmMainWidget::initChildWidget()
     _widgetTool=new OgmToolWidget(_ui->widgetContent);
     _ui->widgetContent->layout()->addWidget(_widgetTool);
 
-    //init serverTop
+    //init server top
     _widgetDataServerTop=new OgmServerTopWidget("Data", widgetListPage);
     _widgetDataServerTop->changeDataServer(OgmSetting::defaultDataServerId);
     layoutListPage->addWidget(_widgetDataServerTop);
@@ -193,6 +203,7 @@ void OgmMainWidget::initChildWidget()
     _widgetFavorTop->changeFavorManager(OgmSetting::defaultFavorId);
     layoutListPage->addWidget(_widgetFavorTop);
 
+    //init mini top
     _widgetTaskTop=new OgmMiniTopWidget("Task", widgetListPage);
     layoutListPage->addWidget(_widgetTaskTop);
 
@@ -315,7 +326,8 @@ void OgmMainWidget::switchPage(QString type)
     else if(type=="FavorList"){
         Favor *favor=_favorBLL.data()->getFavorGroupById(_widgetFavorTop->getCurrentId());
         QList<ModelService*> msList=_favorBLL.data()->favor2modelServiceList(favor);
-        _widgetList->changeModelListUI(msList);
+        _widgetList->changeModelListUI(msList, "FavorModel");
+        _widgetFavorTop->changeFavorManager(OgmSetting::defaultFavorId);
 
         _widgetFavorTop->setHidden(false);
         _widgetList->setHidden(false);

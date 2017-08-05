@@ -1,6 +1,8 @@
 #include "ogmminitopwidget.h"
 
 #include "OgmCommon/ogmuihelper.h"
+#include "OgmCommon/ogmlisthelper.h"
+#include "ogmpopwidget.h"
 
 OgmMiniTopWidget::OgmMiniTopWidget(QString widgetType, QWidget *parent)
     : QWidget(parent)
@@ -8,6 +10,9 @@ OgmMiniTopWidget::OgmMiniTopWidget(QString widgetType, QWidget *parent)
 {
     _ui->setupUi(this);
     _taskBLL=QSharedPointer<TaskBLL>(new TaskBLL);
+
+    _modelServerBLL=QSharedPointer<ModelServerBLL>(new ModelServerBLL);
+    _dataServerBLL=QSharedPointer<DataServerBLL>(new DataServerBLL);
 
     if(widgetType=="Task"){
         initTaskWidget();
@@ -59,6 +64,34 @@ void OgmMiniTopWidget::initServerWidget()
     connect(_ui->btnMiniTopDataServer, &QToolButton::clicked, [=](){
         taskBtnCheckStateManage("DataServer");
         emit signalChangeServerList("DataServer");
+    });
+    connect(_ui->btnNewServer, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("NewServer");
+        popWidget->show();
+
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            QStringList strList=varResult.toStringList();
+            if(strList.at(2)=="ModelServer"){
+                ModelServer *modelServer=new ModelServer();
+                modelServer->ip=strList.at(0);
+                modelServer->name=strList.at(1);
+                modelServer->desc=strList.at(3);
+                modelServer->id=OgmHelper::createUId();
+
+                _modelServerBLL.data()->addServer(modelServer);
+                emit signalChangeServerList("ModelServer");
+            }
+            else if(strList.at(2)=="DataServer"){
+                DataServer *dataServer=new DataServer();
+                dataServer->ip=strList.at(0);
+                dataServer->name=strList.at(1);
+                dataServer->desc=strList.at(3);
+                dataServer->id=OgmHelper::createUId();
+
+                _dataServerBLL.data()->addServer(dataServer);
+                emit signalChangeServerList("DataServer");
+            }
+        });
     });
 }
 

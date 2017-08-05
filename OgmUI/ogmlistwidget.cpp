@@ -3,6 +3,7 @@
 #include "OgmCommon/ogmuihelper.h"
 #include "OgmCommon/ogmlisthelper.h"
 #include "OgmCommon/ogmprogressbar.h"
+#include "OgmCommon/ogmsetting.h"
 
 #include "OgmUI/ogmpopwidget.h"
 
@@ -19,6 +20,7 @@ OgmListWidget::OgmListWidget(QWidget *parent) : QWidget(parent)
     _dataRefactorBLL= QSharedPointer<DataRefactorBLL> (new DataRefactorBLL);
     _dataFileBLL=     QSharedPointer<DataFileBll>     (new DataFileBll);
     _taskBLL=         QSharedPointer<TaskBLL>         (new TaskBLL);
+    _favorBLL=        QSharedPointer<FavorBLL>        (new FavorBLL);
 
     initWidget();
 }
@@ -27,12 +29,12 @@ void OgmListWidget::changeModelListUIByPage(QString serverId, int pageIndex)
 {
     _serverId=serverId;
     QList<ModelService*> modelList=_modelServiceBLL.data()->getModelServiceListByPage(serverId, pageIndex);
-    changeModelListUI(modelList);
+    changeModelListUI(modelList, "Model");
 }
 
-void OgmListWidget::changeModelListUI(QList<ModelService *> modelList)
+void OgmListWidget::changeModelListUI(QList<ModelService *> modelList, QString listType)
 {
-    _listType="Model";
+    _listType=listType;
     clearList();
 
     QList<QVariant> varList=OgmHelper::toVarList(modelList);
@@ -40,9 +42,9 @@ void OgmListWidget::changeModelListUI(QList<ModelService *> modelList)
     listPaging(varList, 25);
 }
 
-void OgmListWidget::changeDataListUI(QList<DataService *> dataList)
+void OgmListWidget::changeDataListUI(QList<DataService *> dataList, QString listType)
 {
-    _listType="Data";
+    _listType=listType;
     clearList();
 
     QList<QVariant> varList=OgmHelper::toVarList(dataList);
@@ -50,9 +52,9 @@ void OgmListWidget::changeDataListUI(QList<DataService *> dataList)
     listPaging(varList, 25);
 }
 
-void OgmListWidget::changeDataListUI(QList<DataMapping *> dataMappingList)
+void OgmListWidget::changeDataListUI(QList<DataMapping *> dataMappingList, QString listType)
 {
-    _listType="DataMapping";
+    _listType=listType;
     clearList();
 
     QList<QVariant> varList=OgmHelper::toVarList(dataMappingList);
@@ -60,9 +62,9 @@ void OgmListWidget::changeDataListUI(QList<DataMapping *> dataMappingList)
     listPaging(varList, 25);
 }
 
-void OgmListWidget::changeDataListUI(QList<DataRefactor *> dataRefactorList)
+void OgmListWidget::changeDataListUI(QList<DataRefactor *> dataRefactorList, QString listType)
 {
-    _listType="DataRefactor";
+    _listType=listType;
     clearList();
 
     QList<QVariant> varList=OgmHelper::toVarList(dataRefactorList);
@@ -76,15 +78,15 @@ void OgmListWidget::changeDataListUI(QString serverId, QString type, int pageInd
 
     if(type=="Data"){
         QList<DataService*> dataList=_dataServiceBLL.data()->getDataListByPage(serverId, pageIndex);
-        changeDataListUI(dataList);
+        changeDataListUI(dataList, "Data");
     }
     else if(type=="DataMapping"){
         QList<DataMapping*> dataMappingList=_dataMappingBLL.data()->getDataMappingByPage(serverId, pageIndex);
-        changeDataListUI(dataMappingList);
+        changeDataListUI(dataMappingList, "DataMapping");
     }
     else if(type=="DataRefactor"){
         QList<DataRefactor*> dataRefactorList=_dataRefactorBLL.data()->getDataRefactorByPage(serverId, pageIndex);
-        changeDataListUI(dataRefactorList);
+        changeDataListUI(dataRefactorList, "DataRefactor");
     }
 }
 
@@ -192,9 +194,15 @@ void OgmListWidget::setPageIndex(int pageIndex)
     _currentPageIndex=pageIndex;
 }
 
+void OgmListWidget::setFavorId(QString favorId)
+{
+    _favorId=favorId;
+}
+
 void OgmListWidget::initWidget()
 {
     _currentPageIndex=0;
+    _favorId=OgmSetting::defaultFavorId;
 
     QVBoxLayout *layoutMain=new QVBoxLayout();
     //layoutMain->setContentsMargins(15, 3, 15, 15);
@@ -361,14 +369,6 @@ void OgmListWidget::addOneDataOnUI(DataService *data, QString style)
     listItemBtnDetail.objectName="btnDataDetail|"+data->id;
     listItemList.append(listItemBtnDetail);
 
-    LISTCHILD listItemBtnFavor;
-    listItemBtnFavor.typeValue=ItemType::ToolButton;
-    listItemBtnFavor.iconValue=0xf004;
-    listItemBtnFavor.styleName="btn-light";
-    listItemBtnFavor.toolTipValue="add to my favor";
-    listItemBtnFavor.objectName="btnDataFavor|"+data->id;
-    listItemList.append(listItemBtnFavor);
-
     LISTCHILD listItemBtnDownload;
     listItemBtnDownload.typeValue=ItemType::ToolButton;
     listItemBtnDownload.iconValue=0xf019;
@@ -376,6 +376,20 @@ void OgmListWidget::addOneDataOnUI(DataService *data, QString style)
     listItemBtnDownload.toolTipValue="download data";
     listItemBtnDownload.objectName="btnDataDownload|"+data->id;
     listItemList.append(listItemBtnDownload);
+
+    if(_listType=="Data"){
+        LISTCHILD listItemBtnFavor;
+        listItemBtnFavor.typeValue=ItemType::ToolButton;
+        listItemBtnFavor.iconValue=0xf004;
+        listItemBtnFavor.styleName="btn-light";
+        listItemBtnFavor.toolTipValue="add to my favor";
+        listItemBtnFavor.objectName="btnDataFavor|"+data->id;
+        listItemList.append(listItemBtnFavor);
+    }
+    else if(_listType=="FavorData"){
+        LISTCHILD listItemBtnDelete=OgmListHelper::createButtonChild(0xf1f8, "btnDataDelete|"+data->id, "btn-light", "delete from group");
+        listItemList.append(listItemBtnDelete);
+    }
 
     LISTCHILD listItemSpaceB;
     listItemSpaceB.typeValue=ItemType::SpaceItem;
@@ -392,9 +406,28 @@ void OgmListWidget::addOneDataOnUI(DataService *data, QString style)
     OgmListHelper::addListItem(_widgetList, "btnDataList|"+data->id, style, "btn", listItemList);
 
     //connect
-    QToolButton *btn=_widgetList->findChild<QToolButton*>(listItemBtnFavor.objectName);
-    connect(btn, &QToolButton::clicked, [=](){
+    QToolButton *btnFavor=_widgetList->findChild<QToolButton*>("btnDataFavor|"+data->id);
+    connect(btnFavor, &QToolButton::clicked, [=](){
         emit signalAddFavorSidebar(data->serverId, data->id, "Data");
+    });
+
+    QToolButton *btnDelete=_widgetList->findChild<QToolButton*>("btnDataDelete|"+data->id);
+    connect(btnDelete, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("DeleteFavorGroup");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            if(varResult.toBool()){
+                SERVICEITEM service;
+                service.serverId=data->serverId;
+                service.serviceId=data->id;
+                service.serviceType="Data";
+                _favorBLL.data()->deleteOneFavorService(service, _favorId);
+                //change ui
+                Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
+                QList<DataService*> msList=_favorBLL.data()->favor2dataServiceList(favor);
+                changeDataListUI(msList, "FavorData");
+            }
+        });
     });
 }
 
@@ -422,14 +455,6 @@ void OgmListWidget::addOneDataMappingOnUI(DataMapping *data, QString style)
     listItemBtnDetail.objectName="btnDataMappingDetail|"+data->id;
     listItemList.append(listItemBtnDetail);
 
-    LISTCHILD listItemBtnFavor;
-    listItemBtnFavor.typeValue=ItemType::ToolButton;
-    listItemBtnFavor.iconValue=0xf004;
-    listItemBtnFavor.styleName="btn-light";
-    listItemBtnFavor.toolTipValue="add to my favor";
-    listItemBtnFavor.objectName="btnDataMappingFavor|"+data->id;
-    listItemList.append(listItemBtnFavor);
-
     LISTCHILD listItemBtnInvoke;
     listItemBtnInvoke.typeValue=ItemType::ToolButton;
     listItemBtnInvoke.iconValue=0xf04b;
@@ -437,6 +462,20 @@ void OgmListWidget::addOneDataMappingOnUI(DataMapping *data, QString style)
     listItemBtnInvoke.toolTipValue="invoke data mapping service";
     listItemBtnInvoke.objectName="btnDataMappingInvoke|"+data->id;
     listItemList.append(listItemBtnInvoke);
+
+    if(_listType=="DataMapping"){
+        LISTCHILD listItemBtnFavor;
+        listItemBtnFavor.typeValue=ItemType::ToolButton;
+        listItemBtnFavor.iconValue=0xf004;
+        listItemBtnFavor.styleName="btn-light";
+        listItemBtnFavor.toolTipValue="add to my favor";
+        listItemBtnFavor.objectName="btnDataMappingFavor|"+data->id;
+        listItemList.append(listItemBtnFavor);
+    }
+    else if(_listType=="FavorDataMapping"){
+        LISTCHILD listItemBtnDelete=OgmListHelper::createButtonChild(0xf1f8, "btnDataMappingDelete|"+data->id, "btn-light", "delete from group");
+        listItemList.append(listItemBtnDelete);
+    }
 
     LISTCHILD listItemSpaceB;
     listItemSpaceB.typeValue=ItemType::SpaceItem;
@@ -453,15 +492,34 @@ void OgmListWidget::addOneDataMappingOnUI(DataMapping *data, QString style)
     OgmListHelper::addListItem(_widgetList, "btnDataMappingList|"+data->id, style, "btn", listItemList);
 
     //connect
-    QToolButton *btn=_widgetList->findChild<QToolButton*>(listItemBtnFavor.objectName);
+    QToolButton *btn=_widgetList->findChild<QToolButton*>("btnDataMappingFavor|"+data->id);
     connect(btn, &QToolButton::clicked, [=](){
         emit signalAddFavorSidebar(data->serverId, data->id, "DataMapping");
     });
 
-    QToolButton *btnInvoke=_widgetList->findChild<QToolButton*>(listItemBtnInvoke.objectName);
+    QToolButton *btnInvoke=_widgetList->findChild<QToolButton*>("btnDataMappingInvoke|"+data->id);
     connect(btnInvoke, &QToolButton::clicked, [=](){
         emit signalSwitchPage("DataMapTaskConfig");
         emit signalChangeDataMapTaskConfigUI(data->serverId, data->id);
+    });
+
+    QToolButton *btnDelete=_widgetList->findChild<QToolButton*>("btnDataMappingDelete|"+data->id);
+    connect(btnDelete, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("DeleteFavorGroup");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            if(varResult.toBool()){
+                SERVICEITEM service;
+                service.serverId=data->serverId;
+                service.serviceId=data->id;
+                service.serviceType="DataMapping";
+                _favorBLL.data()->deleteOneFavorService(service, _favorId);
+                //change ui
+                Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
+                QList<DataMapping*> msList=_favorBLL.data()->favor2dataMappingList(favor);
+                changeDataListUI(msList, "FavorDataMapping");
+            }
+        });
     });
 }
 
@@ -489,14 +547,6 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
     listItemBtnDetail.objectName="btnDataRefactorDetail|"+data->id;
     listItemList.append(listItemBtnDetail);
 
-    LISTCHILD listItemBtnFavor;
-    listItemBtnFavor.typeValue=ItemType::ToolButton;
-    listItemBtnFavor.iconValue=0xf004;
-    listItemBtnFavor.styleName="btn-light";
-    listItemBtnFavor.toolTipValue="add to my favor";
-    listItemBtnFavor.objectName="btnDataRefactorFavor|"+data->id;
-    listItemList.append(listItemBtnFavor);
-
     LISTCHILD listItemBtnDownload;
     listItemBtnDownload.typeValue=ItemType::ToolButton;
     listItemBtnDownload.iconValue=0xf04b;
@@ -504,6 +554,20 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
     listItemBtnDownload.toolTipValue="run data refactor method";
     listItemBtnDownload.objectName="btnDataRefactorRun|"+data->id;
     listItemList.append(listItemBtnDownload);
+
+    if(_listType=="DataRefactor"){
+        LISTCHILD listItemBtnFavor;
+        listItemBtnFavor.typeValue=ItemType::ToolButton;
+        listItemBtnFavor.iconValue=0xf004;
+        listItemBtnFavor.styleName="btn-light";
+        listItemBtnFavor.toolTipValue="add to my favor";
+        listItemBtnFavor.objectName="btnDataRefactorFavor|"+data->id;
+        listItemList.append(listItemBtnFavor);
+    }
+    else if(_listType=="FavorDataRefactor"){
+        LISTCHILD listItemBtnDelete=OgmListHelper::createButtonChild(0xf1f8, "btnDataMappingDelete|"+data->id, "btn-light", "delete from group");
+        listItemList.append(listItemBtnDelete);
+    }
 
     LISTCHILD listItemSpaceB;
     listItemSpaceB.typeValue=ItemType::SpaceItem;
@@ -520,12 +584,12 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
     OgmListHelper::addListItem(_widgetList, "btnDataRefactorList|"+data->id, style, "btn", listItemList);
 
     //connect
-    QToolButton *btnFavor=_widgetList->findChild<QToolButton*>(listItemBtnFavor.objectName);
+    QToolButton *btnFavor=_widgetList->findChild<QToolButton*>("btnDataRefactorFavor|"+data->id);
     connect(btnFavor, &QToolButton::clicked, [=](){
         emit signalAddFavorSidebar(data->serverId, data->id, "DataRefactor");
     });
 
-    QToolButton *btnRun=_widgetList->findChild<QToolButton*>(listItemBtnDownload.objectName);
+    QToolButton *btnRun=_widgetList->findChild<QToolButton*>("btnDataRefactorRun|"+data->id);
     connect(btnRun, &QToolButton::clicked, [=](){
         OgmPopWidget *pop=new OgmPopWidget("ChooseRefactorMethod");
         pop->changeChooseRefactorMethod(_serverId, data->id);
@@ -536,6 +600,25 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
             emit signalChangeDataRefactorTaskConfigUI(serverId, refactorId, methodId);
         });
         pop->show();
+    });
+
+    QToolButton *btnDelete=_widgetList->findChild<QToolButton*>("btnDataRefactorDelete|"+data->id);
+    connect(btnDelete, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("DeleteFavorGroup");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            if(varResult.toBool()){
+                SERVICEITEM service;
+                service.serverId=data->serverId;
+                service.serviceId=data->id;
+                service.serviceType="DataRefactor";
+                _favorBLL.data()->deleteOneFavorService(service, _favorId);
+                //change ui
+                Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
+                QList<DataRefactor*> msList=_favorBLL.data()->favor2dataRefactorList(favor);
+                changeDataListUI(msList, "FavorDataRefactor");
+            }
+        });
     });
 }
 
@@ -592,13 +675,17 @@ void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
     listItemBtnDetail.objectName="btnDataDetail|"+model->id;
     listItemList.append(listItemBtnDetail);
 
-    LISTCHILD listItemBtnFavor;
-    listItemBtnFavor.typeValue=ItemType::ToolButton;
-    listItemBtnFavor.iconValue=0xf004;
-    listItemBtnFavor.styleName="btn-light";
-    listItemBtnFavor.toolTipValue="add to my favor group";
-    listItemBtnFavor.objectName="btnModelFavor|"+model->id;
-    listItemList.append(listItemBtnFavor);
+    LISTCHILD listItemBtnRun=OgmListHelper::createButtonChild(0xf144, "btnModelRun|"+model->id, "btn-light", "run this model");
+    listItemList.append(listItemBtnRun);
+
+    if(_listType=="FavorModel"){
+        LISTCHILD listItemBtnDelete=OgmListHelper::createButtonChild(0xf1f8, "btnModelDelete|"+model->id, "btn-light", "delete from group");
+        listItemList.append(listItemBtnDelete);
+    }
+    else{
+        LISTCHILD listItemBtnFavor=OgmListHelper::createButtonChild(0xf004, "btnModelFavor|"+model->id, "btn-light", "add to my favor group");
+        listItemList.append(listItemBtnFavor);
+    }
 
     LISTCHILD listItemSpaceB;
     listItemSpaceB.typeValue=ItemType::SpaceItem;
@@ -615,9 +702,28 @@ void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
     OgmListHelper::addListItem(_widgetList, "btnModelList|"+model->id, style, "btn", listItemList);
 
     //connect
-    QToolButton *btn=_widgetList->findChild<QToolButton*>(listItemBtnFavor.objectName);
-    connect(btn, &QToolButton::clicked, [=](){
+    QToolButton *btnFavor=_widgetList->findChild<QToolButton*>("btnModelFavor|"+model->id);
+    connect(btnFavor, &QToolButton::clicked, [=](){
         emit signalAddFavorSidebar(model->serverId, model->id, "Model");
+    });
+
+    QToolButton *btnDelete=_widgetList->findChild<QToolButton*>("btnModelDelete|"+model->id);
+    connect(btnDelete, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("DeleteFavorGroup");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            if(varResult.toBool()){
+                SERVICEITEM service;
+                service.serverId=model->serverId;
+                service.serviceId=model->id;
+                service.serviceType="Model";
+                _favorBLL.data()->deleteOneFavorService(service, _favorId);
+                //change ui
+                Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
+                QList<ModelService*> msList=_favorBLL.data()->favor2modelServiceList(favor);
+                changeModelListUI(msList, "FavorModel");
+            }
+        });
     });
 }
 
@@ -833,10 +939,8 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
     OgmListHelper::addListItem(_widgetList, "btnTaskList|"+task->uid, style, "btn", listItemList);
 
     //btn function
-    QToolButton *btnTask=_widgetList->findChild<QToolButton*>("btnTaskCal|"+task->uid);
-
-
-    connect(btnTask, &QToolButton::clicked, [=](){
+    QToolButton *btnTaskCal=_widgetList->findChild<QToolButton*>("btnTaskCal|"+task->uid);
+    connect(btnTaskCal, &QToolButton::clicked, [=](){
         //change run state
         _taskBLL.data()->changeTaskRunState(task->uid, "Running");
 
@@ -862,6 +966,32 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
                 }
             }
         }
+    });
+
+    QToolButton *btnEdit=_widgetList->findChild<QToolButton*>("btnTaskEdit|"+task->uid);
+    connect(btnEdit, &QToolButton::clicked, [=](){
+        if(task->type=="DataMap"){
+            emit signalSwitchPage("DataMapTaskConfig");
+            emit signalChangeDataMapTaskConfigUIByTask(task);
+        }
+        else if(task->type=="DataRefactor"){
+            emit signalSwitchPage("DataRefactorTaskConfig");
+            emit signalChangeDataRefactorTaskConfigUIByTask(task);
+        }
+    });
+
+    QToolButton *btnDelete=_widgetList->findChild<QToolButton*>("btnTaskDel|"+task->uid);
+    connect(btnDelete, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("Common");
+        popWidget->setCommonWidgetInfo("Delete Task", "Do you sure to delete this task?", "Delete");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            if(varResult.toBool()){
+                _taskBLL.data()->deleteTask(task->uid);
+                QList<Task*> taskList=_taskBLL.data()->getAllTask();
+                changeTaskListUI(taskList, task->runstate);
+            }
+        });
     });
 }
 
@@ -924,8 +1054,14 @@ void OgmListWidget::addOneServerOnUI(ModelServer *modelServer, QString style)
     LISTCHILD listSpaceA=OgmListHelper::createSpaceChild();
     list.append(listSpaceA);
 
+    LISTCHILD listServices=OgmListHelper::createButtonChild(0xf04b, "btnModelServerServices|"+modelServer->id, "btn-light", "browse model services in server");
+    list.append(listServices);
+
     LISTCHILD listRun=OgmListHelper::createButtonChild(0xf05a, "btnModelServerDetail|"+modelServer->id, "btn-light", "server detail information");
     list.append(listRun);
+
+    LISTCHILD listDelete=OgmListHelper::createButtonChild(0xf1f8, "btnModelServerDelete|"+modelServer->id, "btn-light", "delete server");
+    list.append(listDelete);
 
     LISTCHILD listSpaceB=OgmListHelper::createSpaceChild();
     list.append(listSpaceB);
@@ -941,6 +1077,24 @@ void OgmListWidget::addOneServerOnUI(ModelServer *modelServer, QString style)
 //        emit signalSwitchPage("DataRefactorTaskConfig");
 //        emit signalChangeDataRefactorTaskConfigUI(dataMethod->serverId, dataMethod->refactorId, dataMethod->name);
 //    });
+    QToolButton *btnDelete=_widgetList->findChild<QToolButton*>("btnModelServerDelete|"+modelServer->id);
+    connect(btnDelete, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("Common");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            if(varResult.toBool()){
+                _modelServerBLL.data()->deleteOneServer(modelServer);
+                changeServerListUI("ModelServer");
+            }
+        });
+    });
+
+    QToolButton *btnBrowse=_widgetList->findChild<QToolButton*>("btnModelServerServices|"+modelServer->id);
+    connect(btnBrowse, &QToolButton::clicked, [=](){
+        emit signalChangeModelServerTopUI(modelServer->id);
+        changeModelListUIByPage(modelServer->id, 0);
+        emit signalSwitchPage("ModelList");
+    });
 }
 
 void OgmListWidget::addOneServerOnUI(DataServer *dataServer, QString style)

@@ -73,6 +73,8 @@ public:
 
     DataServer* getServerId(QString serverId);
 
+    void addServer(DataServer *server);
+
 private:
     QSharedPointer<DataServerDAL> _dataServerDAL;
 };

@@ -2,12 +2,15 @@
 #define OGMLISTHELPER_H
 
 #include <QWidget>
+#include <QDomDocument>
 
 #include <OgmEntity/data.h>
 #include <OgmEntity/model.h>
 #include <OgmEntity/favor.h>
 #include <OgmEntity/file.h>
 #include <OgmEntity/task.h>
+
+
 
 class OgmHelper
 {
@@ -30,6 +33,9 @@ public:
     static QList<QVariant> toVarList(QList<Favor*> favorList);
 
     static QList<QVariant> toVarList(QList<Task*> taskList);
+
+    //xml
+    static QString getXmlStringByPath(QString filePath);
 
 };
 

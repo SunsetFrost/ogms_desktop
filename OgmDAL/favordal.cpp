@@ -71,6 +71,23 @@ bool FavorDAL::addOneServiceToOneFavor(SERVICEITEM service, Favor *favor)
     return false;
 }
 
+bool FavorDAL::deleteOneServiceInOneFavorGroup(SERVICEITEM service, Favor *favor)
+{
+    QList<Favor*> favorList=getAllFavor();
+    for(int i=0; i<favorList.count(); ++i){
+        if(favorList[i]->id==favor->id){
+            for(int j=0; j<favorList[i]->serviceList.count(); ++j){
+                if(favorList[i]->serviceList[j].serverId==service.serverId && favorList[i]->serviceList[j].serviceId==service.serviceId){
+                    favorList[i]->serviceList.removeAt(j);
+                    setAllFavor(favorList);
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
 void FavorDAL::setAllFavor(QList<Favor *> favorList)
 {
     QFile file(favorFilePath);

@@ -3,6 +3,8 @@
 
 #include "OgmEntity/data.h"
 
+#include <QDomDocument>
+
 class DataServiceDAL
 {
 public:
@@ -71,6 +73,7 @@ public:
 public:
     QList<DataServer*> getAllServer();
     DataServer* getServerById(QString serverId);
+    void addServer(DataServer *server);
 
 private:
     QList<DataServer*> _serverList;

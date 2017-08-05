@@ -107,3 +107,37 @@ bool TaskBLL::isTaskFinish(QString serverIp, QString instanceId, QString type)
     else
         return true;
 }
+
+bool TaskBLL::isTaskInfoComplete(Task *task)
+{
+    if(task->type=="DataMap"){
+        if(task->getDataMapTaskConfig()->calltype=="" || task->getDataMapTaskConfig()->inputId=="" || task->getDataMapTaskConfig()->outputFilename==""){
+            return false;
+        }
+        else
+            return true;
+    }
+    if(task->type=="DataRefactor"){
+        for(int i=0; i<task->getDataRefactorTaskConfig()->paramList.count(); ++i){
+            if(task->getDataRefactorTaskConfig()->paramList.at(i).fileName==""){
+                return false;
+            }
+        }
+        return true;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

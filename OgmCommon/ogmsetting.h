@@ -13,8 +13,11 @@ public:
     static QString defaultDataServerId;
     static QString defaultFavorId;
 
-    static QString udxToolPath;
+    static QString udxDataPath;
+    static QString udxSchemaPath;
     static QString omsToolPath;
+
+    static QString serverFilePath;
 };
 
 #endif // OGMSETTING_H

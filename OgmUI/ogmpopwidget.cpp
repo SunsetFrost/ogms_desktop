@@ -15,6 +15,7 @@ OgmPopWidget::OgmPopWidget(QString widgetType, QWidget *parent)
     _ui->widgetPopDeleteFile->setHidden(true);
     _ui->widgetPopChooseFile->setHidden(true);
     _ui->widgetPopSaveTask->setHidden(true);
+    _ui->widgetPopNewServer->setHidden(true);
 
     if(widgetType=="NewFile")
         initNewFileWidget();
@@ -26,10 +27,14 @@ OgmPopWidget::OgmPopWidget(QString widgetType, QWidget *parent)
         initChooseRefactorMethod();
     else if(widgetType=="SaveTask")
         initSaveTask();
+    else if(widgetType=="NewServer")
+        initNewServer();
     else if(widgetType=="NewFavorGroup")
         initNewFavorGroupWidget();
     else if(widgetType=="DeleteFavorGroup")
         initDeleteFavorWidget();
+    else if(widgetType=="Common")
+        initDeleteFileWidget();
 
     setDragWidgetName("widgetPopTitle");
     this->setAttribute(Qt::WA_DeleteOnClose);
@@ -39,6 +44,31 @@ void OgmPopWidget::changeChooseRefactorMethod(QString serverId, QString refactor
 {
     OgmListWidget *mList=_ui->widgetPopChooseFile->findChild<OgmListWidget*>();
     mList->changeRefactorMethodListUI(serverId, refactorId);
+}
+
+void OgmPopWidget::setCommonWidgetInfo(QString title, QString content, QString btnText)
+{
+    _ui->lblPopTitle->setText(title);
+    _ui->lblPop->setText(content);
+    _ui->btnPopA->setText(btnText);
+}
+
+void OgmPopWidget::initCommonWidget()
+{
+    //style
+    this->setFixedHeight(200);
+    _ui->widgetPopDeleteFile->setHidden(false);
+
+    _ui->btnPopB->setText("Cancel");
+
+    //function
+    connect(_ui->btnPopA, &QToolButton::clicked, [=](){
+        bool isConfirm=true;
+        QVariant result(isConfirm);
+        emit signalOperationResult(result);
+        this->close();
+    });
+    connect(_ui->btnPopB, &QToolButton::clicked, this, &OgmPopWidget::close);
 }
 
 void OgmPopWidget::initNewFileWidget()
@@ -217,6 +247,33 @@ void OgmPopWidget::initSaveTask()
         strList.append(_ui->txtPopTaskName->text());
         strList.append(_ui->txtPopTaskTag->text());
         strList.append(_ui->txtPopTaskDesc->toPlainText());
+
+        QVariant varTaskInfo(strList);
+        emit signalOperationResult(varTaskInfo);
+
+        this->close();
+    });
+    connect(_ui->btnPopB, &QToolButton::clicked, this, &OgmPopWidget::close);
+}
+
+void OgmPopWidget::initNewServer()
+{
+    this->setFixedHeight(350);
+    _ui->widgetPopNewServer->setHidden(false);
+
+    _ui->lblPopTitle->setText("New Server");
+    _ui->btnPopA->setText("Confirm");
+    _ui->btnPopB->setText("Cancel");
+
+    connect(_ui->btnPopA, &QToolButton::clicked, [=](){
+        QStringList strList;
+        strList.append(_ui->txtPopNewServerIp->text());
+        strList.append(_ui->txtPopNewServerName->text());
+        if(_ui->radioBtnMs->isChecked())
+            strList.append("ModelServer");
+        else if(_ui->radioBtnDs->isChecked())
+            strList.append("DataServer");
+        strList.append(_ui->txtPopNewServerDesc->toPlainText());
 
         QVariant varTaskInfo(strList);
         emit signalOperationResult(varTaskInfo);

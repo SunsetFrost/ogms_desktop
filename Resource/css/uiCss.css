@@ -512,7 +512,7 @@ QToolButton[windowTitle="btn-info"]{
     border-radius: 2px;
 }
 QToolButton[windowTitle="btn-info"]:pressed,
-QToolButtonp[windowTitle="btn-info"]:hover{
+QToolButton[windowTitle="btn-info"]:hover{
     background: #e6e7ea;
 }
 
@@ -524,7 +524,7 @@ QToolButton[statusTip="btn-info"]{
     border-radius: 2px;
 }
 QToolButton[statusTip="btn-info"]:pressed,
-QToolButtonp[statusTip="btn-info"]:hover{
+QToolButton[statusTip="btn-info"]:hover{
     background: #e6e7ea;
 }
 

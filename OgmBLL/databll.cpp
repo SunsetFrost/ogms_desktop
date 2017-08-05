@@ -52,6 +52,11 @@ DataServer *DataServerBLL::getServerId(QString serverId)
     return server;
 }
 
+void DataServerBLL::addServer(DataServer *server)
+{
+    _dataServerDAL.data()->addServer(server);
+}
+
 DataMappingBLL::DataMappingBLL()
 {
     _dataMappingDAL=QSharedPointer<DataMappingDAL>(new DataMappingDAL());
