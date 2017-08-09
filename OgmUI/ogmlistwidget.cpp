@@ -9,6 +9,7 @@
 
 #include <QLayout>
 #include <QScrollArea>
+#include <QMovie>
 
 OgmListWidget::OgmListWidget(QWidget *parent) : QWidget(parent)
 {
@@ -27,6 +28,7 @@ OgmListWidget::OgmListWidget(QWidget *parent) : QWidget(parent)
 
 void OgmListWidget::changeModelListUIByPage(QString serverId, int pageIndex)
 {
+    clearList();
     _serverId=serverId;
     QList<ModelService*> modelList=_modelServiceBLL.data()->getModelServiceListByPage(serverId, pageIndex);
     changeModelListUI(modelList, "Model");
@@ -35,7 +37,8 @@ void OgmListWidget::changeModelListUIByPage(QString serverId, int pageIndex)
 void OgmListWidget::changeModelListUI(QList<ModelService *> modelList, QString listType)
 {
     _listType=listType;
-    clearList();
+    //clearList();
+    _widgetLoading->setHidden(true);
 
     QList<QVariant> varList=OgmHelper::toVarList(modelList);
 
@@ -45,7 +48,8 @@ void OgmListWidget::changeModelListUI(QList<ModelService *> modelList, QString l
 void OgmListWidget::changeDataListUI(QList<DataService *> dataList, QString listType)
 {
     _listType=listType;
-    clearList();
+    //clearList();
+    _widgetLoading->setHidden(true);
 
     QList<QVariant> varList=OgmHelper::toVarList(dataList);
 
@@ -55,7 +59,8 @@ void OgmListWidget::changeDataListUI(QList<DataService *> dataList, QString list
 void OgmListWidget::changeDataListUI(QList<DataMapping *> dataMappingList, QString listType)
 {
     _listType=listType;
-    clearList();
+    //clearList();
+    _widgetLoading->setHidden(true);
 
     QList<QVariant> varList=OgmHelper::toVarList(dataMappingList);
 
@@ -65,7 +70,8 @@ void OgmListWidget::changeDataListUI(QList<DataMapping *> dataMappingList, QStri
 void OgmListWidget::changeDataListUI(QList<DataRefactor *> dataRefactorList, QString listType)
 {
     _listType=listType;
-    clearList();
+    //clearList();
+    _widgetLoading->setHidden(true);
 
     QList<QVariant> varList=OgmHelper::toVarList(dataRefactorList);
     listPaging(varList, 25);
@@ -93,8 +99,9 @@ void OgmListWidget::changeDataListUI(QString serverId, QString type, int pageInd
 void OgmListWidget::changeFileListUI(QList<DataFile *> dataFileList, QString checkType)
 {
     _listType=checkType;
-    clearList();
+    //clearList();
     _currentPageIndex=0;
+    _widgetLoading->setHidden(true);
 
     QList<QVariant> varList=OgmHelper::toVarList(dataFileList);
 
@@ -123,7 +130,8 @@ void OgmListWidget::changeServerListUI(QString serverType)
 {
     _listType="Server";
     _currentPageIndex=0;
-    clearList();
+    //clearList();
+    _widgetLoading->setHidden(true);
 
     QList<QVariant> varList;
 
@@ -171,7 +179,8 @@ void OgmListWidget::changeTaskListUI(QList<Task *> taskList, QString taskRunStat
 {
     _listType=taskRunState;
     _currentPageIndex=0;
-    clearList();
+    //clearList();
+    _widgetLoading->setHidden(true);
 
     QList<Task*> displayedTaskList=_taskBLL.data()->getSpecificTaskListFromTaskList(taskList, taskRunState, QString());
 
@@ -185,7 +194,8 @@ void OgmListWidget::changeRefactorMethodListUI(QString serverId, QString refacto
 {
     _listType="ChooseRefactorMethod";
     _currentPageIndex=0;
-    clearList();
+    //clearList();
+    _widgetLoading->setHidden(true);
 
     QList<DataRefactorMethod*> methodList=_dataRefactorBLL.data()->getAllDataRefactorMethodByRefactorId(serverId, refactorId);
     QList<QVariant> varList=OgmHelper::toVarList(methodList);
@@ -212,6 +222,25 @@ void OgmListWidget::initWidget()
     //layoutMain->setContentsMargins(15, 3, 15, 15);
     this->setLayout(layoutMain);
 
+    //loading
+    _widgetLoading=new QWidget(this);
+    layoutMain->addWidget(_widgetLoading);
+
+    QVBoxLayout *layoutLoad=new QVBoxLayout();
+    _widgetLoading->setLayout(layoutLoad);
+
+    QLabel *lblLoadingGif=new QLabel(_widgetLoading);
+    lblLoadingGif->setFixedSize(36, 36);
+    lblLoadingGif->setScaledContents(true);
+    QMovie *pMovie=new QMovie(":/png/png/loading.gif");
+    lblLoadingGif->setMovie(pMovie);
+    pMovie->start();
+    layoutLoad->addStretch();
+    layoutLoad->addWidget(lblLoadingGif);
+    layoutLoad->setAlignment(lblLoadingGif, Qt::AlignCenter);
+    layoutLoad->addStretch();
+
+    //list
     _widgetList=new QWidget(this);
     layoutMain->addWidget(_widgetList);
 
@@ -222,6 +251,7 @@ void OgmListWidget::initWidget()
 
     layoutMain->addStretch();
 
+    //turn page
     _widgetTurnPage=new QWidget(this);
     layoutMain->addWidget(_widgetTurnPage);
     //_widgetTurnPage->setHidden(true);
@@ -262,14 +292,20 @@ void OgmListWidget::clearList()
             delete space;
         }
     }
+    _widgetLoading->setHidden(false);
 }
 
 void OgmListWidget::listPaging(QList<QVariant> varList, int pageAmount)
 {
+    //page temporary don't use
+    pageAmount=0;
+
     int count=varList.count();
     QVBoxLayout *layoutList=qobject_cast<QVBoxLayout*>(_widgetList->layout());
 
     if(count==0){
+        layoutList->addStretch();
+        OgmListHelper::addListItemNoResult(_widgetList, "", "btn");
         layoutList->addStretch();
     }
     else if(count<OgmListHelper::pageAmount){
@@ -746,8 +782,8 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
     if(file->type=="file"){
         LISTCHILD listItemDataIcon;
         listItemDataIcon.typeValue=ItemType::Label;
-        listItemDataIcon.iconValue=0xf016;
-        listItemDataIcon.styleName="lbl-lightdark";
+        listItemDataIcon.iconValue=0xf15b;
+        listItemDataIcon.styleName="lbl-grey";
         listItemDataIcon.fixWidth=0;
         listItemList.append(listItemDataIcon);
 
@@ -763,8 +799,8 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
         LISTCHILD listItemFile;
         listItemFile.typeValue=ItemType::ToolButtonWithText;
         listItemFile.textValue=file->name;
-        listItemFile.iconValue=0xf115;
-        listItemFile.styleName="btn-lightdark";
+        listItemFile.iconValue=0xf07c;
+        listItemFile.styleName="btn-filelist";
         listItemFile.objectName="btnDataFileName|"+file->id;
         listItemFile.fixWidth=238;
         listItemFile.isCursorChange=true;
@@ -831,6 +867,7 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
     QToolButton *btnFolder=_widgetList->findChild<QToolButton*>("btnDataFileName|"+file->id);
     connect(btnFolder, &QToolButton::clicked, [=](){
         QList<DataFile*> fileList=_dataFileBLL.data()->getFilesByParent(_serverId, file->id);
+        clearList();
         changeFileListUI(fileList, _listType);
         emit signalAddFolderOnFileLink(file->id, file->name);
     });
@@ -841,6 +878,8 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
         connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varIsDelete){
             bool isDelete=varIsDelete.toBool();
             if(isDelete){
+                clearList();
+
                 _dataFileBLL.data()->deleteData(_serverId, file->id, file->type);
 
                 changeFileListUIByParentId(_serverId, file->parentId, _listType);
@@ -955,7 +994,6 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
     //btn function
     QToolButton *btnTaskCal=_widgetList->findChild<QToolButton*>("btnTaskCal|"+task->uid);
     connect(btnTaskCal, &QToolButton::clicked, [=](){
-        //change run state
         if(task->runstate=="Prepare"){
             OgmPopWidget *popWidget=new OgmPopWidget("Common");
             popWidget->setCommonWidgetInfo("Warning", "Task is not ready, Please go to edit task information.", "Edit");
@@ -978,10 +1016,13 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
             });
         }
 
+        //change run state
         _taskBLL.data()->changeTaskRunState(task->uid, "Running");
 
         addRunningTaskOnUI(task);
-        changeTaskListUI(_taskBLL.data()->getAllTask(), "ToRun");
+        //changeTaskListUI(_taskBLL.data()->getAllTask(), "ToRun");
+        clearList();
+        emit signalChangeMiniTaskTopUI("ToRun");
 
         //synchronous untile task finish
         if(task->type=="DataMap"){
@@ -1027,8 +1068,10 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
         connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
             if(varResult.toBool()){
                 _taskBLL.data()->deleteTask(task->uid);
-                QList<Task*> taskList=_taskBLL.data()->getAllTask();
-                changeTaskListUI(taskList, task->runstate);
+
+//                QList<Task*> taskList=_taskBLL.data()->getAllTask();
+//                changeTaskListUI(taskList, task->runstate);
+                emit signalChangeMiniTaskTopUI(task->runstate);
             }
         });
     });
@@ -1044,7 +1087,8 @@ void OgmListWidget::addRunningTaskOnUI(Task *task)
         _widgetList->layout()->removeWidget(proBar);
         delete proBar;
 
-        changeTaskListUI(_taskBLL.data()->getAllTask(), "Running");
+        //changeTaskListUI(_taskBLL.data()->getAllTask(), "Running");
+        //emit signalChangeMiniTaskTopUI("Running");
     });
 
     _widgetList->layout()->addWidget(proBar);
@@ -1122,17 +1166,21 @@ void OgmListWidget::addOneServerOnUI(ModelServer *modelServer, QString style)
         popWidget->show();
         connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
             if(varResult.toBool()){
+                //clearList();
                 _modelServerBLL.data()->deleteOneServer(modelServer);
-                changeServerListUI("ModelServer");
+
+                //changeServerListUI("ModelServer");
+                emit signalChangeMiniServerTopUI("ModelServer");
             }
         });
     });
 
     QToolButton *btnBrowse=_widgetList->findChild<QToolButton*>("btnModelServerServices|"+modelServer->id);
     connect(btnBrowse, &QToolButton::clicked, [=](){
-        emit signalChangeModelServerTopUI(modelServer->id);
-        changeModelListUIByPage(modelServer->id, 0);
         emit signalSwitchPage("ModelList");
+        emit signalChangeModelServerTopUI(modelServer->id);
+        //changeModelListUIByPage(modelServer->id, 0);
+
     });
 }
 
@@ -1169,17 +1217,22 @@ void OgmListWidget::addOneServerOnUI(DataServer *dataServer, QString style)
         popWidget->show();
         connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
             if(varResult.toBool()){
+                //clearList();
                 _dataServerBLL.data()->deleteOneServer(dataServer);
-                changeServerListUI("DataServer");
+
+                //changeServerListUI("DataServer");
+                emit signalChangeMiniServerTopUI("DataServer");
             }
         });
     });
 
     QToolButton *btnBrowse=_widgetList->findChild<QToolButton*>("btnDataServerServices|"+dataServer->id);
     connect(btnBrowse, &QToolButton::clicked, [=](){
-        emit signalChangeModelServerTopUI(dataServer->id);
-        changeDataListUI(dataServer->id, "Data",0);
         emit signalSwitchPage("DataList");
+        emit signalChangeDataServerTopUI(dataServer->id);
+
+
+        //changeDataListUI(dataServer->id, "Data",0);
     });
 }
 
@@ -1261,6 +1314,11 @@ void OgmListWidget::setAllBtnUnCheck()
 QString OgmListWidget::getServerId()
 {
     return _serverId;
+}
+
+void OgmListWidget::setListType(QString listType)
+{
+    _listType=listType;
 }
 
 

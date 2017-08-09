@@ -33,10 +33,13 @@ public:
 
     void changeModelTask(QString serverId, QString modelId);
 
+    void initAggregationConfig();
+
 private:
     void initDataMapTaskConfig();
     void initDataRefctorTaskConfig();
     void initModelTaskConfig();
+
 
     void changeMethodParamUI(DataRefactorMethodParam *param, TASKREFACTORPARAM taskParam);
 

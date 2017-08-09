@@ -1,6 +1,9 @@
 #include "databll.h"
 #include "OgmCommon/ogmlisthelper.h"
 
+#include <QEventLoop>
+#include <QTimer>
+
 DataServiceBLL::DataServiceBLL()
 {
     _dataServiceDAL=QSharedPointer<DataServiceDAL>(new DataServiceDAL());
@@ -23,6 +26,10 @@ QList<DataService *> DataServiceBLL::getAllData(QString serverId)
 
 QList<DataService *> DataServiceBLL::getDataListByPage(QString serverId, int pageIndex)
 {
+    QEventLoop timeLoop;
+    QTimer::singleShot(2000, &timeLoop, SLOT(quit()));
+    timeLoop.exec();
+
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
     QList<DataService*> dsList=_dataServiceDAL.data()->getDataListByPage(dataServer, OgmListHelper::pageAmount, pageIndex);
     return dsList;
@@ -85,6 +92,10 @@ QList<DataMapping *> DataMappingBLL::getAllDataMapping(QString serverId)
 
 QList<DataMapping *> DataMappingBLL::getDataMappingByPage(QString serverId, int pageIndex)
 {
+    QEventLoop timeLoop;
+    QTimer::singleShot(2000, &timeLoop, SLOT(quit()));
+    timeLoop.exec();
+
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
     QList<DataMapping*> dsList=_dataMappingDAL.data()->getDataMappingListByPage(dataServer, OgmListHelper::pageAmount, pageIndex);
     return dsList;
@@ -119,6 +130,10 @@ QList<DataRefactor *> DataRefactorBLL::getAllDataRefactor(QString serverId)
 
 QList<DataRefactor *> DataRefactorBLL::getDataRefactorByPage(QString serverId, int pageIndex)
 {
+    QEventLoop timeLoop;
+    QTimer::singleShot(2000, &timeLoop, SLOT(quit()));
+    timeLoop.exec();
+
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
     QList<DataRefactor*> dsList=_dataRefactorDAL.data()->getDataRefactorListByPage(dataServer, OgmListHelper::pageAmount, pageIndex);
     return dsList;

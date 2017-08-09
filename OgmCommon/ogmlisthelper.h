@@ -77,6 +77,7 @@ public:
     static void addListItem(QWidget *parent, QString itemName, QString itemStyle, QList<LISTCHILD> itemList);
     static void addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTCHILD> itemList);
     static void addListItem(QWidget *parent, QString itemName, QString itemStyle, QString accessDes, QList<LISTCHILD> itemList, bool checkable);
+    static void addListItemNoResult(QWidget *parent, QString itemStyle, QString accessDes);
 
     static LISTCHILD createLableChild(QString style, int iconValue);
     static LISTCHILD createLableChild(QString style, int width, QString text);

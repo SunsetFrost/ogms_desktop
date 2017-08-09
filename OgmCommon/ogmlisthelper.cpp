@@ -79,6 +79,29 @@ void OgmListHelper::addListItem(QWidget *parent, QString itemName, QString itemS
     }
 }
 
+void OgmListHelper::addListItemNoResult(QWidget *parent, QString itemStyle, QString accessDes)
+{
+    QToolButton *item=new QToolButton(parent);
+    item->setFixedHeight(35);
+    item->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    item->setWindowTitle(itemStyle);
+    item->setAccessibleDescription(accessDes);
+    parent->layout()->addWidget(item);
+
+    QHBoxLayout *layoutItem=new QHBoxLayout();
+    layoutItem->setMargin(6);
+    item->setLayout(layoutItem);
+
+    layoutItem->addStretch();
+
+    QLabel *lbl=new QLabel(item);
+    lbl->setText("No Result");
+    lbl->setWindowTitle("lbl-lightdark-f18");
+    layoutItem->addWidget(lbl);
+
+    layoutItem->addStretch();
+}
+
 LISTCHILD OgmListHelper::createLableChild(QString style, int iconValue)
 {
     LISTCHILD lbl;

@@ -145,16 +145,22 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>240</height>
+       <height>260</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>240</height>
+       <height>260</height>
       </size>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
       <item>
        <widget class="QWidget" name="widget_8" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -165,7 +171,7 @@
           <number>5</number>
          </property>
          <property name="bottomMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <item>
           <widget class="QRadioButton" name="radioBtnMs">
@@ -188,10 +194,10 @@
        <widget class="QWidget" name="widget_6" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_10">
          <property name="topMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <property name="bottomMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <item>
           <widget class="QLineEdit" name="txtPopNewServerIp">
@@ -222,10 +228,10 @@
        <widget class="QWidget" name="widget_7" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_11">
          <property name="topMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <property name="bottomMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <item>
           <widget class="QLineEdit" name="txtPopNewServerName">
@@ -253,13 +259,47 @@
        </widget>
       </item>
       <item>
+       <widget class="QWidget" name="widget_5" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_18">
+         <property name="topMargin">
+          <number>2</number>
+         </property>
+         <property name="bottomMargin">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QLineEdit" name="txtPopNewServerLocation">
+           <property name="minimumSize">
+            <size>
+             <width>340</width>
+             <height>27</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>340</width>
+             <height>27</height>
+            </size>
+           </property>
+           <property name="statusTip">
+            <string>popWidget</string>
+           </property>
+           <property name="placeholderText">
+            <string>Please input server location</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
        <widget class="QWidget" name="widget_9" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_13">
          <property name="topMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <property name="bottomMargin">
-          <number>5</number>
+          <number>2</number>
          </property>
          <item>
           <widget class="QTextEdit" name="txtPopNewServerDesc">

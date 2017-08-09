@@ -19,7 +19,9 @@ class OgmMiniTopWidget : public QWidget
 public:
     explicit OgmMiniTopWidget(QString widgetType, QWidget *parent = 0);
 
-    void taskBtnCheckStateManage(QString taskType);
+    void changeServerType(QString serverType);
+
+    void changeTaskType(QString taskType);
 
 public:
 
@@ -27,6 +29,8 @@ private:
     void initTaskWidget();
 
     void initServerWidget();
+
+    void taskBtnCheckStateManage(QString taskType);
 
 private:
     Ui::OgmMiniTopWidget *_ui;
@@ -37,8 +41,10 @@ private:
 
 signals:
     void signalChangeTaskList(QList<Task*> taskList, QString taskRunState);
-
     void signalChangeServerList(QString serverType);
+    void signalClearList();
+    void signalSetListType(QString taskType);
+    void signalSwitchPage(QString pageType);
 };
 
 #endif // OGMMINITOPWIDGET_H

@@ -188,10 +188,10 @@ void OgmPopWidget::initDeleteFileWidget()
 
     //function
     connect(_ui->btnPopA, &QToolButton::clicked, [=](){
+        this->close();
         bool isConfirm=true;
         QVariant result(isConfirm);
-        emit signalOperationResult(result);
-        this->close();
+        emit signalOperationResult(result);    
     });
     connect(_ui->btnPopB, &QToolButton::clicked, this, &OgmPopWidget::close);
 }
@@ -246,9 +246,10 @@ void OgmPopWidget::initChooseDataFile()
     btnFileLinkAll->setWindowTitle("btn-split");
     btnFileLinkAll->setAccessibleDescription("-1");
     connect(btnFileLinkAll, &QToolButton::clicked, [=](){
-        _currentFileId="-1";
-        listWidget->changeFileListUIByParentId(listWidget->getServerId(), "-1", "FileCheck");
         removeNextAllFileLink("-1", "All");
+        _currentFileId="-1";
+        listWidget->clearList();
+        listWidget->changeFileListUIByParentId(listWidget->getServerId(), "-1", "FileCheck");
     });
     _ui->widgetPopFileLink->layout()->addWidget(btnFileLinkAll);
     _fileLinkList.append(btnFileLinkAll->objectName());
@@ -314,10 +315,10 @@ void OgmPopWidget::initSaveTask()
 
 void OgmPopWidget::initNewServer()
 {
-    this->setFixedHeight(350);
+    this->setFixedHeight(365);
     _ui->widgetPopNewServer->setHidden(false);
 
-    _ui->lblPopTitle->setText("New Server");
+    _ui->lblPopTitle->setText("Connect to Server");
     _ui->btnPopA->setText("Confirm");
     _ui->btnPopB->setText("Cancel");
 
@@ -330,6 +331,7 @@ void OgmPopWidget::initNewServer()
         else if(_ui->radioBtnDs->isChecked())
             strList.append("DataServer");
         strList.append(_ui->txtPopNewServerDesc->toPlainText());
+        strList.append(_ui->txtPopNewServerLocation->text());
 
         QVariant varTaskInfo(strList);
         emit signalOperationResult(varTaskInfo);
@@ -389,9 +391,12 @@ void OgmPopWidget::addOneFileLinkOnUI(QString fileId, QString fileName)
     btnLinkIcon->setWindowTitle("btn-split");
     btnLinkIcon->setAccessibleDescription(fileId);
     connect(btnLinkIcon, &QToolButton::clicked, [=](){
-        OgmListWidget *widgetPopListWidget=_ui->widgetPopFileList->findChild<OgmListWidget*>("mPopListWidget");
-        widgetPopListWidget->changeFileListUIByParentId(widgetPopListWidget->getServerId(), fileId, "FileCheck");
         removeNextAllFileLink(fileId, fileName);
+
+        OgmListWidget *widgetPopListWidget=_ui->widgetPopFileList->findChild<OgmListWidget*>("mPopListWidget");
+        widgetPopListWidget->clearList();
+
+        widgetPopListWidget->changeFileListUIByParentId(widgetPopListWidget->getServerId(), fileId, "FileCheck");
     });
 
     _ui->widgetPopFileLink->layout()->addWidget(btnLinkIcon);

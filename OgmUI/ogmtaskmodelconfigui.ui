@@ -51,7 +51,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="lblTaskConfigModelName">
         <property name="statusTip">
          <string>lbl-f18-title</string>
         </property>

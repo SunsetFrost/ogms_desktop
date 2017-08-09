@@ -19,6 +19,7 @@ public:
 
 public:
     QString getServerId();
+    void setListType(QString listType);
 
     void changeModelListUIByPage(QString serverId, int pageIndex);
     void changeModelListUI(QList<ModelService*> modelList, QString listType);
@@ -48,10 +49,13 @@ public:
     void setPageIndex(int pageIndex);
     void setFavorId(QString favorId);
 
+    //ui
+    void clearList();
+
 private:
     void initWidget();
 
-    void clearList();
+
     void listPaging(QList<QVariant> varList, int pageAmount);
     void addListIntelligent(QVariant var, QString style);
     void setAllBtnUnCheck();
@@ -90,6 +94,7 @@ private:
 
     QWidget *_widgetList;
     QWidget *_widgetTurnPage;
+    QWidget *_widgetLoading;
 
     QSharedPointer<ModelServiceBLL> _modelServiceBLL;
     QSharedPointer<ModelServerBLL> _modelServerBLL;
@@ -109,7 +114,11 @@ signals:
     void signalAddFavorSidebar(QString serverId, QString serviceId, QString serviceType);
 
     void signalSwitchPage(QString pageType);
+
     void signalChangeModelServerTopUI(QString serverId);
+    void signalChangeDataServerTopUI(QString serverId);
+    void signalChangeMiniServerTopUI(QString type);
+    void signalChangeMiniTaskTopUI(QString taskType);
 
     void signalChangeDataMapTaskConfigUI(QString serverId, QString dataMapId);
     void signalChangeDataMapTaskConfigUIByTask(Task *task);

@@ -237,6 +237,38 @@ void OgmConfigTaskWidget::initModelTaskConfig()
     connect(_uiModel->btnTaskConfigModelSave, &QToolButton::clicked, this, &OgmConfigTaskWidget::saveTask);
 }
 
+void OgmConfigTaskWidget::initAggregationConfig()
+{
+    //init ui
+    _uiModel=new Ui::TaskConfigModelUI();
+    _uiModel->setupUi(this);
+
+    _uiModel->lblTaskConfigModelName->setText("  Aggregation Model");
+    _uiModel->btnTaskConfigModelData->setFixedWidth(140);
+    _uiModel->btnTaskConfigModelSave->setFixedWidth(150);
+    _uiModel->btnTaskConfigModelSaveAs->setFixedWidth(120);
+
+    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelData, 0xf0ae, "New solution", 6);
+    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelSave, 0xf0ae, "Query solution", 6);
+    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelSaveAs, 0xf0ae, "Query task", 6);
+
+    //web diagram
+    _webView=new QWebEngineView();
+    _webView->setUrl(QUrl(OgmSetting::urlAggragationNewSolution));
+    _uiModel->widgetTaskConfigModelDiagram->layout()->addWidget(_webView);
+
+    //init function
+    connect(_uiModel->btnTaskConfigModelData, &QToolButton::clicked, [=](){
+        _webView->setUrl(OgmSetting::urlAggragationNewSolution);
+    });
+    connect(_uiModel->btnTaskConfigModelSave, &QToolButton::clicked, [=](){
+        _webView->setUrl(OgmSetting::urlAggragationQuerySolution);
+    });
+    connect(_uiModel->btnTaskConfigModelSaveAs, &QToolButton::clicked, [=](){
+        _webView->setUrl(OgmSetting::urlAggragationQueryTask);
+    });
+}
+
 void OgmConfigTaskWidget::saveTask()
 {
     OgmPopWidget *widgetPop=new OgmPopWidget("SaveTask");

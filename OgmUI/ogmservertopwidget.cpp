@@ -54,6 +54,9 @@ void OgmServerTopWidget::changeDataServer(QString serverId)
         _ui->widgetTopDes->setHidden(false);
         _ui->lblServerDesContent->setHidden(true);
     }
+
+    setBtnCheckState(_ui->btnServerDataPage->objectName());
+    emit signalChangeDataList(_serverId);
 }
 
 void OgmServerTopWidget::changeModelServer(QString serverId)
@@ -81,6 +84,8 @@ void OgmServerTopWidget::changeModelServer(QString serverId)
         _ui->widgetTopDes->setHidden(false);
         _ui->lblServerDesContent->setHidden(true);
     }
+
+    emit signalChangeModelList(_serverId, 0);
 }
 
 void OgmServerTopWidget::changeFileManager(QString serverId)
@@ -108,12 +113,15 @@ void OgmServerTopWidget::changeFileManager(QString serverId)
         _ui->widgetTopDes->setHidden(false);
         _ui->lblServerDesContent->setHidden(true);
     }
+
+    emit signalClearList();
+    emit signalChangeDataFileByParentId(_serverId, "-1", "");
 }
 
 void OgmServerTopWidget::changeFavorManager(QString favorId)
 {
-    _serverId=favorId;
-    Favor *favor=_favorBLL.data()->getFavorGroupById(_serverId);
+    _favorId=favorId;
+    Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
 
     _ui->lblName->setText(favor->name);
 
@@ -135,23 +143,32 @@ void OgmServerTopWidget::changeFavorManager(QString favorId)
 
 
     //change list
+    setBtnCheckState(_ui->btnFavorToolModel->objectName());
+    emit signalClearList();
     QList<ModelService*> msList=_favorBLL.data()->favor2modelServiceList(favor);
 
     emit signalChangeModelListByList(msList);
 }
 
-QString OgmServerTopWidget::getCurrentId()
+QString OgmServerTopWidget::getCurrentServerId()
 {
     return _serverId;
 }
 
 QString OgmServerTopWidget::getCurrentFileId()
 {
-    return _currentFileId;
+    return _folderId;
+}
+
+QString OgmServerTopWidget::getCurrentFavorId()
+{
+    return _favorId;
 }
 
 void OgmServerTopWidget::initModelWidget()
 {
+    _serverId=OgmSetting::defaultModelServerId;
+
     //style
     OgmUiHelper::Instance()->setIcon(_ui->lblNameIcon, QChar(0xf17a));
     OgmUiHelper::Instance()->setIcon(_ui->lblServerLocationIcon, QChar(0xf041));
@@ -181,6 +198,8 @@ void OgmServerTopWidget::initModelWidget()
 
 void OgmServerTopWidget::initDataWidget()
 {
+    _serverId=OgmSetting::defaultDataServerId;
+
     //style
     OgmUiHelper::Instance()->setIcon(_ui->lblNameIcon, QChar(0xf17a));
     OgmUiHelper::Instance()->setIcon(_ui->lblServerLocationIcon, QChar(0xf041));
@@ -200,14 +219,17 @@ void OgmServerTopWidget::initDataWidget()
 
     //function
     connect(_ui->btnServerDataPage, &QToolButton::clicked, [=](){
+        setBtnCheckState(_ui->btnServerDataPage->objectName());
         emit signalChangeDataList(_serverId);
         //emit signalSwitchPage("DataList");
     });
     connect(_ui->btnServerDataMappingPage, &QToolButton::clicked, [=](){
+        setBtnCheckState(_ui->btnServerDataMappingPage->objectName());
         emit signalChangeDataMappingList(_serverId);
         //emit signalSwitchPage("DataList");
     });
     connect(_ui->btnServerDataRefactorPage, &QToolButton::clicked, [=](){
+        setBtnCheckState(_ui->btnServerDataRefactorPage->objectName());
         emit signalChangeDataRefactorList(_serverId);
         //emit signalSwitchPage("DataList");
     });
@@ -223,6 +245,8 @@ void OgmServerTopWidget::initDataWidget()
 
 void OgmServerTopWidget::initFavorWidget()
 {
+    _favorId=OgmSetting::defaultFavorId;
+
     OgmUiHelper::Instance()->setIcon(_ui->lblIcon, QChar(0xf004));
     OgmUiHelper::Instance()->setIcon(_ui->lblServerLocationIcon, QChar(0xf041));
     OgmUiHelper::Instance()->setIcon(_ui->lblNameIcon, QChar(0xf004));
@@ -267,25 +291,37 @@ void OgmServerTopWidget::initFavorWidget()
 
     //favor function
     connect(_ui->btnFavorToolModel, &QToolButton::clicked, [=](){
-        Favor *favor=_favorBLL.data()->getFavorGroupById(_serverId);
+        setBtnCheckState(_ui->btnFavorToolModel->objectName());
+        emit signalClearList();
+
+        Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
         QList<ModelService*> msList=_favorBLL.data()->favor2modelServiceList(favor);
 
         emit signalChangeModelListByList(msList);
     });
     connect(_ui->btnFavorToolData, &QToolButton::clicked, [=](){
-        Favor *favor=_favorBLL.data()->getFavorGroupById(_serverId);
+        setBtnCheckState(_ui->btnFavorToolData->objectName());
+        emit signalClearList();
+
+        Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
         QList<DataService*> dsList=_favorBLL.data()->favor2dataServiceList(favor);
 
         emit signalChangeDataListByList(dsList);
     });
     connect(_ui->btnFavorToolDataMapping, &QToolButton::clicked, [=](){
-        Favor *favor=_favorBLL.data()->getFavorGroupById(_serverId);
+        setBtnCheckState(_ui->btnFavorToolDataMapping->objectName());
+        emit signalClearList();
+
+        Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
         QList<DataMapping*> mappingList=_favorBLL.data()->favor2dataMappingList(favor);
 
         emit signalChangeDataMappingListByList(mappingList);
     });
     connect(_ui->btnFavorToolDataRefactor, &QToolButton::clicked, [=](){
-        Favor *favor=_favorBLL.data()->getFavorGroupById(_serverId);
+        setBtnCheckState(_ui->btnFavorToolDataRefactor->objectName());
+        emit signalClearList();
+
+        Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
         QList<DataRefactor*> refactorList=_favorBLL.data()->favor2dataRefactorList(favor);
 
         emit signalChangeDataRefactorListByList(refactorList);
@@ -294,7 +330,7 @@ void OgmServerTopWidget::initFavorWidget()
 
 void OgmServerTopWidget::initFileWidget()
 {
-    _currentFileId="-1";
+    _folderId="-1";
 
     OgmUiHelper::Instance()->setIcon(_ui->lblIcon, QChar(0xf07b));
     OgmUiHelper::Instance()->setIcon(_ui->lblNameIcon, QChar(0xf07b));
@@ -323,9 +359,10 @@ void OgmServerTopWidget::initFileWidget()
     btnFileLinkAll->setWindowTitle("btn-split");
     btnFileLinkAll->setAccessibleDescription("-1");
     connect(btnFileLinkAll, &QToolButton::clicked, [=](){
-        _currentFileId="-1";
-        emit signalChangeDataFileByParentId(_serverId, "-1", "File");
+        _folderId="-1";
         removeNextAllFileLink("-1", "All");
+        emit signalClearList();
+        emit signalChangeDataFileByParentId(_serverId, "-1", "File");
     });
     _ui->widgetFileLink->layout()->addWidget(btnFileLinkAll);
     _fileLinkList.append(btnFileLinkAll->objectName());
@@ -337,10 +374,12 @@ void OgmServerTopWidget::initFileWidget()
             QString folderName=result.toString();
             QString addTime=QDateTime::currentDateTime().toString("yyyy-MM-dd");
 
-            _dataFileBLL.data()->addFolder(_serverId, _currentFileId, folderName, addTime);
+            emit signalClearList();
+
+            _dataFileBLL.data()->addFolder(_serverId, _folderId, folderName, addTime);
 
             //change list
-            emit signalChangeDataFileByParentId(_serverId, _currentFileId, "File");
+            emit signalChangeDataFileByParentId(_serverId, _folderId, "File");
         });
         popWidget->show();
     });
@@ -348,7 +387,7 @@ void OgmServerTopWidget::initFileWidget()
        QString filePath=QFileDialog::getOpenFileName(this, "choose upload data");
        if(filePath==QString::null)
            return;
-       _dataFileBLL.data()->uploadFile(_serverId, _currentFileId, filePath);
+       _dataFileBLL.data()->uploadFile(_serverId, _folderId, filePath);
     });
 
     connect(_ui->btnServerChange, &QToolButton::clicked, [=](){
@@ -362,7 +401,7 @@ void OgmServerTopWidget::initFileWidget()
 
 void OgmServerTopWidget::addOneFileLinkOnUI(QString fileId, QString fileName)
 {
-    _currentFileId=fileId;
+    _folderId=fileId;
 
     QLabel *lblLinkIcon=new QLabel(_ui->widgetFileLink);
     lblLinkIcon->setObjectName("lblFileLink|"+fileName);
@@ -377,8 +416,10 @@ void OgmServerTopWidget::addOneFileLinkOnUI(QString fileId, QString fileName)
     btnLinkIcon->setWindowTitle("btn-split");
     btnLinkIcon->setAccessibleDescription(fileId);
     connect(btnLinkIcon, &QToolButton::clicked, [=](){
-        emit signalChangeDataFileByParentId(_serverId, fileId, "File");
         removeNextAllFileLink(fileId, fileName);
+        emit signalClearList();
+        emit signalChangeDataFileByParentId(_serverId, fileId, "File");
+
     });
 
     _ui->widgetFileLink->layout()->addWidget(btnLinkIcon);
@@ -401,5 +442,17 @@ void OgmServerTopWidget::removeNextAllFileLink(QString fileId, QString fileName)
             _ui->widgetFileLink->layout()->removeWidget(widgetDel);
             delete widgetDel;
             _fileLinkList.removeAt(count);
+    }
+}
+
+void OgmServerTopWidget::setBtnCheckState(QString btnName)
+{
+    QList<QToolButton*> btnList=_ui->widgetDataServerTool->findChildren<QToolButton*>();
+    for(int i=0; i<btnList.count(); ++i){
+        if(btnList.at(i)->objectName()==btnName){
+            btnList[i]->setChecked(true);
+        }
+        else
+            btnList[i]->setChecked(false);
     }
 }

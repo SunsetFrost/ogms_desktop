@@ -22,6 +22,10 @@ public:
 
     static QString webDiagramIP;
     static QString webDiagramPath;
+
+    static QString urlAggragationNewSolution;
+    static QString urlAggragationQuerySolution;
+    static QString urlAggragationQueryTask;
 };
 
 #endif // OGMSETTING_H

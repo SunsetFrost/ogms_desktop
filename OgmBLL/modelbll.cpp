@@ -1,6 +1,9 @@
 #include "modelbll.h"
 #include "OgmCommon/ogmlisthelper.h"
 
+#include "QEventLoop"
+#include "QTimer"
+
 ModelServiceBLL::ModelServiceBLL()
 {
     _modelServerDAL=QSharedPointer<ModelServerDAL>(new ModelServerDAL);
@@ -16,6 +19,10 @@ QList<ModelService *> ModelServiceBLL::getAllModelService(QString serverId)
 
 QList<ModelService *> ModelServiceBLL::getModelServiceListByPage(QString serverId, int pageIndex)
 {
+    QEventLoop timeLoop;
+    QTimer::singleShot(3000, &timeLoop, SLOT(quit()));
+    timeLoop.exec();
+
     ModelServer *modelServer=_modelServerDAL.data()->getServerById(serverId);
 
     int start=OgmListHelper::pageAmount*pageIndex+1;

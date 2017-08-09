@@ -149,13 +149,21 @@ QLabel[statusTip="lbl-dark"]{
     color: #333333;
 }
 
+QLabel[windowTitle="lbl-grey"]{
+    font-size: 14px;
+    color: #8d8d8d;
+}
+
 QLabel[windowTitle="lbl-lightdark"]{
     font-size: 14px;
     color: #5c5c5c;
 }
-
 QLabel[statusTip="lbl-lightdark"]{
     font-size: 14px;
+    color: #5c5c5c;
+}
+QLabel[windowTitle="lbl-lightdark-f18"]{
+    font-size: 18px;
     color: #5c5c5c;
 }
 
@@ -307,6 +315,15 @@ QToolButton[statusTip="btn-miniTopRight"] QLabel[windowTitle="left"]{
 QToolButton[statusTip="btn-miniTopRight"] QLabel[windowTitle="right"]{
     font-size: 16px;
     color: #666666;
+}
+
+QToolButton[windowTitle="btn-filelist"] QLabel[windowTitle="left"]{
+    font-size: 14px;
+    color: #8d8d8d;
+}
+QToolButton[windowTitle="btn-filelist"] QLabel[windowTitle="right"]{
+    font-size: 14px;
+    color: #5c5c5c;
 }
 
 QToolButton[statusTip="btn-diffcolor-square"] QLabel[windowTitle="left"]{

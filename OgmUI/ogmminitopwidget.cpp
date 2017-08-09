@@ -22,27 +22,57 @@ OgmMiniTopWidget::OgmMiniTopWidget(QString widgetType, QWidget *parent)
     }
 }
 
+void OgmMiniTopWidget::changeServerType(QString serverType)
+{
+    taskBtnCheckStateManage(serverType);
+    emit signalClearList();
+    emit signalChangeServerList(serverType);
+}
+
+void OgmMiniTopWidget::changeTaskType(QString taskType)
+{
+    taskBtnCheckStateManage(taskType);
+
+    emit signalClearList();
+    QList<Task*> taskList=_taskBLL.data()->getAllTask();
+    emit signalChangeTaskList(taskList, taskType);
+}
+
 void OgmMiniTopWidget::initTaskWidget()
 {
     _ui->widgetMiniTopServer->setHidden(true);
 
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnNewTaskMiniTop, 0xf055, "new", 7);
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnOpenTaskMiniTop, 0xf07c, "open", 7);
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnNewTaskMiniTop, 0xf055, "Aggragation task", 7);
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnOpenTaskMiniTop, 0xf07c, "Open task", 7);
 
     connect(_ui->btnToRunMiniTop, &QToolButton::clicked, [=](){
+        emit signalSetListType("ToRun");
+        emit signalClearList();
+
         taskBtnCheckStateManage("ToRun");
         QList<Task*> taskList=_taskBLL.data()->getAllTask();
         emit signalChangeTaskList(taskList, "ToRun");
     });
     connect(_ui->btnRunningMiniTop, &QToolButton::clicked, [=](){
+        emit signalSetListType("Running");
+        emit signalClearList();
+
         taskBtnCheckStateManage("Running");
         QList<Task*> taskList=_taskBLL.data()->getAllTask();
         emit signalChangeTaskList(taskList, "Running");
     });
     connect(_ui->btnFinishMiniTop, &QToolButton::clicked, [=](){
+        emit signalSetListType("Finish");
+        emit signalClearList();
+
         taskBtnCheckStateManage("Finish");
         QList<Task*> taskList=_taskBLL.data()->getAllTask();
         emit signalChangeTaskList(taskList, "Finish");
+    });
+
+    connect(_ui->btnNewTaskMiniTop, &QToolButton::clicked, [=](){
+        emit signalSwitchPage("AggragationConfig");
+
     });
 //    connect(_ui->btnPrepareMintop, &QToolButton::clicked, [=](){
 //        taskBtnCheckStateManage("Prepare");
@@ -59,10 +89,12 @@ void OgmMiniTopWidget::initServerWidget()
 
     connect(_ui->btnMiniTopModelServer, &QToolButton::clicked, [=](){
         taskBtnCheckStateManage("ModelServer");
+        emit signalClearList();
         emit signalChangeServerList("ModelServer");
     });
     connect(_ui->btnMiniTopDataServer, &QToolButton::clicked, [=](){
         taskBtnCheckStateManage("DataServer");
+        emit signalClearList();
         emit signalChangeServerList("DataServer");
     });
     connect(_ui->btnNewServer, &QToolButton::clicked, [=](){
@@ -76,9 +108,14 @@ void OgmMiniTopWidget::initServerWidget()
                 modelServer->ip=strList.at(0);
                 modelServer->name=strList.at(1);
                 modelServer->desc=strList.at(3);
+                modelServer->location=strList.at(4);
                 modelServer->id=OgmHelper::createUId();
 
                 _modelServerBLL.data()->addServer(modelServer);
+
+                //ui change
+                taskBtnCheckStateManage("ModelServer");
+                emit signalClearList();
                 emit signalChangeServerList("ModelServer");
             }
             else if(strList.at(2)=="DataServer"){
@@ -87,8 +124,13 @@ void OgmMiniTopWidget::initServerWidget()
                 dataServer->name=strList.at(1);
                 dataServer->desc=strList.at(3);
                 dataServer->id=OgmHelper::createUId();
+                dataServer->location=strList.at(4);
 
                 _dataServerBLL.data()->addServer(dataServer);
+
+                //ui change
+                taskBtnCheckStateManage("DataServer");
+                emit signalClearList();
                 emit signalChangeServerList("DataServer");
             }
         });

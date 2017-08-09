@@ -37,6 +37,7 @@ private:
     void initChildWidget();
 
     void btnSideBarClicked();
+    void btnCheckStateChange(QString btnName);
 
     void switchPage(QString type);
 
@@ -60,6 +61,7 @@ private:
     OgmConfigTaskWidget *_widgetDataMapTaskConfig;
     OgmConfigTaskWidget *_widgetDataRefactorTaskConfig;
     OgmConfigTaskWidget *_widgetModelTaskConfig;
+    OgmConfigTaskWidget *_widgetAggragationConfig;
 
     OgmToolWidget *_widgetTool;
 

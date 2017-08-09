@@ -28,8 +28,9 @@ public:
 
     void changeFavorManager(QString favorId);
 
-    QString getCurrentId();
+    QString getCurrentServerId();
     QString getCurrentFileId();
+    QString getCurrentFavorId();
 
     void addOneFileLinkOnUI(QString fileId, QString fileName);
 
@@ -41,6 +42,8 @@ private:
 
     void removeNextAllFileLink(QString fileId, QString fileName);
 
+    void setBtnCheckState(QString btnName);
+
 private:
     Ui::OgmTopWidget *_ui;
 
@@ -50,13 +53,14 @@ private:
     QSharedPointer<DataFileBll> _dataFileBLL;
 
     QString _serverId;
-    QString _currentFileId;
+    QString _folderId;
+    QString _favorId;
 
     QList<QString> _fileLinkList;
 
 signals:
     void signalChangeModelServer();
-    void signalChangeModelList(QString serverId);
+    void signalChangeModelList(QString serverId, int pageIndex);
     void signalChangeModelListByList(QList<ModelService*> msList);
 
     void signalChangeDataServer();
@@ -72,6 +76,7 @@ signals:
     void signalChangeDataFileByParentId(QString serverId, QString parentId, QString checkType);
 
     void signalSwitchPage(QString pageType);
+    void signalClearList();
 };
 
 #endif // OGMSERVERTOPWIDGET_H
