@@ -2,6 +2,10 @@
 
 #include "OgmCommon/ogmnetwork.h"
 
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonDocument>
+
 QString TaskDAL::taskPath=QDir::currentPath()+"/task";
 
 TaskDAL::TaskDAL()
@@ -105,6 +109,8 @@ QString TaskDAL::runDataRefactorTask(QString serverIp, Task *task)
     return strResult;
 }
 
+
+
 QVariant TaskDAL::getDataTaskRecords(QString serverIp, QString instanceId, QString type)
 {
     QString request="http://"+serverIp+"/common/records?guid="+instanceId+"&type="+type;
@@ -120,6 +126,145 @@ QVariant TaskDAL::getDataTaskRecords(QString serverIp, QString instanceId, QStri
         QVariant varResult(strResult);
         return varResult;
     }
+}
+
+ModelTaskConfig *TaskDAL::getStateInfo(QString serverIp, QString modelId)
+{
+    QString strRequest="http://"+serverIp+":8060/modelser/inputdata/json/"+modelId;
+
+    QByteArray byteResult=OgmNetWork::get(strRequest);
+
+    return json2state(byteResult);
+}
+
+QString TaskDAL::getModelRunResultByModelFileId(QString serverIp, QString dataId)
+{
+    QString url="http://"+serverIp+":8060/geodata/"+dataId;
+
+    QNetworkAccessManager net;
+    QNetworkReply *reply=net.get(QNetworkRequest(url));
+
+    QEventLoop eventLoop;
+    QObject::connect(reply, SIGNAL(finished()), &eventLoop, SLOT(quit()));
+    eventLoop.exec();
+
+    QByteArray result=reply->readAll();
+    return QString::fromUtf8(result);
+}
+
+QString TaskDAL::uploadFileToModelServer(QString serverIp, QString filePath)
+{
+    QString url="http://"+serverIp+":8060/geodata?type=file";
+
+    //config upload data
+    QByteArray data;
+    QString crlf="\r\n";
+    QString b=QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary="---------------------------"+b;
+    QString endBoundary=crlf+"--"+boundary+"--"+crlf;
+    QString contentType="multipart/form-data; boundary="+boundary;
+    boundary="--"+boundary+crlf;
+    QByteArray bond=boundary.toUtf8();
+
+    QFile file(filePath);
+    file.open(QIODevice::ReadOnly);
+
+    data.append(bond);
+    boundary = crlf + boundary;
+    bond = boundary.toUtf8();
+    data.append(QString("Content-Disposition: form-data; name=\"myfile\"; filename=\""+QString(filePath+"\""+crlf).toUtf8()));
+    data.append("Content-Type:application/xml""\r\n\r\n");
+    data.append(crlf.toUtf8());
+    data.append(file.readAll());
+    data.append(endBoundary.toUtf8());
+
+    file.close();
+
+    //config qt network
+    QNetworkAccessManager net;
+    QNetworkRequest request;
+    request.setUrl(QUrl(url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, contentType);
+
+    QNetworkReply *reply=net.post(request, data);
+    QEventLoop eventLoop;
+
+    //config event loop
+    QObject::connect(reply, SIGNAL(finished()), &eventLoop, SLOT(quit()));
+    eventLoop.exec();
+
+    //result data
+    QByteArray result=reply->readAll();
+
+    QJsonParseError jsonError;
+    QJsonObject json=QJsonDocument::fromJson(result, &jsonError).object();
+    QString dataId=json.value("gd_id").toString();
+
+    return dataId;
+}
+
+QString TaskDAL::getModelRunInstanceId(QString serverIp, Task *task)
+{
+    QString url="http://"+serverIp+":8060/modelser/"+task->getModelTaskConfig()->modelId+"?ac=run&inputdata=[";
+    foreach(EventTaskConfig *event, task->getModelTaskConfig()->eventList){
+        if(event->eventType=="response"){
+            url.append("{\"StateId\":\""+task->getModelTaskConfig()->stateId+"\",");
+            url.append("\"Event\":\""+event->eventName+"\",");
+            url.append("\"DataId\":\""+event->dataFromModelId+"\"},");
+        }
+    }
+    url=url.left(url.length()-1);
+    url.append("]");
+
+    QNetworkAccessManager net;
+    QNetworkReply* reply=net.get(QNetworkRequest(url));
+
+    QEventLoop eventLoop;
+    QObject::connect(reply, SIGNAL(finished()), &eventLoop, SLOT (quit()));
+    eventLoop.exec();
+
+    QByteArray result=reply->readAll();
+
+    QJsonParseError jsonError;
+    QJsonObject json=QJsonDocument::fromJson(result, &jsonError).object();
+    QString msrId=json.value("msr_id").toString();
+
+    return msrId;
+}
+
+double TaskDAL::getModelRunInstanceInfo(QString serverIp, QString msrId, Task *task)
+{
+    QString url="http://"+serverIp+":8060/modelserrun/json/"+msrId;
+
+    QNetworkAccessManager net;
+    QNetworkReply *reply=net.get(QNetworkRequest(url));
+
+    QEventLoop eventLoop;
+    QObject::connect(reply, SIGNAL(finished()), &eventLoop, SLOT(quit()));
+    eventLoop.exec();
+
+    QByteArray result=reply->readAll();
+
+    QJsonParseError jsonError;
+    QJsonObject json=QJsonDocument::fromJson(result, &jsonError).object();
+    QJsonObject jsonMsr=json.value("data").toObject();
+    double msrTime=jsonMsr.value("msr_time").toDouble();
+
+    if(msrTime>0){
+        QJsonArray jsonOutput=jsonMsr.value("msr_output").toArray();
+        for(int i=0; i<jsonMsr.size(); ++i){
+            QString eventName=jsonOutput.at(i).toObject().value("Event").toString();
+            QString dataId=jsonOutput.at(i).toObject().value("DataId").toString();
+
+            for(int j=0; j<task->getModelTaskConfig()->eventList.count(); ++j){
+                if(task->getModelTaskConfig()->eventList.at(j)->eventName==eventName){
+                    task->getModelTaskConfig()->eventList.at(j)->dataFromModelId=dataId;
+                }
+            }
+        }
+
+    }
+    return msrTime;
 }
 
 void TaskDAL::task2xml(Task *task, QDomDocument *doc)
@@ -231,9 +376,66 @@ void TaskDAL::task2xml(Task *task, QDomDocument *doc)
             elementRefactorConfig.appendChild(elementParam);
         }
     }
+    else if(task->type=="Model"){
+        ModelTaskConfig *modelTask=task->getModelTaskConfig();
+        QDomElement eleModel=doc->createElement("ModelConfig");
 
+        attr=doc->createAttribute("modelId");
+        attr.setValue(modelTask->modelId);
+        eleModel.setAttributeNode(attr);
 
+        attr=doc->createAttribute("stateId");
+        attr.setValue(modelTask->stateId);
+        eleModel.setAttributeNode(attr);
 
+        attr=doc->createAttribute("serverId");
+        attr.setValue(modelTask->serverId);
+        eleModel.setAttributeNode(attr);
+
+        attr=doc->createAttribute("stateName");
+        attr.setValue(modelTask->serverId);
+        eleModel.setAttributeNode(attr);
+
+        elementTask.appendChild(eleModel);
+
+        for(int i=0; i<modelTask->eventList.count(); ++i){
+            QDomElement eleEvent=doc->createElement("Event");
+
+            attr=doc->createAttribute("eventName");
+            attr.setValue(modelTask->eventList.at(i)->eventName);
+            eleEvent.setAttributeNode(attr);
+
+            attr=doc->createAttribute("eventDes");
+            attr.setValue(modelTask->eventList.at(i)->eventDes);
+            eleEvent.setAttributeNode(attr);
+
+            attr=doc->createAttribute("eventType");
+            attr.setValue(modelTask->eventList.at(i)->eventType);
+            eleEvent.setAttributeNode(attr);
+
+            eleModel.appendChild(eleEvent);
+
+            QDomElement eleData=doc->createElement("Data");
+
+            attr=doc->createAttribute("dataType");
+            attr.setValue(modelTask->eventList.at(i)->dataType);
+            eleData.setAttributeNode(attr);
+
+            attr=doc->createAttribute("modelId");
+            attr.setValue(modelTask->eventList.at(i)->dataFromModelId);
+            eleData.setAttributeNode(attr);
+
+            attr=doc->createAttribute("dataId");
+            attr.setValue(modelTask->eventList.at(i)->dataFromDataId);
+            eleData.setAttributeNode(attr);
+
+            attr=doc->createAttribute("dataPath");
+            attr.setValue(modelTask->eventList.at(i)->dataPath);
+            eleData.setAttributeNode(attr);
+
+            eleEvent.appendChild(eleData);
+        }
+    }
 }
 
 void TaskDAL::xml2task(QDomDocument *doc, Task *task)
@@ -287,6 +489,70 @@ void TaskDAL::xml2task(QDomDocument *doc, Task *task)
 
         task->setTaskConfig(refactorTask);
     }
+    else if(task->type=="Model"){
+        ModelTaskConfig *modelTask=new ModelTaskConfig();
+
+        QDomElement eleModel=elementTask.firstChildElement("ModelConfig");
+        modelTask->modelId=eleModel.attributeNode("modelId").value();
+        modelTask->stateId=eleModel.attributeNode("stateId").value();
+        modelTask->serverId=eleModel.attributeNode("serverId").value();
+        modelTask->stateName=eleModel.attributeNode("stateName").value();
+
+        QDomNodeList nodeEventList=eleModel.childNodes();
+        QList<EventTaskConfig*> eventList;
+        for(int i=0; i<nodeEventList.size(); ++i){
+            EventTaskConfig *event=new EventTaskConfig();
+            event->eventName=nodeEventList.at(i).toElement().attributeNode("eventName").value();
+            event->eventDes=nodeEventList.at(i).toElement().attributeNode("eventDes").value();
+            event->eventType=nodeEventList.at(i).toElement().attributeNode("eventType").value();
+
+            QDomElement eleData=nodeEventList.at(i).toElement().firstChildElement();
+            event->dataType=eleData.attributeNode("dataType").value();
+            event->dataFromModelId=eleData.attributeNode("modelId").value();
+            event->dataFromDataId=eleData.attributeNode("dataId").value();
+            event->dataPath=eleData.attributeNode("dataPath").value();
+
+            eventList.append(event);
+        }
+        modelTask->eventList=eventList;
+        task->setTaskConfig(modelTask);
+    }
+}
+
+ModelTaskConfig *TaskDAL::json2state(QByteArray json)
+{
+    ModelTaskConfig *modelTaskConfig=new ModelTaskConfig();
+    QList<EventTaskConfig*> eventList;
+    QJsonParseError jsonError;
+    QJsonObject jsonObj=QJsonDocument::fromJson(json, &jsonError).object();
+    if(jsonError.error== QJsonParseError::NoError){
+        QJsonObject jsData=jsonObj.value("data").toObject();
+        QJsonArray jsState=jsData.value("States").toArray();
+
+        QJsonObject jsStateItem=jsState.at(0).toObject();
+        QJsonObject jsStateRoot=jsStateItem.value("$").toObject();
+        modelTaskConfig->stateId=jsStateRoot.value("id").toString();
+        modelTaskConfig->stateName=jsStateRoot.value("name").toString();
+        //modelState.description=jsStateRoot.value("description").toString();
+        //modelState.type=jsStateRoot.value("type").toString();
+
+        QJsonArray jsEventArray=jsStateItem.value("Event").toArray();
+        for(int i=0; i<jsEventArray.size(); ++i){
+            EventTaskConfig *event=new EventTaskConfig();
+
+            QJsonObject jsEvent=jsEventArray.at(i).toObject();
+            QJsonObject jsEventRoot=jsEvent.value("$").toObject();
+
+            event->eventName=jsEventRoot.value("name").toString();
+            event->eventType=jsEventRoot.value("type").toString();
+            event->eventDes=jsEventRoot.value("description").toString();
+
+            eventList.append(event);
+        }
+
+        modelTaskConfig->eventList=eventList;
+    }
+    return modelTaskConfig;
 }
 
 

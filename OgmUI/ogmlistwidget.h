@@ -115,6 +115,7 @@ signals:
     void signalChangeDataMapTaskConfigUIByTask(Task *task);
     void signalChangeDataRefactorTaskConfigUI(QString serverId, QString refactorId, QString methodName);
     void signalChangeDataRefactorTaskConfigUIByTask(Task *task);
+    void signalChangeModelTaskConfigUI(QString serverId, QString modelId);
 
 
 

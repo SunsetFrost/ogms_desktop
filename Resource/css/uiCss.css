@@ -394,6 +394,19 @@ QToolButton[windowTitle="btn-miniTopLeft"]:checked{
     border-color: #47a4e9;
 }
 
+QToolButton[windowTitle="btn-miniTopLeft-f14"]{
+    font-size: 14px;
+    color: #666666;
+}
+QToolButton[windowTitle="btn-miniTopLeft-f14"]:pressed,
+QToolButton[windowTitle="btn-miniTopLeft-f14"]:hover,
+QToolButton[windowTitle="btn-miniTopLeft-f14"]:checked{
+    color:#47a4e9;
+    border-style: solid;
+    border-width: 0px 0px 3px 0px;
+    border-color: #47a4e9;
+}
+
 QToolButton[statusTip="btn-miniTopRight"]{
     font-size: 16px;
     color: #666666;

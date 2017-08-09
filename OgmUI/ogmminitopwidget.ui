@@ -176,25 +176,6 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QToolButton" name="btnPrepareMintop">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="statusTip">
-            <string>btn-miniTopLeft</string>
-           </property>
-           <property name="text">
-            <string>Prepare</string>
-           </property>
-           <property name="checkable">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
         </layout>
        </widget>
       </item>
@@ -306,6 +287,9 @@
       <string>widget-miniTop</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>12</number>
+      </property>
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -397,13 +381,13 @@
        <widget class="QToolButton" name="btnNewServer">
         <property name="minimumSize">
          <size>
-          <width>80</width>
+          <width>100</width>
           <height>26</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>80</width>
+          <width>100</width>
           <height>26</height>
          </size>
         </property>

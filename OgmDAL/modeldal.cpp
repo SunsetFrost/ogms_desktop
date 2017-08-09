@@ -104,7 +104,7 @@ ModelServerDAL::ModelServerDAL()
 QList<ModelServer *> ModelServerDAL::getAllServer()
 {
     QDomDocument doc;
-    QFile file(OgmSetting::serverFilePath);
+    QFile file(OgmSetting::modelServerFilePath);
     file.open(QIODevice::ReadOnly);
     doc.setContent(&file);
     file.close();
@@ -177,6 +177,10 @@ void ModelServerDAL::modelServerList2xml(QList<ModelServer *> &modelServerList, 
         attr.setValue(modelServerList.at(i)->location);
         elementGroup.setAttributeNode(attr);
 
+        attr=doc.createAttribute("desc");
+        attr.setValue(modelServerList.at(i)->desc);
+        elementGroup.setAttributeNode(attr);
+
         attr=doc.createAttribute("connect");
         if(modelServerList.at(i)->isConnect){
             attr.setValue("true");
@@ -209,6 +213,7 @@ void ModelServerDAL::xml2modelServerList(QDomDocument &doc, QList<ModelServer *>
             server->name=elementGroup.attributeNode("name").value();
             server->system=elementGroup.attributeNode("system").value();
             server->location=elementGroup.attributeNode("location").value();
+            server->desc=elementGroup.attributeNode("desc").value();
 
             modelServerList.append(server);
         }
@@ -217,7 +222,7 @@ void ModelServerDAL::xml2modelServerList(QDomDocument &doc, QList<ModelServer *>
 
 void ModelServerDAL::setAllModelServerList(QList<ModelServer *> modelServerList)
 {
-    QFile file(OgmSetting::serverFilePath);
+    QFile file(OgmSetting::modelServerFilePath);
     if(!file.open(QIODevice::WriteOnly))
         return;
     QTextStream out(&file);

@@ -16,7 +16,6 @@ public:
     explicit OgmFavorSidebarWidget(QWidget *parent = 0);
 
     void changeFavorUI();
-
     void changeChooseFavorUI(QString serverId, QString serviceId, QString serviceType);
 
 private:

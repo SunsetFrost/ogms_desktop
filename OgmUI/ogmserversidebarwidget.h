@@ -19,6 +19,8 @@ public:
 
     void changeDataServerUI();
 
+    void changeDataFileUI();
+
 private:
     void initWidget();
 
@@ -35,6 +37,7 @@ private:
 signals:
     void signalChangeModelList(QString serverId);
     void signalChangeDataList(QString serverId);
+    void signalChangeDataFileUI(QString serverId, QString parentFileId, QString checkType);
 };
 
 #endif // OGMSERVERSIDEBARWIDGET_H

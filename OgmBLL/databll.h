@@ -75,6 +75,8 @@ public:
 
     void addServer(DataServer *server);
 
+    bool deleteOneServer(DataServer *server);
+
 private:
     QSharedPointer<DataServerDAL> _dataServerDAL;
 };

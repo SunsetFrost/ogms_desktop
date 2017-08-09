@@ -74,8 +74,13 @@ public:
     QList<DataServer*> getAllServer();
     DataServer* getServerById(QString serverId);
     void addServer(DataServer *server);
+    bool deleteOneServer(DataServer *server);
 
 private:
+    void dataServerList2xml(QList<DataServer*> &dataServerList, QDomDocument &doc);
+    void xml2dataServerList(QDomDocument &doc, QList<DataServer*> &dataServerList);
+    void setAllDataServerList(QList<DataServer*> dataServerList);
+
     QList<DataServer*> _serverList;
 };
 

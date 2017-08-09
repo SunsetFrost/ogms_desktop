@@ -5,6 +5,11 @@ Task::Task()
 
 }
 
+ModelTaskConfig *Task::getModelTaskConfig()
+{
+    return _modelTaskConfig;
+}
+
 DataMapTaskConfig *Task::getDataMapTaskConfig()
 {
     return _dataMapTaskConfig;
@@ -13,6 +18,11 @@ DataMapTaskConfig *Task::getDataMapTaskConfig()
 DataRefactorTaskConfig *Task::getDataRefactorTaskConfig()
 {
     return _dataRefactorConfig;
+}
+
+void Task::setTaskConfig(ModelTaskConfig *modelConfig)
+{
+    _modelTaskConfig=modelConfig;
 }
 
 void Task::setTaskConfig(DataMapTaskConfig *dataMapConfig)
@@ -36,6 +46,11 @@ DataMapTaskConfig::DataMapTaskConfig()
 }
 
 DataRefactorTaskConfig::DataRefactorTaskConfig()
+{
+
+}
+
+EventTaskConfig::EventTaskConfig()
 {
 
 }

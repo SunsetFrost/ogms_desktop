@@ -6,6 +6,7 @@ FORMS += \
     $$PWD/ogmdataserviceconfig.ui \
     $$PWD/ogmrefactortaskconfigui.ui \
     $$PWD/ogmtoolui.ui \
+    $$PWD/ogmtaskmodelconfigui.ui \
 
 HEADERS += \
     $$PWD/ogmmainwidget.h \

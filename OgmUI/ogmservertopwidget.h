@@ -41,7 +41,6 @@ private:
 
     void removeNextAllFileLink(QString fileId, QString fileName);
 
-
 private:
     Ui::OgmTopWidget *_ui;
 

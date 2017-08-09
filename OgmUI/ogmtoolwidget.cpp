@@ -39,16 +39,16 @@ void OgmToolWidget::initWidget()
 
     //function
     connect(_ui->btnToolUdxDataRun, &QToolButton::clicked, [=](){
-       QProcess *pro=new QProcess();
-       pro->start(OgmSetting::udxDataPath);
+        QProcess *pro=new QProcess();
+        pro->start(OgmSetting::udxDataPath);
     });
     connect(_ui->btnToolUdxSchemaRun, &QToolButton::clicked, [=](){
-       QProcess *pro=new QProcess();
-       pro->start(OgmSetting::udxSchemaPath);
+        QProcess *pro=new QProcess();
+        pro->start(OgmSetting::udxSchemaPath);
     });
     connect(_ui->btnToolOmsRun, &QToolButton::clicked, [=](){
-       QProcess *pro=new QProcess();
-       pro->start(OgmSetting::omsToolPath);
+        QProcess *pro=new QProcess();
+        pro->start(OgmSetting::omsToolPath);
     });
     connect(_ui->btnToolBRun, &QToolButton::clicked, [=](){
         ModelServer *server=_modelServerBLL.data()->getServerId(OgmSetting::defaultModelServerId);

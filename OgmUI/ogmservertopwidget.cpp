@@ -37,6 +37,14 @@ void OgmServerTopWidget::changeDataServer(QString serverId)
 
     _ui->lblName->setText(server->name);
     _ui->lblServerLocation->setText(server->location);
+
+    if(serverId==OgmSetting::defaultDataServerId){
+        _ui->btnServerDefault->setHidden(true);
+    }
+    else{
+        _ui->btnServerDefault->setHidden(false);
+    }
+
     if(!server->desc.isEmpty() || !server->desc.isNull() || server->desc!=""){
         _ui->widgetTopDes->setHidden(true);
         _ui->lblServerDesContent->setHidden(false);
@@ -64,7 +72,7 @@ void OgmServerTopWidget::changeModelServer(QString serverId)
         _ui->btnServerDefault->setHidden(false);
     }
 
-    if(!server->desc.isEmpty() || !server->desc.isNull() || server->desc!=""){
+    if(server->desc!=""){
         _ui->widgetTopDes->setHidden(true);
         _ui->lblServerDesContent->setHidden(false);
         _ui->lblServerDesContent->setText(server->desc);
@@ -81,6 +89,13 @@ void OgmServerTopWidget::changeFileManager(QString serverId)
     _serverId=serverId;
 
     DataServer *server=_dServerBLL.data()->getServerId(serverId);
+
+    if(serverId==OgmSetting::defaultDataServerId){
+        _ui->btnServerDefault->setHidden(true);
+    }
+    else{
+        _ui->btnServerDefault->setHidden(false);
+    }
 
     _ui->lblName->setText(server->name);
     _ui->lblServerLocation->setText(server->location);
@@ -195,6 +210,14 @@ void OgmServerTopWidget::initDataWidget()
     connect(_ui->btnServerDataRefactorPage, &QToolButton::clicked, [=](){
         emit signalChangeDataRefactorList(_serverId);
         //emit signalSwitchPage("DataList");
+    });
+
+    connect(_ui->btnServerChange, &QToolButton::clicked, [=](){
+        emit signalChangeDataServer();
+    });
+    connect(_ui->btnServerDefault, &QToolButton::clicked, [=](){
+        OgmSetting::defaultDataServerId=_serverId;
+        _ui->btnServerDefault->setHidden(true);
     });
 }
 
@@ -326,6 +349,14 @@ void OgmServerTopWidget::initFileWidget()
        if(filePath==QString::null)
            return;
        _dataFileBLL.data()->uploadFile(_serverId, _currentFileId, filePath);
+    });
+
+    connect(_ui->btnServerChange, &QToolButton::clicked, [=](){
+        emit signalChangeDataServer();
+    });
+    connect(_ui->btnServerDefault, &QToolButton::clicked, [=](){
+        OgmSetting::defaultDataServerId=_serverId;
+        _ui->btnServerDefault->setHidden(true);
     });
 }
 

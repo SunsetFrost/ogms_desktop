@@ -6,6 +6,8 @@
 #include <QUuid>
 
 #include "ogmuihelper.h"
+#include "ogmsetting.h"
+#include "ogmnetwork.h"
 
 int OgmListHelper::pageAmount=20;
 
@@ -352,6 +354,15 @@ QString OgmHelper::getXmlStringByPath(QString filePath)
 
     QString xml= doc.toString();
     return xml;
+}
+
+QString OgmHelper::getInitDiagramJson(QString modelId)
+{
+    QString strIp="http://"+OgmSetting::webDiagramIP+"/GeoModeling/diagramExpressionZBWServlet?uid="+modelId;
+
+    QString result=QString::fromUtf8(OgmNetWork::get(strIp));
+
+    return result;
 }
 
 

@@ -2,9 +2,11 @@
 
 #include "OgmCommon/ogmuihelper.h"
 #include "OgmCommon/ogmlisthelper.h"
+#include "OgmCommon/ogmsetting.h"
 #include "OgmUI/ogmpopwidget.h"
 
 #include <QDateTime>
+
 
 OgmConfigTaskWidget::OgmConfigTaskWidget(QString taskType, QWidget *parent)
     : QWidget(parent)
@@ -14,13 +16,13 @@ OgmConfigTaskWidget::OgmConfigTaskWidget(QString taskType, QWidget *parent)
     _dataRefactorBLL=QSharedPointer<DataRefactorBLL>(new DataRefactorBLL);
 
     if(taskType=="DataMap"){
-
         initDataMapTaskConfig();
     }
     else if(taskType=="DataRefactor"){
-
-
         initDataRefctorTaskConfig();
+    }
+    else if(taskType=="Model"){
+        initModelTaskConfig();
     }
 }
 
@@ -171,6 +173,17 @@ void OgmConfigTaskWidget::changeDataRefactorTaskByTask(Task *task)
     changeMethodParamUI(method->paramList.at(0), _task->getDataRefactorTaskConfig()->paramList.at(0));
 }
 
+void OgmConfigTaskWidget::changeModelTask(QString serverId, QString modelId)
+{
+    //init task
+    _task=_taskBLL.data()->createModelTask(serverId, modelId);
+
+    //init diagram
+    QString initJson=OgmHelper::getInitDiagramJson("TnprME1XSTRaalF0TWpVMU5pMDBaVFUyTFdJek16TXRNVEEzT0RZMU16TXhNelZs");
+    initJson="initPage("+initJson+")";
+    _webView->page()->runJavaScript(initJson);
+}
+
 void OgmConfigTaskWidget::initDataMapTaskConfig()
 {
     //init ui
@@ -204,9 +217,24 @@ void OgmConfigTaskWidget::initDataRefctorTaskConfig()
     connect(_uiDataRefactor->btnRefactorTaskConfigSaveTask, &QToolButton::clicked, this, &OgmConfigTaskWidget::saveTask);
 }
 
-void OgmConfigTaskWidget::uiInfo2task()
+void OgmConfigTaskWidget::initModelTaskConfig()
 {
+    //init ui
+    _uiModel=new Ui::TaskConfigModelUI();
+    _uiModel->setupUi(this);
 
+    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelData, 0xf07c, "Config", 6);
+    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelSave, 0xf0c2, "Save", 6);
+    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelSaveAs, 0xf02e, "Save as", 6);
+
+    //web diagram
+    _webView=new QWebEngineView();
+    _webView->setUrl(QUrl(OgmSetting::webDiagramPath));
+    _uiModel->widgetTaskConfigModelDiagram->layout()->addWidget(_webView);
+
+    //init function
+    connect(_uiModel->btnTaskConfigModelData, &QToolButton::clicked, this, &OgmConfigTaskWidget::configModelData);
+    connect(_uiModel->btnTaskConfigModelSave, &QToolButton::clicked, this, &OgmConfigTaskWidget::saveTask);
 }
 
 void OgmConfigTaskWidget::saveTask()
@@ -280,6 +308,16 @@ void OgmConfigTaskWidget::chooseFile()
 
             _uiDataRefactor->txtRefactorTaskConfigInput->setText(strList[1]);
         }
+    });
+}
+
+void OgmConfigTaskWidget::configModelData()
+{
+    OgmPopWidget *widgetPop=new OgmPopWidget("ConfigModelTask");
+    widgetPop->changeConfigModelTaskUI(_task);
+    widgetPop->show();
+    connect(widgetPop, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+        _task=varResult.value<Task*>();
     });
 }
 

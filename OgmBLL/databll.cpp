@@ -57,6 +57,12 @@ void DataServerBLL::addServer(DataServer *server)
     _dataServerDAL.data()->addServer(server);
 }
 
+bool DataServerBLL::deleteOneServer(DataServer *server)
+{
+    bool result=_dataServerDAL.data()->deleteOneServer(server);
+    return result;
+}
+
 DataMappingBLL::DataMappingBLL()
 {
     _dataMappingDAL=QSharedPointer<DataMappingDAL>(new DataMappingDAL());

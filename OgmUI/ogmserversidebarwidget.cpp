@@ -50,6 +50,86 @@ void OgmServerSidebarWidget::changeModelServerUI()
     _layoutServer->addStretch();
 }
 
+void OgmServerSidebarWidget::changeDataServerUI()
+{
+    this->setHidden(false);
+
+    while(_layoutServer->count()>0){
+        QWidget *widgetDel= _layoutServer->itemAt(0)->widget();
+        _layoutServer->removeWidget(widgetDel);
+        delete widgetDel;
+    }
+
+    QList<DataServer*> dataServerList=_dataBLL.data()->getAllServer();
+
+    for(int i=0; i<dataServerList.count(); ++i){
+        QWidget *mChildWidget=new QWidget();
+        QHBoxLayout *layoutChildWidget=new QHBoxLayout();
+        layoutChildWidget->setMargin(0);
+
+        QToolButton *btnDictionaryName=new QToolButton();
+        btnDictionaryName->setWindowTitle("btn-sidebar");
+        btnDictionaryName->setCheckable(true);
+        btnDictionaryName->setFixedHeight(40);
+        btnDictionaryName->setFixedWidth(180);
+        OgmUiHelper::Instance()->setButtonIcon(btnDictionaryName, 0xf17a, dataServerList.at(i)->name);
+        btnDictionaryName->setObjectName("btnHomeDataServer|"+dataServerList.at(i)->id);
+        //connect(btnDictionaryName, SIGNAL(clicked()), this, SLOT(onServerClicked()));
+        connect(btnDictionaryName, &QToolButton::clicked, [=](){
+            buttonCheck(btnDictionaryName);
+            this->setHidden(true);
+            emit signalChangeDataList(dataServerList.at(i)->id);
+        });
+
+        //layoutChildWidget->addSpacing(10);
+        layoutChildWidget->addWidget(btnDictionaryName);
+        //layoutChildWidget->addStretch();
+        mChildWidget->setLayout(layoutChildWidget);
+        _layoutServer->addWidget(mChildWidget);
+    }
+    _layoutServer->addStretch();
+}
+
+void OgmServerSidebarWidget::changeDataFileUI()
+{
+    this->setHidden(false);
+
+    while(_layoutServer->count()>0){
+        QWidget *widgetDel= _layoutServer->itemAt(0)->widget();
+        _layoutServer->removeWidget(widgetDel);
+        delete widgetDel;
+    }
+
+    QList<DataServer*> dataServerList=_dataBLL.data()->getAllServer();
+
+    for(int i=0; i<dataServerList.count(); ++i){
+        QWidget *mChildWidget=new QWidget();
+        QHBoxLayout *layoutChildWidget=new QHBoxLayout();
+        layoutChildWidget->setMargin(0);
+
+        QToolButton *btnDictionaryName=new QToolButton();
+        btnDictionaryName->setWindowTitle("btn-sidebar");
+        btnDictionaryName->setCheckable(true);
+        btnDictionaryName->setFixedHeight(40);
+        btnDictionaryName->setFixedWidth(180);
+        OgmUiHelper::Instance()->setButtonIcon(btnDictionaryName, 0xf17a, dataServerList.at(i)->name);
+        btnDictionaryName->setObjectName("btnHomeDataServer|"+dataServerList.at(i)->id);
+        //connect(btnDictionaryName, SIGNAL(clicked()), this, SLOT(onServerClicked()));
+        connect(btnDictionaryName, &QToolButton::clicked, [=](){
+            buttonCheck(btnDictionaryName);
+            this->setHidden(true);
+            emit signalChangeDataFileUI(dataServerList.at(i)->id, "-1", "File");
+        });
+
+        //layoutChildWidget->addSpacing(10);
+        layoutChildWidget->addWidget(btnDictionaryName);
+        //layoutChildWidget->addStretch();
+        mChildWidget->setLayout(layoutChildWidget);
+        _layoutServer->addWidget(mChildWidget);
+    }
+    _layoutServer->addStretch();
+}
+
 void OgmServerSidebarWidget::initWidget()
 {
     this->setFixedWidth(180);

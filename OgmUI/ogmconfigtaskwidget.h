@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QSharedPointer>
+#include <QWebEngineView>
 
 #include <OgmCommon/ogmwidget.h>
 #include "OgmBLL/taskbll.h"
@@ -10,10 +11,12 @@
 
 #include "ui_ogmdataserviceconfig.h"
 #include "ui_ogmrefactortaskconfigui.h"
+#include "ui_ogmtaskmodelconfigui.h"
 
 namespace Ui{
 class DataMapTaskConfigUI;
 class DataRefactorTaskConfigUI;
+class TaskConfigModelUI;
 }
 
 class OgmConfigTaskWidget : public QWidget
@@ -28,24 +31,30 @@ public:
     void changeDataRefactorTask(QString serverId, QString dataRefactorId, QString methodName);
     void changeDataRefactorTaskByTask(Task *task);
 
+    void changeModelTask(QString serverId, QString modelId);
+
 private:
     void initDataMapTaskConfig();
-
     void initDataRefctorTaskConfig();
+    void initModelTaskConfig();
 
-    bool isTaskInfoComplete();
+    void changeMethodParamUI(DataRefactorMethodParam *param, TASKREFACTORPARAM taskParam);
 
-    void uiInfo2task();
-
+    //btn
     void saveTask();
 
     void chooseFile();
 
-    void changeMethodParamUI(DataRefactorMethodParam *param, TASKREFACTORPARAM taskParam);
+    void configModelData();
+
+
 
 private:
     Ui::DataMapTaskConfigUI *_uiDataMap;
     Ui::DataRefactorTaskConfigUI *_uiDataRefactor;
+    Ui::TaskConfigModelUI *_uiModel;
+    QWebEngineView *_webView;
+
     QString _taskType;
     QString _paramIndex;
 

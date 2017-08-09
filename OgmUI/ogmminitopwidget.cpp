@@ -44,18 +44,18 @@ void OgmMiniTopWidget::initTaskWidget()
         QList<Task*> taskList=_taskBLL.data()->getAllTask();
         emit signalChangeTaskList(taskList, "Finish");
     });
-    connect(_ui->btnPrepareMintop, &QToolButton::clicked, [=](){
-        taskBtnCheckStateManage("Prepare");
-        QList<Task*> taskList=_taskBLL.data()->getAllTask();
-        emit signalChangeTaskList(taskList, "Prepare");
-    });
+//    connect(_ui->btnPrepareMintop, &QToolButton::clicked, [=](){
+//        taskBtnCheckStateManage("Prepare");
+//        QList<Task*> taskList=_taskBLL.data()->getAllTask();
+//        emit signalChangeTaskList(taskList, "Prepare");
+//    });
 }
 
 void OgmMiniTopWidget::initServerWidget()
 {
     _ui->widgetMiniTopTask->setHidden(true);
 
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnNewServer, 0xf055, "new", 7);
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnNewServer, 0xf055, "Connect", 7);
 
     connect(_ui->btnMiniTopModelServer, &QToolButton::clicked, [=](){
         taskBtnCheckStateManage("ModelServer");
@@ -110,8 +110,8 @@ void OgmMiniTopWidget::taskBtnCheckStateManage(QString taskType)
         _ui->btnRunningMiniTop->setChecked(true);
     else if(taskType=="Finish")
         _ui->btnFinishMiniTop->setChecked(true);
-    else if(taskType=="Prepare")
-        _ui->btnPrepareMintop->setChecked(true);
+//    else if(taskType=="Prepare")
+//        _ui->btnPrepareMintop->setChecked(true);
     else if(taskType=="ModelServer")
         _ui->btnMiniTopModelServer->setChecked(true);
     else if(taskType=="DataServer")

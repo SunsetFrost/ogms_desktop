@@ -3,6 +3,7 @@
 
 #include "OgmCommon/ogmwidget.h"
 #include "OgmUI/ogmlistwidget.h"
+#include "OgmEntity/task.h"
 
 #include <QVariant>
 
@@ -18,6 +19,7 @@ public:
     OgmPopWidget(QString widgetType, QWidget *parent=0);
 
     void changeChooseRefactorMethod(QString serverId, QString refactorId);
+    void changeConfigModelTaskUI(Task *task);
 
     void setCommonWidgetInfo(QString title, QString content, QString btnText);
 
@@ -40,13 +42,16 @@ private:
 
     void initNewServer();
 
+    void initConfigModelTask();
+
 
 
     //file
     void addOneFileLinkOnUI(QString fileId, QString fileName);
     void removeNextAllFileLink(QString fileId, QString fileName);
-
-
+    //task
+    Task *_task;
+    QString _eventIndex;
 
 
 private:

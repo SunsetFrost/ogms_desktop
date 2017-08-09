@@ -59,6 +59,7 @@ private:
 
     OgmConfigTaskWidget *_widgetDataMapTaskConfig;
     OgmConfigTaskWidget *_widgetDataRefactorTaskConfig;
+    OgmConfigTaskWidget *_widgetModelTaskConfig;
 
     OgmToolWidget *_widgetTool;
 

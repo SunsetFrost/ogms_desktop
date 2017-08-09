@@ -1,6 +1,7 @@
 #include "datadal.h"
 
 #include "OgmCommon/ogmnetwork.h"
+#include "OgmCommon/ogmsetting.h"
 
 #include <QJsonArray>
 #include <QJsonObject>
@@ -125,14 +126,24 @@ DataServerDAL::DataServerDAL()
 
 QList<DataServer*> DataServerDAL::getAllServer()
 {
-    return _serverList;
+    QDomDocument doc;
+    QFile file(OgmSetting::dataServerFilePath);
+    file.open(QIODevice::ReadOnly);
+    doc.setContent(&file);
+    file.close();
+
+    QList<DataServer*> serverList;
+    xml2dataServerList(doc, serverList);
+
+    return serverList;
 }
 
 DataServer* DataServerDAL::getServerById(QString serverId)
 {
-    for(int i=0; i<_serverList.count(); ++i){
-        if(_serverList.at(i)->id==serverId){
-            return _serverList.at(i);
+    QList<DataServer*> serverList=getAllServer();
+    for(int i=0; i<serverList.count(); ++i){
+        if(serverList.at(i)->id==serverId){
+            return serverList.at(i);
         }
     }
     DataServer *nullServer=new DataServer();
@@ -141,7 +152,106 @@ DataServer* DataServerDAL::getServerById(QString serverId)
 
 void DataServerDAL::addServer(DataServer *server)
 {
-    _serverList.append(server);
+    QList<DataServer*> serverList=getAllServer();
+    serverList.append(server);
+    setAllDataServerList(serverList);
+}
+
+bool DataServerDAL::deleteOneServer(DataServer *server)
+{
+    QList<DataServer*> serverList=getAllServer();
+    for(int i=0; i<serverList.count(); ++i){
+        if(serverList.at(i)->id==server->id){
+            serverList.removeAt(i);
+            setAllDataServerList(serverList);
+            return true;
+        }
+    }
+    return false;
+}
+
+void DataServerDAL::dataServerList2xml(QList<DataServer *> &dataServerList, QDomDocument &doc)
+{
+    QDomAttr attr;
+
+    QDomElement elementConfig=doc.createElement("server");
+    doc.appendChild(elementConfig);
+
+    for(int i=0; i<dataServerList.count(); ++i){
+        QDomElement elementGroup=doc.createElement("dataserver");
+
+        attr=doc.createAttribute("id");
+        attr.setValue(dataServerList.at(i)->id);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("ip");
+        attr.setValue(dataServerList.at(i)->ip);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("name");
+        attr.setValue(dataServerList.at(i)->name);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("system");
+        attr.setValue(dataServerList.at(i)->system);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("location");
+        attr.setValue(dataServerList.at(i)->location);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("desc");
+        attr.setValue(dataServerList.at(i)->location);
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("connect");
+        if(dataServerList.at(i)->isConnect){
+            attr.setValue("true");
+        }
+        else{
+            attr.setValue("false");
+        }
+        elementGroup.setAttributeNode(attr);
+
+        attr=doc.createAttribute("des");
+        attr.setValue(dataServerList.at(i)->desc);
+        elementGroup.setAttributeNode(attr);
+
+        elementConfig.appendChild(elementGroup);
+    }
+}
+
+void DataServerDAL::xml2dataServerList(QDomDocument &doc, QList<DataServer *> &dataServerList)
+{
+    QDomElement elementConfig=doc.documentElement();
+    QDomNodeList nodeListGroup=elementConfig.childNodes();
+    for(int i=0; i<nodeListGroup.count(); ++i){
+        QDomNode nodeGroup=nodeListGroup.item(i);
+        if(nodeGroup.nodeName()=="dataserver"){
+            QDomElement elementGroup=nodeGroup.toElement();
+
+            DataServer *server=new DataServer();
+            server->id=elementGroup.attributeNode("id").value();
+            server->ip=elementGroup.attributeNode("ip").value();
+            server->name=elementGroup.attributeNode("name").value();
+            server->system=elementGroup.attributeNode("system").value();
+            server->location=elementGroup.attributeNode("location").value();
+            server->desc=elementGroup.attributeNode("desc").value();
+
+            dataServerList.append(server);
+        }
+    }
+}
+
+void DataServerDAL::setAllDataServerList(QList<DataServer *> dataServerList)
+{
+    QFile file(OgmSetting::dataServerFilePath);
+    if(!file.open(QIODevice::WriteOnly))
+        return;
+    QTextStream out(&file);
+    QDomDocument doc;
+    dataServerList2xml(dataServerList, doc);
+    doc.save(out, 4);
 }
 
 DataMappingDAL::DataMappingDAL()

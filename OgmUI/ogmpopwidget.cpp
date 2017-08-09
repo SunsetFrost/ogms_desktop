@@ -5,6 +5,8 @@
 #include "OgmCommon/ogmsetting.h"
 #include "OgmCommon/ogmuihelper.h"
 
+#include <QFileDialog>
+
 OgmPopWidget::OgmPopWidget(QString widgetType, QWidget *parent)
     :OgmWidget(false, true, parent)
     ,_ui(new Ui::OgmPopUI)
@@ -16,6 +18,7 @@ OgmPopWidget::OgmPopWidget(QString widgetType, QWidget *parent)
     _ui->widgetPopChooseFile->setHidden(true);
     _ui->widgetPopSaveTask->setHidden(true);
     _ui->widgetPopNewServer->setHidden(true);
+    _ui->widgetPopConfigModelTaskData->setHidden(true);
 
     if(widgetType=="NewFile")
         initNewFileWidget();
@@ -35,6 +38,8 @@ OgmPopWidget::OgmPopWidget(QString widgetType, QWidget *parent)
         initDeleteFavorWidget();
     else if(widgetType=="Common")
         initDeleteFileWidget();
+    else if(widgetType=="ConfigModelTask")
+        initConfigModelTask();
 
     setDragWidgetName("widgetPopTitle");
     this->setAttribute(Qt::WA_DeleteOnClose);
@@ -44,6 +49,57 @@ void OgmPopWidget::changeChooseRefactorMethod(QString serverId, QString refactor
 {
     OgmListWidget *mList=_ui->widgetPopChooseFile->findChild<OgmListWidget*>();
     mList->changeRefactorMethodListUI(serverId, refactorId);
+}
+
+void OgmPopWidget::changeConfigModelTaskUI(Task *task)
+{
+    _task=task;
+
+    while(_ui->widgetPopTaskModelBtnGroup->layout()->count()>0){
+        QWidget *widgetDel=_ui->widgetPopTaskModelBtnGroup->layout()->itemAt(0)->widget();
+        _ui->widgetPopTaskModelBtnGroup->layout()->removeWidget(widgetDel);
+        delete widgetDel;
+    }
+
+    for(int i=0; i<task->getModelTaskConfig()->eventList.count(); ++i){
+        if(task->getModelTaskConfig()->eventList.at(i)->eventType=="response"){
+            QToolButton *btnEvent=new QToolButton(_ui->widgetPopTaskModelBtnGroup);
+            btnEvent->setObjectName("btnConfigTaskEvent"+task->getModelTaskConfig()->eventList.at(i)->eventName);
+            btnEvent->setText(task->getModelTaskConfig()->eventList.at(i)->eventName);
+            //btnEvent->setFixedWidth(50);
+            btnEvent->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+            btnEvent->setWindowTitle("btn-miniTopLeft-f14");
+            btnEvent->setCheckable(true);
+            btnEvent->setAccessibleDescription(QString::number(i));
+            connect(btnEvent, &QToolButton::clicked, [=](){
+                _eventIndex=btnEvent->accessibleDescription();
+                QString dataPath=_task->getModelTaskConfig()->eventList.at(_eventIndex.toInt())->dataPath;
+                if(dataPath=="")
+                    _ui->txtPopEventFileName->setText(QString());
+                else{
+                    QStringList pathList=dataPath.split("/");
+                    QString fileName=pathList.at(pathList.count()-1);
+                    _ui->txtPopEventFileName->setText(fileName);
+                }
+
+                QList<QToolButton*> btns=_ui->widgetPopTaskModelBtnGroup->findChildren<QToolButton*>();
+                foreach(QToolButton *mBtn, btns){
+                    if(mBtn==btnEvent){
+                        mBtn->setChecked(true);
+                    }
+                    else{
+                        mBtn->setChecked(false);
+                    }
+                }
+
+                _ui->lblPopEventDes->setText(_task->getModelTaskConfig()->eventList.at(i)->eventDes);
+            });
+            _ui->widgetPopTaskModelBtnGroup->layout()->addWidget(btnEvent);
+        }
+    }
+    //click first event
+    QToolButton *btnFirstEvent=_ui->widgetPopTaskModelBtnGroup->findChild<QToolButton*>("btnConfigTaskEvent"+task->getModelTaskConfig()->eventList.at(0)->eventName);
+    btnFirstEvent->click();
 }
 
 void OgmPopWidget::setCommonWidgetInfo(QString title, QString content, QString btnText)
@@ -207,7 +263,7 @@ void OgmPopWidget::initChooseDataFile()
 
 void OgmPopWidget::initChooseRefactorMethod()
 {
-    this->setFixedSize(500, 280);
+    this->setFixedSize(500, 330);
     _ui->widgetPopChooseFile->setHidden(false);
     _ui->widget_4->setHidden(true);
     _ui->btnPopA->setHidden(true);
@@ -277,6 +333,39 @@ void OgmPopWidget::initNewServer()
 
         QVariant varTaskInfo(strList);
         emit signalOperationResult(varTaskInfo);
+
+        this->close();
+    });
+    connect(_ui->btnPopB, &QToolButton::clicked, this, &OgmPopWidget::close);
+}
+
+void OgmPopWidget::initConfigModelTask()
+{
+    this->setFixedSize(500, 300);
+
+    _ui->widgetPopConfigModelTaskData->setHidden(false);
+
+    _ui->lblPopTitle->setText("Config model task");
+    _ui->btnPopA->setText("Confirm");
+    _ui->btnPopB->setText("Cancel");
+
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnPopUploadLocalData, 0xf07c, "Local", 6);
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnUploadRemoteData, 0xf07c, "Remote", 6);
+
+    connect(_ui->btnPopUploadLocalData, &QToolButton::clicked, [=](){
+        QString filePath=QFileDialog::getOpenFileName(this, "choose upload data");
+        if(filePath==QString::null)
+            return;
+        _task->getModelTaskConfig()->eventList[_eventIndex.toInt()]->dataPath=filePath;
+
+        QStringList pathList=filePath.split("/");
+        QString fileName=pathList.at(pathList.count()-1);
+        _ui->txtPopEventFileName->setText(fileName);
+    });
+    connect(_ui->btnPopA, &QToolButton::clicked, [=](){
+        QVariant varResult;
+        varResult.setValue(_task);
+        emit signalOperationResult(varResult);
 
         this->close();
     });

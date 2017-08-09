@@ -37,6 +37,9 @@ public:
     //xml
     static QString getXmlStringByPath(QString filePath);
 
+    //temp written here
+    static QString getInitDiagramJson(QString modelId);
+
 };
 
 ////////////////////////////////////////////////////////////////////

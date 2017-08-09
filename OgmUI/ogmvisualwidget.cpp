@@ -13,6 +13,7 @@ void OgmVisualWidget::initWidget()
 {
     QWebEngineView *view=new QWebEngineView();
     view->setUrl(QUrl("https://cesiumjs.org/NewYork/index.html"));
+    //view->setUrl(QUrl("https://www.baidu.com"));
 
     QVBoxLayout *layoutMain=new QVBoxLayout();
     layoutMain->setMargin(0);

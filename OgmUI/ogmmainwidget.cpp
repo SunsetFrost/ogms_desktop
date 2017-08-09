@@ -81,6 +81,8 @@ void OgmMainWidget::initFunction()
     connect(_widgetDataServerTop, &OgmServerTopWidget::signalChangeDataRefactorList, [=](QString serverId){
         _widgetList->changeDataListUI(serverId, "DataRefactor", 0);
     });
+    connect(_widgetDataServerTop, &OgmServerTopWidget::signalChangeDataServer, _widgetServerSidebar, &OgmServerSidebarWidget::changeDataServerUI);
+    connect(_widgetDataServerTop, &OgmServerTopWidget::signalChangeDataFileByParentId, _widgetServerSidebar, &OgmServerSidebarWidget::changeDataFileUI);
 
     //model top
     connect(_widgetModelServerTop, &OgmServerTopWidget::signalChangeModelServer, _widgetServerSidebar, &OgmServerSidebarWidget::changeModelServerUI);
@@ -89,6 +91,7 @@ void OgmMainWidget::initFunction()
     connect(_widgetServerTop, &OgmMiniTopWidget::signalChangeServerList, _widgetList, &OgmListWidget::changeServerListUI);
 
     //file top
+    connect(_widgetFileServerTop, &OgmServerTopWidget::signalChangeDataServer, _widgetServerSidebar, &OgmServerSidebarWidget::changeDataFileUI);
     connect(_widgetFileServerTop, &OgmServerTopWidget::signalChangeDataFileByParentId, _widgetList, &OgmListWidget::changeFileListUIByParentId);
 
     //favor top
@@ -125,6 +128,7 @@ void OgmMainWidget::initFunction()
     connect(_widgetList, &OgmListWidget::signalChangeDataMapTaskConfigUIByTask, _widgetDataMapTaskConfig, &OgmConfigTaskWidget::changeDataMapTaskByTask);
     connect(_widgetList, &OgmListWidget::signalChangeDataRefactorTaskConfigUI, _widgetDataRefactorTaskConfig, &OgmConfigTaskWidget::changeDataRefactorTask);
     connect(_widgetList, &OgmListWidget::signalChangeDataRefactorTaskConfigUIByTask, _widgetDataRefactorTaskConfig, &OgmConfigTaskWidget::changeDataRefactorTaskByTask);
+    connect(_widgetList, &OgmListWidget::signalChangeModelTaskConfigUI, _widgetModelTaskConfig, &OgmConfigTaskWidget::changeModelTask);
     connect(_widgetList, &OgmListWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
     connect(_widgetList, &OgmListWidget::signalChangeModelServerTopUI, _widgetModelServerTop, &OgmServerTopWidget::changeModelServer);
 
@@ -132,6 +136,14 @@ void OgmMainWidget::initFunction()
     connect(_widgetServerSidebar, &OgmServerSidebarWidget::signalChangeModelList, [=](QString serverId){
         _widgetModelServerTop->changeModelServer(serverId);
         _widgetList->changeModelListUIByPage(serverId, 0);
+    });
+    connect(_widgetServerSidebar, &OgmServerSidebarWidget::signalChangeDataList, [=](QString serverId){
+        _widgetDataServerTop->changeDataServer(serverId);
+        _widgetList->changeDataListUI(serverId, "Data", 0);
+    });
+    connect(_widgetServerSidebar, &OgmServerSidebarWidget::signalChangeDataFileUI, [=](QString serverId, QString fileParentId, QString fileCheckType){
+        _widgetDataServerTop->changeDataServer(serverId);
+        _widgetList->changeFileListUIByParentId(serverId, fileParentId, fileCheckType);
     });
 
     //favor sidebar
@@ -181,6 +193,9 @@ void OgmMainWidget::initChildWidget()
 
     _widgetDataRefactorTaskConfig=new OgmConfigTaskWidget("DataRefactor", widgetListPage);
     _ui->widgetContent->layout()->addWidget(_widgetDataRefactorTaskConfig);
+
+    _widgetModelTaskConfig=new OgmConfigTaskWidget("Model", widgetListPage);
+    _ui->widgetContent->layout()->addWidget(_widgetModelTaskConfig);
 
     //init tool
     _widgetTool=new OgmToolWidget(_ui->widgetContent);
@@ -286,6 +301,7 @@ void OgmMainWidget::switchPage(QString type)
 
     _widgetDataMapTaskConfig->setHidden(true);
     _widgetDataRefactorTaskConfig->setHidden(true);
+    _widgetModelTaskConfig->setHidden(true);
 
     _widgetList->setHidden(true);
 
@@ -327,7 +343,7 @@ void OgmMainWidget::switchPage(QString type)
         Favor *favor=_favorBLL.data()->getFavorGroupById(_widgetFavorTop->getCurrentId());
         QList<ModelService*> msList=_favorBLL.data()->favor2modelServiceList(favor);
         _widgetList->changeModelListUI(msList, "FavorModel");
-        _widgetFavorTop->changeFavorManager(OgmSetting::defaultFavorId);
+        _widgetFavorTop->changeFavorManager(_widgetFavorTop->getCurrentId());
 
         _widgetFavorTop->setHidden(false);
         _widgetList->setHidden(false);
@@ -347,6 +363,9 @@ void OgmMainWidget::switchPage(QString type)
     }
     else if(type=="DataRefactorTaskConfig"){
         _widgetDataRefactorTaskConfig->setHidden(false);
+    }
+    else if(type=="ModelTaskConfig"){
+        _widgetModelTaskConfig->setHidden(false);
     }
     else if(type=="Visual"){
         _widgetVisual->setHidden(false);

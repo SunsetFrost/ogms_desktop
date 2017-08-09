@@ -94,6 +94,7 @@ void OgmListWidget::changeFileListUI(QList<DataFile *> dataFileList, QString che
 {
     _listType=checkType;
     clearList();
+    _currentPageIndex=0;
 
     QList<QVariant> varList=OgmHelper::toVarList(dataFileList);
 
@@ -121,6 +122,7 @@ void OgmListWidget::changeFileListUIByParentId(QString serverId, QString parentI
 void OgmListWidget::changeServerListUI(QString serverType)
 {
     _listType="Server";
+    _currentPageIndex=0;
     clearList();
 
     QList<QVariant> varList;
@@ -168,6 +170,7 @@ QVariant OgmListWidget::getCheckFileInfo()
 void OgmListWidget::changeTaskListUI(QList<Task *> taskList, QString taskRunState)
 {
     _listType=taskRunState;
+    _currentPageIndex=0;
     clearList();
 
     QList<Task*> displayedTaskList=_taskBLL.data()->getSpecificTaskListFromTaskList(taskList, taskRunState, QString());
@@ -181,6 +184,7 @@ void OgmListWidget::changeTaskListUI(QList<Task *> taskList, QString taskRunStat
 void OgmListWidget::changeRefactorMethodListUI(QString serverId, QString refactorId)
 {
     _listType="ChooseRefactorMethod";
+    _currentPageIndex=0;
     clearList();
 
     QList<DataRefactorMethod*> methodList=_dataRefactorBLL.data()->getAllDataRefactorMethodByRefactorId(serverId, refactorId);
@@ -702,6 +706,12 @@ void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
     OgmListHelper::addListItem(_widgetList, "btnModelList|"+model->id, style, "btn", listItemList);
 
     //connect
+    QToolButton *btnRun=_widgetList->findChild<QToolButton*>("btnModelRun|"+model->id);
+    connect(btnRun, &QToolButton::clicked, [=](){
+        emit signalChangeModelTaskConfigUI(model->serverId, model->id);
+        emit signalSwitchPage("ModelTaskConfig");
+    });
+
     QToolButton *btnFavor=_widgetList->findChild<QToolButton*>("btnModelFavor|"+model->id);
     connect(btnFavor, &QToolButton::clicked, [=](){
         emit signalAddFavorSidebar(model->serverId, model->id, "Model");
@@ -886,6 +896,10 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
         listItemBtnRun.objectName="btnTaskCal|"+task->uid;
         listItemList.append(listItemBtnRun);
     }
+    if(task->runstate=="Prepare"){
+        LISTCHILD listItemBtnRun=OgmListHelper::createButtonChild(0, "btnTaskPreCal|"+task->uid, "", "");
+        listItemList.append(listItemBtnRun);
+    }
 
     LISTCHILD listItemBtnEdit;
     listItemBtnEdit.typeValue=ItemType::ToolButton;
@@ -942,6 +956,28 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
     QToolButton *btnTaskCal=_widgetList->findChild<QToolButton*>("btnTaskCal|"+task->uid);
     connect(btnTaskCal, &QToolButton::clicked, [=](){
         //change run state
+        if(task->runstate=="Prepare"){
+            OgmPopWidget *popWidget=new OgmPopWidget("Common");
+            popWidget->setCommonWidgetInfo("Warning", "Task is not ready, Please go to edit task information.", "Edit");
+            popWidget->show();
+            connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+                if(varResult.toBool()){
+                    if(task->type=="DataMap"){
+                        emit signalSwitchPage("DataMapTaskConfig");
+                        emit signalChangeDataMapTaskConfigUIByTask(task);
+                    }
+                    else if(task->type=="DataRefactor"){
+                        emit signalSwitchPage("DataRefactorTaskConfig");
+                        emit signalChangeDataRefactorTaskConfigUIByTask(task);
+                    }
+                    else if(task->type=="Model"){
+                        emit signalSwitchPage("ModelTaskConfig");
+                        emit signalChangeModelTaskConfigUI(task->getModelTaskConfig()->serverId, task->getModelTaskConfig()->modelId);
+                    }
+                }
+            });
+        }
+
         _taskBLL.data()->changeTaskRunState(task->uid, "Running");
 
         addRunningTaskOnUI(task);
@@ -953,6 +989,9 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
         }
         else if(task->type=="DataRefactor"){
             _taskBLL.data()->runDataRefactorTask(task);
+        }
+        else if(task->type=="Model"){
+            _taskBLL.data()->runModelTask(task);
         }
 
         for(int i=0; i<_widgetList->layout()->count(); ++i){
@@ -1107,8 +1146,14 @@ void OgmListWidget::addOneServerOnUI(DataServer *dataServer, QString style)
     LISTCHILD listSpaceA=OgmListHelper::createSpaceChild();
     list.append(listSpaceA);
 
-    LISTCHILD listRun=OgmListHelper::createButtonChild(0xf05a, "btnModelServerDetail|"+dataServer->id, "btn-light", "server detail information");
+    LISTCHILD listServices=OgmListHelper::createButtonChild(0xf04b, "btnDataServerServices|"+dataServer->id, "btn-light", "browse data services in server");
+    list.append(listServices);
+
+    LISTCHILD listRun=OgmListHelper::createButtonChild(0xf05a, "btnDataServerDetail|"+dataServer->id, "btn-light", "server detail information");
     list.append(listRun);
+
+    LISTCHILD listDelete=OgmListHelper::createButtonChild(0xf1f8, "btnDataServerDelete|"+dataServer->id, "btn-light", "delete server");
+    list.append(listDelete);
 
     LISTCHILD listSpaceB=OgmListHelper::createSpaceChild();
     list.append(listSpaceB);
@@ -1117,6 +1162,25 @@ void OgmListWidget::addOneServerOnUI(DataServer *dataServer, QString style)
     list.append(listDesc);
 
     OgmListHelper::addListItem(_widgetList, "btnListModelServer"+dataServer->id, style, "btn", list);
+
+    QToolButton *btnDelete=_widgetList->findChild<QToolButton*>("btnDataServerDelete|"+dataServer->id);
+    connect(btnDelete, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("Common");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            if(varResult.toBool()){
+                _dataServerBLL.data()->deleteOneServer(dataServer);
+                changeServerListUI("DataServer");
+            }
+        });
+    });
+
+    QToolButton *btnBrowse=_widgetList->findChild<QToolButton*>("btnDataServerServices|"+dataServer->id);
+    connect(btnBrowse, &QToolButton::clicked, [=](){
+        emit signalChangeModelServerTopUI(dataServer->id);
+        changeDataListUI(dataServer->id, "Data",0);
+        emit signalSwitchPage("DataList");
+    });
 }
 
 void OgmListWidget::initTurnPage(QString turnPageType)

@@ -17,7 +17,11 @@ public:
     static QString udxSchemaPath;
     static QString omsToolPath;
 
-    static QString serverFilePath;
+    static QString modelServerFilePath;
+    static QString dataServerFilePath;
+
+    static QString webDiagramIP;
+    static QString webDiagramPath;
 };
 
 #endif // OGMSETTING_H

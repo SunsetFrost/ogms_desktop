@@ -105,6 +105,7 @@ public:
     QString location;
     QString system;
     QString desc;
+    bool isConnect;
 };
 
 Q_DECLARE_METATYPE(DataServer*)

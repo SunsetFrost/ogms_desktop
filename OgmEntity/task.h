@@ -4,14 +4,36 @@
 #include <QString>
 #include <QList>
 
+//temp written here  , next add mdl class in model, these info should include in model class
+class EventTaskConfig
+{
+public:
+    EventTaskConfig();
+
+    QString eventName;
+    QString eventType;
+    QString eventDes;
+
+    QString dataType;
+    QString dataFromModelId;
+    QString dataFromDataId;
+    QString dataPath;
+};
+
+//model task only for one state
 class ModelTaskConfig
 {
 public:
     ModelTaskConfig();
 
+    QString modelId;
+    QString serverId;
+    QString stateId;
+    QString stateName;
+    QList<EventTaskConfig*> eventList;
 };
 
-///////////////////////////
+///////////////////////////////////////////
 class DataMapTaskConfig
 {
 public:
@@ -29,7 +51,7 @@ public:
 
 };
 
-///////////////////////////
+/////////////////////////////////////////////////
 struct TASKREFACTORPARAM{
     QString oid;
     QString fileName;
@@ -49,7 +71,7 @@ public:
     QList<TASKREFACTORPARAM> paramList;
 };
 
-////////////////////////////////
+///////////////////////////////////////////////
 class Task
 {
 public:

@@ -2,6 +2,8 @@
 #define TASKBLL_H
 
 #include "OgmDAL/taskdal.h"
+
+#include "OgmDAL/modeldal.h"
 #include "OgmDAL/datadal.h"
 
 #include <QSharedPointer>
@@ -13,25 +15,32 @@ public:
 
     Task* getTaskById(QString id);
     QList<Task*> getAllTask();
+    QList<Task*> getSpecificTaskListFromTaskList(QList<Task*> taskList, QString taskRunState, QString taskType);
+
     void saveTask(Task *task);
     void saveAsTask(Task *task, QString savePath);
+
     void deleteTask(QString id);
 
     void changeTaskRunState(QString taskId, QString taskRunState);
-    QList<Task*> getSpecificTaskListFromTaskList(QList<Task*> taskList, QString taskRunState, QString taskType);
+
+    //create task
+    Task* createModelTask(QString serverId, QString modelId);//only allow  model have just on state
+
 
     //run  event loop
     QString runDatamapTask(Task *task);
     QString runDataRefactorTask(Task *task);
+    QString runModelTask(Task *task);
 
-    bool isTaskFinish(QString serverIp, QString instanceId, QString type);
-
+    bool isRunningTaskFinish(QString serverIp, QString instanceId, QString type);
     bool isTaskInfoComplete(Task *task);
 
 
 private:
     QSharedPointer<TaskDAL> _taskDAL;
     QSharedPointer<DataServerDAL> _dataServerDAL;
+    QSharedPointer<ModelServerDAL> _modelServerDAL;
 };
 
 
