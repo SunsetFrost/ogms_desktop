@@ -37,6 +37,10 @@ void OgmToolWidget::initWidget()
     OgmUiHelper::Instance()->setIcon(_ui->btnToolBRun, QChar(0xf144));
     OgmUiHelper::Instance()->setIcon(_ui->btnToolBInfo, QChar(0xf05a));
 
+    OgmUiHelper::Instance()->setIcon(_ui->lblToolData, QChar(0xf1b2));
+    OgmUiHelper::Instance()->setIcon(_ui->btnToolDataRun, QChar(0xf144));
+    OgmUiHelper::Instance()->setIcon(_ui->btnToolDataDesc, QChar(0xf05a));
+
     //function
     connect(_ui->btnToolUdxDataRun, &QToolButton::clicked, [=](){
         QProcess *pro=new QProcess();
@@ -53,6 +57,10 @@ void OgmToolWidget::initWidget()
     connect(_ui->btnToolBRun, &QToolButton::clicked, [=](){
         ModelServer *server=_modelServerBLL.data()->getServerId(OgmSetting::defaultModelServerId);
         QDesktopServices::openUrl(QUrl("http://"+server->ip+":8060/index"));
+    });
+    connect(_ui->btnToolDataRun, &QToolButton::clicked, [=](){
+        DataServer *server=_dataServerBLL.data()->getServerId(OgmSetting::defaultDataServerId);
+        QDesktopServices::openUrl(QUrl("http://"+server->ip));
     });
 }
 

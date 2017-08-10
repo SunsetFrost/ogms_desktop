@@ -21,7 +21,7 @@ public:
 
     void addFolder(DataServer *server, QString parentId, QString folderName, QString addTime);
 
-    void download(DataServer *server, QString fileName);
+    QString download(DataServer *server, QString fileName);
 
 private:
     QList<DataFile*> json2fileList(QByteArray response);

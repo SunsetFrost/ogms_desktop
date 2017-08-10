@@ -190,10 +190,6 @@ void ModelServerDAL::modelServerList2xml(QList<ModelServer *> &modelServerList, 
         }
         elementGroup.setAttributeNode(attr);
 
-        attr=doc.createAttribute("des");
-        attr.setValue(modelServerList.at(i)->desc);
-        elementGroup.setAttributeNode(attr);
-
         elementConfig.appendChild(elementGroup);
     }
 }

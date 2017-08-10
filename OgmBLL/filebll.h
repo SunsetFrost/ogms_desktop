@@ -21,6 +21,10 @@ public:
 
     void uploadFile(QString serverId, QString parentId, QString filePath);
 
+    void updateFileName(QString serverId, QString fileId, QString newName, QString newTime);
+
+    void downloadFile(QString serverId, QString fileId, QString savePath);
+
 private:
     QSharedPointer<DataServerDAL> _dataServerDAL;
     QSharedPointer<DataFileDAL> _dataFileDAL;

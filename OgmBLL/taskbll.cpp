@@ -10,6 +10,8 @@ TaskBLL::TaskBLL()
 
     _modelServerDAL=QSharedPointer<ModelServerDAL>(new ModelServerDAL);
     _dataServerDAL=QSharedPointer<DataServerDAL>(new DataServerDAL);
+    _datamapDAL=QSharedPointer<DataMappingDAL>(new DataMappingDAL);
+    _datarefactorDAL=QSharedPointer<DataRefactorDAL>(new DataRefactorDAL);
 }
 
 Task *TaskBLL::getTaskById(QString id)
@@ -198,6 +200,18 @@ bool TaskBLL::isTaskInfoComplete(Task *task)
         }
         return true;
     }
+}
+
+QString TaskBLL::getDatamapSchema(QString serverId, QString datamapId)
+{
+    DataServer *server=_dataServerDAL.data()->getServerById(serverId);
+    return _datamapDAL.data()->getDataMappingXML(server, datamapId, "xml");
+}
+
+QString TaskBLL::getDataRefactorParamSchema(QString serverId, QString refactorId, QString schemaName, QString ioType)
+{
+    DataServer *server=_dataServerDAL.data()->getServerById(serverId);
+    return _datarefactorDAL.data()->getDataRefactorParamSchema(server, refactorId, schemaName, ioType);
 }
 
 

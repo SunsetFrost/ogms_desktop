@@ -77,6 +77,7 @@ signals:
 
     void signalSwitchPage(QString pageType);
     void signalClearList();
+    void signalSearchTxtChanged(QString txt);
 };
 
 #endif // OGMSERVERTOPWIDGET_H

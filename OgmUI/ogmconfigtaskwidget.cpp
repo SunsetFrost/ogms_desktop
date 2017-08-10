@@ -29,6 +29,7 @@ OgmConfigTaskWidget::OgmConfigTaskWidget(QString taskType, QWidget *parent)
 void OgmConfigTaskWidget::changeDataMapTaskByService(QString serverId, QString dataMapId)
 {
     //init task
+    _serverId=serverId;
     _task=new Task();
     DataMapTaskConfig *dataMapConfig=new DataMapTaskConfig();
     _task->setTaskConfig(dataMapConfig);
@@ -37,11 +38,16 @@ void OgmConfigTaskWidget::changeDataMapTaskByService(QString serverId, QString d
     _task->getDataMapTaskConfig()->id=dataMapId;
     _task->getDataMapTaskConfig()->serverId=serverId;
 
+    QString xml=_taskBLL.data()->getDatamapSchema(serverId, dataMapId);
+    _uiDataMap->txtDatamapTaskXML->setText(xml);
+    _uiDataMap->txtDatamapTaskXML->setAutoFormatting(QTextEdit::AutoAll);
+
 }
 
 void OgmConfigTaskWidget::changeDataMapTaskByTask(Task *task)
 {
     _task=task;
+    _serverId=task->getDataMapTaskConfig()->serverId;
 
     if(_task->getDataMapTaskConfig()->calltype=="src2udx"){
         _uiDataMap->radioButtonSrc2Udx->setChecked(true);
@@ -58,6 +64,10 @@ void OgmConfigTaskWidget::changeDataMapTaskByTask(Task *task)
     if(_task->getDataMapTaskConfig()->outputFilename!=""){
         _uiDataMap->txtDatamapTaskOutput->setText(_task->getDataMapTaskConfig()->outputFilename);
     }
+
+    QString xml=_taskBLL.data()->getDatamapSchema(task->getDataMapTaskConfig()->serverId, task->getDataMapTaskConfig()->id);
+    _uiDataMap->txtDatamapTaskXML->setText(xml);
+    _uiDataMap->txtDatamapTaskXML->setAutoFormatting(QTextEdit::AutoAll);
 }
 
 void OgmConfigTaskWidget::changeDataRefactorTask(QString serverId, QString dataRefactorId, QString methodName)
@@ -67,6 +77,8 @@ void OgmConfigTaskWidget::changeDataRefactorTask(QString serverId, QString dataR
     //init task
     _task=new Task();
     _task->type="DataRefactor";
+    _serverId=serverId;
+    _refactorId=dataRefactorId;
 
     DataRefactorTaskConfig *dataRefactorConfig=new DataRefactorTaskConfig();
     dataRefactorConfig->id=dataRefactorId;
@@ -102,9 +114,11 @@ void OgmConfigTaskWidget::changeDataRefactorTask(QString serverId, QString dataR
         btnParam->setAccessibleDescription(QString::number(i));
 
         connect(btnParam, &QToolButton::clicked, [=](){
+
             //btn check state
             _paramIndex=btnParam->accessibleDescription();
             _uiDataRefactor->txtRefactorTaskConfigInput->setText(QString());
+
 
             QList<QToolButton*> btns=_uiDataRefactor->widgetBtnParamsGroup->findChildren<QToolButton*>();
             foreach(QToolButton *mBtn, btns){
@@ -121,15 +135,28 @@ void OgmConfigTaskWidget::changeDataRefactorTask(QString serverId, QString dataR
         _uiDataRefactor->widgetBtnParamsGroup->layout()->addWidget(btnParam);
     }
     //init param
-    changeMethodParamUI(method->paramList.at(0), _task->getDataRefactorTaskConfig()->paramList.at(0));
+    QList<QToolButton*> btnList=_uiDataRefactor->widgetBtnParamsGroup->findChildren<QToolButton*>();
+    for(int i=0; i<btnList.count(); ++i){
+        if(btnList.at(i)->accessibleDescription()=="0")
+            btnList.at(i)->click();
+    }
+
+    //changeMethodParamUI(method->paramList.at(0), _task->getDataRefactorTaskConfig()->paramList.at(0));
 }
 
 void OgmConfigTaskWidget::changeDataRefactorTaskByTask(Task *task)
 {
     _task=task;
+    _serverId=task->getDataRefactorTaskConfig()->serverId;
+    _refactorId=task->getDataRefactorTaskConfig()->id;
     DataRefactorMethod *method=_dataRefactorBLL.data()->getDataRefactorByMethodName(_task->getDataRefactorTaskConfig()->serverId, _task->getDataRefactorTaskConfig()->id, _task->getDataRefactorTaskConfig()->methodName);
 
-
+    if(NULL==method){
+        OgmPopWidget *popWidget=new OgmPopWidget("Common");
+        popWidget->setCommonWidgetInfo("Warning", "Data Refactor information is expired", "Ok");
+        popWidget->show();
+        return;
+    }
     //ui
 
     //clear btn
@@ -151,6 +178,7 @@ void OgmConfigTaskWidget::changeDataRefactorTaskByTask(Task *task)
         btnParam->setAccessibleDescription(QString::number(i));
 
         connect(btnParam, &QToolButton::clicked, [=](){
+
             //btn check state
             _paramIndex=btnParam->accessibleDescription();
             _uiDataRefactor->txtRefactorTaskConfigInput->setText(method->paramList.at(_paramIndex.toInt())->name);
@@ -170,13 +198,31 @@ void OgmConfigTaskWidget::changeDataRefactorTaskByTask(Task *task)
         _uiDataRefactor->widgetBtnParamsGroup->layout()->addWidget(btnParam);
     }
     //init param
-    changeMethodParamUI(method->paramList.at(0), _task->getDataRefactorTaskConfig()->paramList.at(0));
+    QList<QToolButton*> btnList=_uiDataRefactor->widgetBtnParamsGroup->findChildren<QToolButton*>();
+    for(int i=0; i<btnList.count(); ++i){
+        if(btnList.at(i)->accessibleDescription()=="0")
+            btnList.at(i)->click();
+    }
+
+    //changeMethodParamUI(method->paramList.at(0), _task->getDataRefactorTaskConfig()->paramList.at(0));
 }
 
 void OgmConfigTaskWidget::changeModelTask(QString serverId, QString modelId)
 {
     //init task
     _task=_taskBLL.data()->createModelTask(serverId, modelId);
+    _serverId=serverId;
+
+    //init diagram
+    QString initJson=OgmHelper::getInitDiagramJson("TnprME1XSTRaalF0TWpVMU5pMDBaVFUyTFdJek16TXRNVEEzT0RZMU16TXhNelZs");
+    initJson="initPage("+initJson+")";
+    _webView->page()->runJavaScript(initJson);
+}
+
+void OgmConfigTaskWidget::changeModelTaskByTask(Task *task)
+{
+    _task=task;
+    _serverId=task->getModelTaskConfig()->serverId;
 
     //init diagram
     QString initJson=OgmHelper::getInitDiagramJson("TnprME1XSTRaalF0TWpVMU5pMDBaVFUyTFdJek16TXRNVEEzT0RZMU16TXhNelZs");
@@ -189,6 +235,7 @@ void OgmConfigTaskWidget::initDataMapTaskConfig()
     //init ui
     _uiDataMap=new Ui::DataMapTaskConfigUI();
     _uiDataMap->setupUi(this);
+    _uiDataMap->btnDataMapTaskSaveAs->setHidden(true);
 
     OgmUiHelper::Instance()->setButtonIcon(_uiDataMap->btnDataMapTaskChooseInput, 0xf07c, "Choose", 6);
 
@@ -206,6 +253,7 @@ void OgmConfigTaskWidget::initDataRefctorTaskConfig()
     //init ui
     _uiDataRefactor=new Ui::DataRefactorTaskConfigUI();
     _uiDataRefactor->setupUi(this);
+    _uiDataRefactor->btnRefactorTaskConfigSaveAsTask->setHidden(true);
 
     OgmUiHelper::Instance()->setButtonIcon(_uiDataRefactor->btnRefactorTaskConfigInput, 0xf07c, "Choose", 6);
 
@@ -222,6 +270,7 @@ void OgmConfigTaskWidget::initModelTaskConfig()
     //init ui
     _uiModel=new Ui::TaskConfigModelUI();
     _uiModel->setupUi(this);
+    _uiModel->btnTaskConfigModelSaveAs->setHidden(true);
 
     OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelData, 0xf07c, "Config", 6);
     OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelSave, 0xf0c2, "Save", 6);
@@ -301,7 +350,6 @@ void OgmConfigTaskWidget::saveTask()
            _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].ioType="out";
        }
 
-
        if(_taskBLL.data()->isTaskInfoComplete(_task)){
            _task->runstate="ToRun";
        }
@@ -316,7 +364,7 @@ void OgmConfigTaskWidget::saveTask()
 
 void OgmConfigTaskWidget::chooseFile()
 {
-    OgmPopWidget *widgetPop=new OgmPopWidget("ChooseFile");
+    OgmPopWidget *widgetPop=new OgmPopWidget("ChooseFile", _serverId);
     widgetPop->show();
     connect(widgetPop, &OgmPopWidget::signalOperationResult, [=](QVariant varFileInfo){
         if(_taskType=="DataMap"){
@@ -326,10 +374,10 @@ void OgmConfigTaskWidget::chooseFile()
             _task->getDataMapTaskConfig()->outputDirId=strList[2];
             _uiDataMap->txtDatamapTaskInput->setText(strList[1]);
 
-            //NOTE test
-            QString xml=OgmHelper::getXmlStringByPath("D:/Program/OGMS/build-OGMS-Desktop_Qt_5_8_0_MSVC2015_32bit-Debug/bin/user.config");
-            _uiDataMap->txtDatamapTaskXML->setText(xml);
-            _uiDataMap->txtDatamapTaskXML->setAutoFormatting(QTextEdit::AutoAll);
+
+//            QString xml=OgmHelper::getXmlStringByPath("D:/Program/OGMS/build-OGMS-Desktop_Qt_5_8_0_MSVC2015_32bit-Debug/bin/user.config");
+//            _uiDataMap->txtDatamapTaskXML->setText(xml);
+//            _uiDataMap->txtDatamapTaskXML->setAutoFormatting(QTextEdit::AutoAll);
         }
         else if(_taskType=="DataRefactor"){
             QStringList strList=varFileInfo.toStringList();
@@ -355,6 +403,11 @@ void OgmConfigTaskWidget::configModelData()
 
 void OgmConfigTaskWidget::changeMethodParamUI(DataRefactorMethodParam *param, TASKREFACTORPARAM taskParam)
 {
+    //schema
+    QString xml=_taskBLL.data()->getDataRefactorParamSchema(_serverId, _refactorId, param->schema, param->type);
+    _uiDataRefactor->txtRefactorSchema->setText(xml);
+    _uiDataRefactor->txtRefactorSchema->setAutoFormatting(QTextEdit::AutoAll);
+
     _uiDataRefactor->lblParamName->setText(param->name);
     _uiDataRefactor->lblParamType->setText(param->type);
     _uiDataRefactor->lblParamDescription->setText(param->description);

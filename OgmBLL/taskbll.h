@@ -36,11 +36,17 @@ public:
     bool isRunningTaskFinish(QString serverIp, QString instanceId, QString type);
     bool isTaskInfoComplete(Task *task);
 
+    //get schema
+    QString getDatamapSchema(QString serverId, QString datamapId);
+    QString getDataRefactorParamSchema(QString serverId, QString refactorId, QString schemaName, QString ioType);
+
 
 private:
     QSharedPointer<TaskDAL> _taskDAL;
     QSharedPointer<DataServerDAL> _dataServerDAL;
     QSharedPointer<ModelServerDAL> _modelServerDAL;
+    QSharedPointer<DataMappingDAL> _datamapDAL;
+    QSharedPointer<DataRefactorDAL> _datarefactorDAL;
 };
 
 

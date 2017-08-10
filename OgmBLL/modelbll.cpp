@@ -20,7 +20,7 @@ QList<ModelService *> ModelServiceBLL::getAllModelService(QString serverId)
 QList<ModelService *> ModelServiceBLL::getModelServiceListByPage(QString serverId, int pageIndex)
 {
     QEventLoop timeLoop;
-    QTimer::singleShot(3000, &timeLoop, SLOT(quit()));
+    QTimer::singleShot(1000, &timeLoop, SLOT(quit()));
     timeLoop.exec();
 
     ModelServer *modelServer=_modelServerDAL.data()->getServerById(serverId);

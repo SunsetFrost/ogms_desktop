@@ -34,11 +34,26 @@ void DataFileDAL::deleteData(DataServer *server, QString id, QString type)
     QByteArray response=OgmNetWork::get(request);
 }
 
+void DataFileDAL::updateName(DataServer *server, QString id, QString newName, QString newTime)
+{
+    QString ip=server->ip;
+    QString request="http://"+ip+"/user/updatename?username=admin&oid="+id+"&newname="+newName+"&newTime="+newTime;
+    QByteArray response=OgmNetWork::get(request);
+}
+
 void DataFileDAL::addFolder(DataServer *server, QString parentId, QString folderName, QString addTime)
 {
     QString ip=server->ip;
     QString request="http://"+ip+"/user/addFolder?username=admin&parentid="+parentId+"&foldername="+folderName+"&addTime="+addTime;
     QByteArray response=OgmNetWork::get(request);
+}
+
+QString DataFileDAL::download(DataServer *server, QString fileName)
+{
+    QString ip=server->ip;
+    QString request="http://"+ip+"/user/download?username=admin&filename="+fileName;
+    QByteArray response=OgmNetWork::get(request);
+    return QString::fromUtf8(response);
 }
 
 QList<DataFile *> DataFileDAL::json2fileList(QByteArray response)

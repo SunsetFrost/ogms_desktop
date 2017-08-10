@@ -40,6 +40,7 @@ public:
     //temp written here
     static QString getInitDiagramJson(QString modelId);
 
+    static QString getElidedText(QString originalTxt, int width);
 };
 
 ////////////////////////////////////////////////////////////////////

@@ -41,6 +41,7 @@ void OgmMiniTopWidget::changeTaskType(QString taskType)
 void OgmMiniTopWidget::initTaskWidget()
 {
     _ui->widgetMiniTopServer->setHidden(true);
+    _ui->btnOpenTaskMiniTop->setHidden(true);
 
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnNewTaskMiniTop, 0xf055, "Aggragation task", 7);
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnOpenTaskMiniTop, 0xf07c, "Open task", 7);

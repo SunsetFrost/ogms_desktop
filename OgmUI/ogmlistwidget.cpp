@@ -10,6 +10,8 @@
 #include <QLayout>
 #include <QScrollArea>
 #include <QMovie>
+#include <QDateTime>
+#include <QFileDialog>
 
 OgmListWidget::OgmListWidget(QWidget *parent) : QWidget(parent)
 {
@@ -121,8 +123,9 @@ void OgmListWidget::changeFileListUI(QString serverId, QString fileType, QString
 void OgmListWidget::changeFileListUIByParentId(QString serverId, QString parentId, QString checkType)
 {
     _serverId=serverId;
+    _folderId=parentId;
 
-    QList<DataFile*> fileList=_dataFileBLL.data()->getFilesByParent(serverId, parentId);
+    QList<DataFile*> fileList=_dataFileBLL.data()->getFilesByParent(_serverId, _folderId);
     changeFileListUI(fileList, checkType);
 }
 
@@ -219,7 +222,8 @@ void OgmListWidget::initWidget()
     _favorId=OgmSetting::defaultFavorId;
 
     QVBoxLayout *layoutMain=new QVBoxLayout();
-    //layoutMain->setContentsMargins(15, 3, 15, 15);
+    layoutMain->setContentsMargins(9, 0, 9, 9);
+
     this->setLayout(layoutMain);
 
     //loading
@@ -390,11 +394,13 @@ void OgmListWidget::addOneDataOnUI(DataService *data, QString style)
     QList<LISTCHILD> listItemList;
 
     LISTCHILD listItemDataName;
+    listItemDataName.objectName="lblListName"+data->id;
     listItemDataName.typeValue=ItemType::Label;
-    listItemDataName.textValue=data->name;
+    listItemDataName.textValue=OgmHelper::getElidedText(data->name, 220);
     listItemDataName.styleName="lbl-lightdark";
     listItemDataName.fixWidth=220;
     listItemDataName.iconValue=0;
+    listItemDataName.toolTipValue=data->name;
     listItemList.append(listItemDataName);
 
     LISTCHILD listItemSpaceA;
@@ -409,13 +415,13 @@ void OgmListWidget::addOneDataOnUI(DataService *data, QString style)
     listItemBtnDetail.objectName="btnDataDetail|"+data->id;
     listItemList.append(listItemBtnDetail);
 
-    LISTCHILD listItemBtnDownload;
-    listItemBtnDownload.typeValue=ItemType::ToolButton;
-    listItemBtnDownload.iconValue=0xf019;
-    listItemBtnDownload.styleName="btn-light";
-    listItemBtnDownload.toolTipValue="download data";
-    listItemBtnDownload.objectName="btnDataDownload|"+data->id;
-    listItemList.append(listItemBtnDownload);
+//    LISTCHILD listItemBtnDownload;
+//    listItemBtnDownload.typeValue=ItemType::ToolButton;
+//    listItemBtnDownload.iconValue=0xf019;
+//    listItemBtnDownload.styleName="btn-light";
+//    listItemBtnDownload.toolTipValue="download data";
+//    listItemBtnDownload.objectName="btnDataDownload|"+data->id;
+//    listItemList.append(listItemBtnDownload);
 
     if(_listType=="Data"){
         LISTCHILD listItemBtnFavor;
@@ -477,10 +483,12 @@ void OgmListWidget::addOneDataMappingOnUI(DataMapping *data, QString style)
 
     LISTCHILD listItemDataName;
     listItemDataName.typeValue=ItemType::Label;
-    listItemDataName.textValue=data->name;
+    listItemDataName.objectName="lblListName"+data->id;
+    listItemDataName.textValue=OgmHelper::getElidedText(data->name, 220);
     listItemDataName.styleName="lbl-lightdark";
     listItemDataName.fixWidth=220;
     listItemDataName.iconValue=0;
+    listItemDataName.toolTipValue=data->name;
     listItemList.append(listItemDataName);
 
     LISTCHILD listItemSpaceA;
@@ -569,10 +577,12 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
 
     LISTCHILD listItemDataName;
     listItemDataName.typeValue=ItemType::Label;
-    listItemDataName.textValue=data->name;
+    listItemDataName.objectName="lblListName"+data->id;
+    listItemDataName.textValue=OgmHelper::getElidedText(data->name, 220);
     listItemDataName.styleName="lbl-lightdark";
     listItemDataName.fixWidth=220;
     listItemDataName.iconValue=0;
+    listItemDataName.toolTipValue=data->name;
     listItemList.append(listItemDataName);
 
     LISTCHILD listItemSpaceA;
@@ -697,10 +707,12 @@ void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
 
     LISTCHILD listItemDataName;
     listItemDataName.typeValue=ItemType::Label;
-    listItemDataName.textValue=model->mName;
+    listItemDataName.objectName="lblListName"+model->id;
+    listItemDataName.textValue=OgmHelper::getElidedText(model->mName, 220);
     listItemDataName.styleName="lbl-lightdark";
     listItemDataName.fixWidth=220;
     listItemDataName.iconValue=0;
+    listItemDataName.toolTipValue=model->mName;
     listItemList.append(listItemDataName);
 
     LISTCHILD listItemSpaceA;
@@ -733,10 +745,11 @@ void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
 
     LISTCHILD listItemAuthor;
     listItemAuthor.typeValue=ItemType::Label;
-    listItemAuthor.textValue=model->userName;
-    listItemAuthor.fixWidth=100;
+    listItemAuthor.textValue=OgmHelper::getElidedText(model->mType, 150);
+    listItemAuthor.fixWidth=150;
     listItemAuthor.iconValue=0;
     listItemAuthor.styleName="lbl-light";
+    listItemAuthor.toolTipValue=model->mType;
     listItemList.append(listItemAuthor);
 
     OgmListHelper::addListItem(_widgetList, "btnModelList|"+model->id, style, "btn", listItemList);
@@ -857,7 +870,6 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
         }
         else
              OgmListHelper::addListItem(_widgetList, "btnDataFileList|"+file->id+"|"+file->name+"|"+file->parentId, style, "btn", listItemList, false);
-
     }
     else if(file->type=="folder"){
         OgmListHelper::addListItem(_widgetList, "btnDataFileList|"+file->id+"|"+file->name+"|"+file->parentId, style, "btn", listItemList);
@@ -868,8 +880,15 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
     connect(btnFolder, &QToolButton::clicked, [=](){
         QList<DataFile*> fileList=_dataFileBLL.data()->getFilesByParent(_serverId, file->id);
         clearList();
+        _folderId=file->id;
         changeFileListUI(fileList, _listType);
         emit signalAddFolderOnFileLink(file->id, file->name);
+    });
+
+    QToolButton *btnFile=_widgetList->findChild<QToolButton*>("btnDataFileList|"+file->id+"|"+file->name+"|"+file->parentId);
+    connect(btnFile, &QToolButton::clicked, [=](){
+        setAllBtnUnCheck();
+        btnFile->setChecked(true);
     });
 
     QToolButton *btnDelete=_widgetList->findChild<QToolButton*>("btnDataFileDelete|"+file->id);
@@ -888,10 +907,26 @@ void OgmListWidget::addOneDataFileOnUI(DataFile *file, QString style)
         popWidget->show();
     });
 
-    QToolButton *btnFile=_widgetList->findChild<QToolButton*>("btnDataFileList|"+file->id+"|"+file->name);
-    connect(btnFile, &QToolButton::clicked, [=](){
-        setAllBtnUnCheck();
-        btnFile->setChecked(true);
+    QToolButton *btnReName=_widgetList->findChild<QToolButton*>("btnDataFileRename|"+file->id);
+    connect(btnReName, &QToolButton::clicked, [=](){
+        OgmPopWidget *popWidget=new OgmPopWidget("RenameFile");
+        popWidget->show();
+
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            clearList();
+
+            QString newFilename=varResult.toString();
+            _dataFileBLL.data()->updateFileName(_serverId, file->id, newFilename, QDateTime::currentDateTime().toString("yyyy-MM-dd"));
+            changeFileListUIByParentId(_serverId, _folderId, "");
+        });
+    });
+
+    QToolButton *btnDownLoad=_widgetList->findChild<QToolButton*>("btnDataFileDownload|"+file->id);
+    connect(btnDownLoad, &QToolButton::clicked, [=](){
+        QString savePath=QFileDialog::getSaveFileName(this, "save data");
+        if(savePath==QString::null)
+            return;
+        _dataFileBLL.data()->downloadFile(_serverId, file->id, savePath);
     });
 }
 
@@ -926,7 +961,7 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
     listItemSpaceA.typeValue=ItemType::SpaceItem;
     listItemList.append(listItemSpaceA);
 
-    if(task->runstate=="ToRun"){
+    if(task->runstate=="ToRun" || task->runstate=="Prepare"){
         LISTCHILD listItemBtnRun;
         listItemBtnRun.typeValue=ItemType::ToolButton;
         listItemBtnRun.iconValue=0xf04b;
@@ -935,10 +970,10 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
         listItemBtnRun.objectName="btnTaskCal|"+task->uid;
         listItemList.append(listItemBtnRun);
     }
-    if(task->runstate=="Prepare"){
-        LISTCHILD listItemBtnRun=OgmListHelper::createButtonChild(0, "btnTaskPreCal|"+task->uid, "", "");
-        listItemList.append(listItemBtnRun);
-    }
+//    if(task->runstate=="Prepare"){
+//        LISTCHILD listItemBtnRun=OgmListHelper::createButtonChild(0, "btnTaskPreCal|"+task->uid, "", "");
+//        listItemList.append(listItemBtnRun);
+//    }
 
     LISTCHILD listItemBtnEdit;
     listItemBtnEdit.typeValue=ItemType::ToolButton;
@@ -1058,6 +1093,10 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
             emit signalSwitchPage("DataRefactorTaskConfig");
             emit signalChangeDataRefactorTaskConfigUIByTask(task);
         }
+        else if(task->type=="Model"){
+            emit signalSwitchPage("ModelTaskConfig");
+            emit signalChangeModelTaskConfigUIByTask(task);
+        }
     });
 
     QToolButton *btnDelete=_widgetList->findChild<QToolButton*>("btnTaskDel|"+task->uid);
@@ -1103,17 +1142,17 @@ void OgmListWidget::addRunningTaskOnUI(Task *task)
     layoutTask->addWidget(lblName);
     layoutTask->addStretch();
 
-    QToolButton *btnDel=new QToolButton();
-    OgmUiHelper::Instance()->setIcon(btnDel, QChar(0xf1f8));
-    btnDel->setObjectName("btnTaskDel|"+task->uid);
-    btnDel->setWindowTitle("btn-light");
-    btnDel->setToolTip("delete task");
-    layoutTask->addWidget(btnDel);
+//    QToolButton *btnDel=new QToolButton();
+//    OgmUiHelper::Instance()->setIcon(btnDel, QChar(0xf1f8));
+//    btnDel->setObjectName("btnTaskDel|"+task->uid);
+//    btnDel->setWindowTitle("btn-light");
+//    btnDel->setToolTip("delete task");
+//    layoutTask->addWidget(btnDel);
 
-    layoutTask->addStretch();
+//    layoutTask->addStretch();
 
     QLabel *lblTaskTag=new QLabel();
-    lblTaskTag->setText("taskTag");
+    lblTaskTag->setText(task->type);
     lblTaskTag->setFixedWidth(100);
     lblTaskTag->setWindowTitle("lbl-light");
     layoutTask->addWidget(lblTaskTag);
@@ -1249,21 +1288,27 @@ void OgmListWidget::initTurnPage(QString turnPageType)
     OgmUiHelper::Instance()->setIcon(btnPrevPage, QChar(0xf053));
     connect(btnPrevPage, &QToolButton::clicked, this, &OgmListWidget::btnTurnPageClicked);
     btnPrevPage->setObjectName("btnPrevPage");
-    btnPrevPage->setWindowTitle("btn-normal");  
-    if(turnPageType=="firstFull")
+    btnPrevPage->setWindowTitle("btn-turnpage");
+    if(turnPageType=="firstFull"){
         btnPrevPage->setEnabled(false);
+//        btnPrevPage->setHidden(true);
+    }
 
     QToolButton *btnNextPage=new QToolButton(_widgetTurnPage);
     OgmUiHelper::Instance()->setIcon(btnNextPage, QChar(0xf054));
     connect(btnNextPage, &QToolButton::clicked, this, &OgmListWidget::btnTurnPageClicked);
     btnNextPage->setObjectName("btnNextPage");
-    btnNextPage->setWindowTitle("btn-normal");
+    btnNextPage->setWindowTitle("btn-turnpage");
     if(turnPageType=="last"){
         btnNextPage->setEnabled(false);
+//        btnNextPage->setHidden(true);
     }
     if(turnPageType=="first"){
         btnPrevPage->setEnabled(false);
         btnNextPage->setEnabled(false);
+
+//        btnNextPage->setHidden(true);
+//        btnPrevPage->setHidden(true);
     }
 
     layoutTurnPage->addStretch();
@@ -1319,6 +1364,29 @@ QString OgmListWidget::getServerId()
 void OgmListWidget::setListType(QString listType)
 {
     _listType=listType;
+}
+
+void OgmListWidget::searchListItemOnUI(QString serachTxt)
+{
+    QList<QWidget*> widgetAllList=_widgetList->findChildren<QWidget*>(QString(), Qt::FindDirectChildrenOnly);
+    for(int i=0; i<widgetAllList.count(); ++i){
+        bool isSearchItem=false;
+
+        QList<QLabel*> widgetChildList=widgetAllList.at(i)->findChildren<QLabel*>(QString(), Qt::FindDirectChildrenOnly);
+        for(int j=0; j<widgetChildList.count(); ++j){
+            if(widgetChildList.at(j)->objectName().contains("lblListName")){
+                if(widgetChildList.at(j)->text().contains(serachTxt))
+                    isSearchItem=true;
+                else
+                    isSearchItem=false;
+            }
+        }
+
+        if(isSearchItem)
+            widgetAllList[i]->setHidden(false);
+        else
+            widgetAllList[i]->setHidden(true);
+    }
 }
 
 

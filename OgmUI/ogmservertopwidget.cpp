@@ -194,6 +194,9 @@ void OgmServerTopWidget::initModelWidget()
         OgmSetting::defaultModelServerId=_serverId;
         _ui->btnServerDefault->setHidden(true);
     });
+    connect(_ui->txtServerSearch, &QLineEdit::textChanged, [=](QString txt){
+        emit signalSearchTxtChanged(txt);
+    });
 }
 
 void OgmServerTopWidget::initDataWidget()
@@ -240,6 +243,9 @@ void OgmServerTopWidget::initDataWidget()
     connect(_ui->btnServerDefault, &QToolButton::clicked, [=](){
         OgmSetting::defaultDataServerId=_serverId;
         _ui->btnServerDefault->setHidden(true);
+    });
+    connect(_ui->txtServerSearch, &QLineEdit::textChanged, [=](QString txt){
+        emit signalSearchTxtChanged(txt);
     });
 }
 
@@ -325,6 +331,10 @@ void OgmServerTopWidget::initFavorWidget()
         QList<DataRefactor*> refactorList=_favorBLL.data()->favor2dataRefactorList(favor);
 
         emit signalChangeDataRefactorListByList(refactorList);
+    });
+
+    connect(_ui->txtServerSearch, &QLineEdit::textChanged, [=](QString txt){
+        emit signalSearchTxtChanged(txt);
     });
 }
 

@@ -1107,7 +1107,7 @@
        </spacer>
       </item>
       <item>
-       <widget class="QLineEdit" name="btnServerSearch">
+       <widget class="QLineEdit" name="txtServerSearch">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
           <horstretch>0</horstretch>

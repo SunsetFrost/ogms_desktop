@@ -1,5 +1,8 @@
 #include "filebll.h"
 
+#include <QTextStream>
+
+
 DataFileBll::DataFileBll()
 {
     _dataServerDAL=QSharedPointer<DataServerDAL>(new DataServerDAL);
@@ -37,4 +40,22 @@ void DataFileBll::uploadFile(QString serverId, QString parentId, QString filePat
 {
     DataServer* server=_dataServerDAL.data()->getServerById(serverId);
     _dataFileDAL.data()->uploadFile(server, parentId, filePath);
+}
+
+void DataFileBll::updateFileName(QString serverId, QString fileId, QString newName, QString newTime)
+{
+    DataServer *server=_dataServerDAL.data()->getServerById(serverId);
+    _dataFileDAL.data()->updateName(server, fileId, newName, newTime);
+}
+
+void DataFileBll::downloadFile(QString serverId, QString fileId, QString savePath)
+{
+    DataServer *server=_dataServerDAL.data()->getServerById(serverId);
+    QString result=_dataFileDAL.data()->download(server, fileId);
+
+    QFile file(savePath);
+    file.open(QIODevice::WriteOnly | QIODevice::Append);
+    QTextStream ts(&file);
+    ts<<result<<endl;
+    file.close();
 }

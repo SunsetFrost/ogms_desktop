@@ -32,6 +32,7 @@ public:
     void changeDataRefactorTaskByTask(Task *task);
 
     void changeModelTask(QString serverId, QString modelId);
+    void changeModelTaskByTask(Task *task);
 
     void initAggregationConfig();
 
@@ -58,8 +59,10 @@ private:
     Ui::TaskConfigModelUI *_uiModel;
     QWebEngineView *_webView;
 
+    QString _serverId;
     QString _taskType;
     QString _paramIndex;
+    QString _refactorId;
 
     Task *_task;
 

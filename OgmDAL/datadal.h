@@ -38,6 +38,8 @@ public:
 
     int getDataMappingCount(DataServer *server);
 
+    QString getDataMappingXML(DataServer *server, QString id, QString type);//type=  xml  or json
+
 private:
     QList<DataMapping*> json2dataMappingList(QByteArray dataStr, QString serverId);
 };
@@ -57,6 +59,8 @@ public:
     int getDataRefactorCount(DataServer *server);
 
     QList<DataRefactorMethod *> getDataRefactorMethodList(DataServer *server, QString refactorId);
+
+    QString getDataRefactorParamSchema(DataServer *server, QString id, QString schema, QString ioType);
 
 private:
     QList<DataRefactor*> json2dataRefactorList(QByteArray dataStr, QString serverId);

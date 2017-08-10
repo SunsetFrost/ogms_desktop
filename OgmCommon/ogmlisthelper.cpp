@@ -202,6 +202,9 @@ void OgmListHelper::addItemChildrenByItemStruct(QWidget *parent, LISTCHILD item)
             if(item.alignment=="center")
                 lbl->setAlignment(Qt::AlignCenter);
         }
+        if(!item.toolTipValue.isEmpty()){
+            lbl->setToolTip(item.toolTipValue);
+        }
 
         parent->layout()->addWidget(lbl);
     }
@@ -386,6 +389,17 @@ QString OgmHelper::getInitDiagramJson(QString modelId)
     QString result=QString::fromUtf8(OgmNetWork::get(strIp));
 
     return result;
+}
+
+QString OgmHelper::getElidedText(QString originalTxt, int width)
+{
+    QFont font(OgmUiHelper::g_fontName);
+
+    QFontMetrics fontWidth(font);
+    int txtWidth=fontWidth.width(originalTxt);
+    if(txtWidth>width)
+        originalTxt=fontWidth.elidedText(originalTxt, Qt::ElideRight, width);
+    return originalTxt;
 }
 
 

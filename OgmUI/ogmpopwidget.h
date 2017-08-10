@@ -17,16 +17,20 @@ class OgmPopWidget : public OgmWidget
 
 public:
     OgmPopWidget(QString widgetType, QWidget *parent=0);
+    OgmPopWidget(QString widgetType, QString serverId, QWidget *parent=0);
 
     void changeChooseRefactorMethod(QString serverId, QString refactorId);
     void changeConfigModelTaskUI(Task *task);
 
     void setCommonWidgetInfo(QString title, QString content, QString btnText);
 
+    void setFileServerId(QString fileServerId);
+
 private:
     void initCommonWidget();
 
     void initNewFileWidget();
+    void initReNameFileWidget();
 
     void initNewFavorGroupWidget();
 
@@ -60,6 +64,7 @@ private:
     //file
     QString _currentFileId;
     QList<QString> _fileLinkList;
+    QString _fileServerId;
 
 signals:
     void signalOperationResult(QVariant result);

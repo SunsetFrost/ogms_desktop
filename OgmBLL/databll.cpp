@@ -27,7 +27,7 @@ QList<DataService *> DataServiceBLL::getAllData(QString serverId)
 QList<DataService *> DataServiceBLL::getDataListByPage(QString serverId, int pageIndex)
 {
     QEventLoop timeLoop;
-    QTimer::singleShot(2000, &timeLoop, SLOT(quit()));
+    QTimer::singleShot(1000, &timeLoop, SLOT(quit()));
     timeLoop.exec();
 
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
@@ -93,7 +93,7 @@ QList<DataMapping *> DataMappingBLL::getAllDataMapping(QString serverId)
 QList<DataMapping *> DataMappingBLL::getDataMappingByPage(QString serverId, int pageIndex)
 {
     QEventLoop timeLoop;
-    QTimer::singleShot(2000, &timeLoop, SLOT(quit()));
+    QTimer::singleShot(1000, &timeLoop, SLOT(quit()));
     timeLoop.exec();
 
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
@@ -131,7 +131,7 @@ QList<DataRefactor *> DataRefactorBLL::getAllDataRefactor(QString serverId)
 QList<DataRefactor *> DataRefactorBLL::getDataRefactorByPage(QString serverId, int pageIndex)
 {
     QEventLoop timeLoop;
-    QTimer::singleShot(2000, &timeLoop, SLOT(quit()));
+    QTimer::singleShot(1000, &timeLoop, SLOT(quit()));
     timeLoop.exec();
 
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);

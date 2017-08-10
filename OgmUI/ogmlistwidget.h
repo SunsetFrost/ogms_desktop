@@ -20,6 +20,7 @@ public:
 public:
     QString getServerId();
     void setListType(QString listType);
+    void searchListItemOnUI(QString serachTxt);
 
     void changeModelListUIByPage(QString serverId, int pageIndex);
     void changeModelListUI(QList<ModelService*> modelList, QString listType);
@@ -86,6 +87,7 @@ private:
 private:
     QString _serverId;
     QString _fileId;
+    QString _folderId;
     QString _listType;
     QString _favorId;
     int _currentPageIndex;
@@ -125,6 +127,7 @@ signals:
     void signalChangeDataRefactorTaskConfigUI(QString serverId, QString refactorId, QString methodName);
     void signalChangeDataRefactorTaskConfigUIByTask(Task *task);
     void signalChangeModelTaskConfigUI(QString serverId, QString modelId);
+    void signalChangeModelTaskConfigUIByTask(Task *task);
 
 
 

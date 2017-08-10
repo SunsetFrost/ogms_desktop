@@ -86,11 +86,13 @@ void OgmMainWidget::initFunction()
     });
 
     connect(_widgetDataServerTop, &OgmServerTopWidget::signalChangeDataServer, _widgetServerSidebar, &OgmServerSidebarWidget::changeDataServerUI);
+    connect(_widgetDataServerTop, &OgmServerTopWidget::signalSearchTxtChanged, _widgetList, &OgmListWidget::searchListItemOnUI);
     //connect(_widgetDataServerTop, &OgmServerTopWidget::signalChangeDataFileByParentId, _widgetServerSidebar, &OgmServerSidebarWidget::changeDataFileUI);
 
     //model top
     connect(_widgetModelServerTop, &OgmServerTopWidget::signalChangeModelList, _widgetList, &OgmListWidget::changeModelListUIByPage);
     connect(_widgetModelServerTop, &OgmServerTopWidget::signalChangeModelServer, _widgetServerSidebar, &OgmServerSidebarWidget::changeModelServerUI);
+    connect(_widgetModelServerTop, &OgmServerTopWidget::signalSearchTxtChanged, _widgetList, &OgmListWidget::searchListItemOnUI);
 
     //server top
     connect(_widgetServerTop, &OgmMiniTopWidget::signalChangeServerList, _widgetList, &OgmListWidget::changeServerListUI);
@@ -125,6 +127,7 @@ void OgmMainWidget::initFunction()
         _widgetList->changeDataListUI(refactorList, "FavorDataRefactor");
     });
     connect(_widgetFavorTop, &OgmServerTopWidget::signalClearList, _widgetList, &OgmListWidget::clearList);
+    connect(_widgetFavorTop, &OgmServerTopWidget::signalSearchTxtChanged, _widgetList, &OgmListWidget::searchListItemOnUI);
 
     //task top
     connect(_widgetTaskTop, &OgmMiniTopWidget::signalChangeTaskList, _widgetList, &OgmListWidget::changeTaskListUI);
@@ -140,10 +143,10 @@ void OgmMainWidget::initFunction()
     connect(_widgetList, &OgmListWidget::signalChangeDataMapTaskConfigUIByTask, _widgetDataMapTaskConfig, &OgmConfigTaskWidget::changeDataMapTaskByTask);
     connect(_widgetList, &OgmListWidget::signalChangeDataRefactorTaskConfigUI, _widgetDataRefactorTaskConfig, &OgmConfigTaskWidget::changeDataRefactorTask);
     connect(_widgetList, &OgmListWidget::signalChangeDataRefactorTaskConfigUIByTask, _widgetDataRefactorTaskConfig, &OgmConfigTaskWidget::changeDataRefactorTaskByTask);
+    connect(_widgetList, &OgmListWidget::signalChangeModelTaskConfigUI, _widgetModelTaskConfig, &OgmConfigTaskWidget::changeModelTask);
+    connect(_widgetList, &OgmListWidget::signalChangeModelTaskConfigUIByTask, _widgetModelTaskConfig, &OgmConfigTaskWidget::changeModelTaskByTask);
 
     connect(_widgetList, &OgmListWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
-
-    connect(_widgetList, &OgmListWidget::signalChangeModelTaskConfigUI, _widgetModelTaskConfig, &OgmConfigTaskWidget::changeModelTask);  
 
     connect(_widgetList, &OgmListWidget::signalChangeModelServerTopUI, _widgetModelServerTop, &OgmServerTopWidget::changeModelServer);
     connect(_widgetList, &OgmListWidget::signalChangeDataServerTopUI, _widgetDataServerTop, &OgmServerTopWidget::changeDataServer);
@@ -371,7 +374,8 @@ void OgmMainWidget::switchPage(QString type)
         _widgetList->setHidden(false);
         _scrollArea->setHidden(false);
 
-        _widgetList->changeDataListUI(_widgetDataServerTop->getCurrentServerId(), "Data", 0);
+        _widgetDataServerTop->changeDataServer(_widgetDataServerTop->getCurrentServerId());
+        //_widgetList->changeDataListUI(_widgetDataServerTop->getCurrentServerId(), "Data", 0);
     }
     else if(type=="ModelList"){
         _widgetList->clearList();

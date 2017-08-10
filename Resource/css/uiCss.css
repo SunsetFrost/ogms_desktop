@@ -386,6 +386,15 @@ QToolButton[statusTip="btn-tool"] {
     color: #999999;
 }
 
+QToolButton[windowTitle="btn-turnpage"] {
+    font-size: 14px;
+    color: #666666;
+}
+QToolButton[windowTitle="btn-turnpage"]:pressed,
+QToolButton[windowTitle="btn-turnpage"]:hover{
+    color: #47a4e9;
+}
+
 QToolButton[statusTip="btn-miniTopLeft"]{
     font-size: 16px;
     color: #666666;

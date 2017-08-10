@@ -213,9 +213,6 @@ void DataServerDAL::dataServerList2xml(QList<DataServer *> &dataServerList, QDom
         }
         elementGroup.setAttributeNode(attr);
 
-        attr=doc.createAttribute("des");
-        attr.setValue(dataServerList.at(i)->desc);
-        elementGroup.setAttributeNode(attr);
 
         elementConfig.appendChild(elementGroup);
     }
@@ -306,6 +303,15 @@ int DataMappingDAL::getDataMappingCount(DataServer *server)
 
     int count=result.toInt();
     return count;
+}
+
+QString DataMappingDAL::getDataMappingXML(DataServer *server, QString id, QString type)
+{
+    QString ip=server->ip;
+    QString request="http://"+ip+"/datamap/use/udxSchema?id="+id+"&type="+type;
+    QByteArray result=OgmNetWork::get(request);
+
+    return QString::fromUtf8(result);
 }
 
 QList<DataMapping *> DataMappingDAL::json2dataMappingList(QByteArray dataStr, QString serverId)
@@ -403,6 +409,15 @@ QList<DataRefactorMethod *> DataRefactorDAL::getDataRefactorMethodList(DataServe
     QByteArray result=OgmNetWork::get(request);
 
     return json2dataRefactorMethodList(result, server->id, refactorId);
+}
+
+QString DataRefactorDAL::getDataRefactorParamSchema(DataServer *server, QString id, QString schema, QString ioType)
+{
+    QString ip=server->ip;
+    QString request="http://"+ip+"/refactor/paramSchema?id="+id+"&schema="+schema+"&iotype="+ioType;
+    QByteArray result=OgmNetWork::get(request);
+
+    return QString::fromUtf8(result);
 }
 
 QList<DataRefactor *> DataRefactorDAL::json2dataRefactorList(QByteArray dataStr, QString serverId)
