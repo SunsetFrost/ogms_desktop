@@ -8,6 +8,7 @@
 #include <OgmCommon/ogmwidget.h>
 #include "OgmBLL/taskbll.h"
 #include "OgmBLL/databll.h"
+#include "OgmBLL/visualbll.h"
 
 #include "ui_ogmdataserviceconfig.h"
 #include "ui_ogmrefactortaskconfigui.h"
@@ -34,12 +35,18 @@ public:
     void changeModelTask(QString serverId, QString modelId);
     void changeModelTaskByTask(Task *task);
 
-    void initAggregationConfig();
+    void changeVisual(Visual *visual, int formatIndex);
+
+    void changeAggregationConfig(QString url);
+
+
 
 private:
     void initDataMapTaskConfig();
     void initDataRefctorTaskConfig();
     void initModelTaskConfig();
+    void initVisualConfig();
+    void initAggregationConfig();
 
 
     void changeMethodParamUI(DataRefactorMethodParam *param, TASKREFACTORPARAM taskParam);
@@ -57,20 +64,28 @@ private:
     Ui::DataMapTaskConfigUI *_uiDataMap;
     Ui::DataRefactorTaskConfigUI *_uiDataRefactor;
     Ui::TaskConfigModelUI *_uiModel;
+    Ui::DataRefactorTaskConfigUI *_uiVisual;
+
     QWebEngineView *_webView;
 
+    Task *_task;
     QString _serverId;
     QString _taskType;
     QString _paramIndex;
     QString _refactorId;
 
-    Task *_task;
+    Visual *_visual;
+    int _visualFormatIndex;
+    int _visualParamIndex;
 
     QSharedPointer<TaskBLL> _taskBLL;
     QSharedPointer<DataRefactorBLL> _dataRefactorBLL;
+    QSharedPointer<VisualBLL> _visualBLL;
 
 signals:
     void signalSwitchPage(QString pageType);
+    void signalGoVisual(QString visualUrl);
+    void signalChangeVisualFormatSidebar(Visual *visual);
 };
 
 #endif // OGMCONFIGTASKWIDGET_H

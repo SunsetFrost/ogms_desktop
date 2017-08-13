@@ -11,5 +11,6 @@
         <file>png/ProgramIcon.png</file>
         <file>png/UserIcon.png</file>
         <file>png/loading.gif</file>
+        <file>png/logo.png</file>
     </qresource>
 </RCC>

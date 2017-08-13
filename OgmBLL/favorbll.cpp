@@ -55,10 +55,12 @@ QList<ModelService *> FavorBLL::favor2modelServiceList(Favor *favor)
 {
     QList<ModelService*> listModel;
     for(int i=0; i<favor->serviceList.count(); ++i){
-        if(favor->serviceList[i].serviceType=="Model"){
-            ModelServer *server=_modelServerDAL.data()->getServerById(favor->serviceList[i].serverId);
-            ModelService *service=_modelServiceDAL.data()->getOneModelServiceById(server, favor->serviceList[i].serviceId);
-            listModel.append(service);
+        if(favor->serviceList.at(i).serviceType=="Model"){
+            ModelServer *server=_modelServerDAL.data()->getServerById(favor->serviceList.at(i).serverId);
+            ModelService *service=_modelServiceDAL.data()->getOneModelServiceById(server, favor->serviceList.at(i).serviceId);
+            if(service->id!=""){
+                listModel.append(service);
+            }
         }
     }
     return listModel;
@@ -71,7 +73,9 @@ QList<DataService *> FavorBLL::favor2dataServiceList(Favor *favor)
         if(favor->serviceList[i].serviceType=="Data"){
             DataServer *server=_dataServerDAL.data()->getServerById(favor->serviceList[i].serverId);
             DataService *service=_dataServiceDAL.data()->getDataById(server, favor->serviceList[i].serviceId);
-            listModel.append(service);
+            if(service->id!=""){
+                listModel.append(service);
+            }
         }
     }
     return listModel;
@@ -84,7 +88,9 @@ QList<DataMapping *> FavorBLL::favor2dataMappingList(Favor *favor)
         if(favor->serviceList[i].serviceType=="DataMapping"){
             DataServer *server=_dataServerDAL.data()->getServerById(favor->serviceList[i].serverId);
             DataMapping *service=_dataMappingDAL.data()->getDataMappingById(server, favor->serviceList[i].serviceId);
-            listModel.append(service);
+            if(service->id!=""){
+                listModel.append(service);
+            }
         }
     }
     return listModel;
@@ -97,7 +103,9 @@ QList<DataRefactor *> FavorBLL::favor2dataRefactorList(Favor *favor)
         if(favor->serviceList[i].serviceType=="DataRefactor"){
             DataServer *server=_dataServerDAL.data()->getServerById(favor->serviceList[i].serverId);
             DataRefactor *service=_dataRefactorDAL.data()->getDataRefactorById(server, favor->serviceList[i].serviceId);
-            listModel.append(service);
+            if(service->id!=""){
+                listModel.append(service);
+            }
         }
     }
     return listModel;

@@ -1,5 +1,6 @@
 #include "taskdal.h"
 
+#include "OgmCommon/ogmsetting.h"
 #include "OgmCommon/ogmnetwork.h"
 
 #include <QJsonArray>
@@ -16,7 +17,7 @@ TaskDAL::TaskDAL()
 Task *TaskDAL::getTaskById(QString id)
 {
     QDomDocument *doc=new QDomDocument();
-    QString taskFilePath=taskPath+"/"+id+".task";
+    QString taskFilePath=OgmSetting::taskPath+"/"+id+".task";
     QFile file(taskFilePath);
     file.open(QIODevice::ReadOnly);
     doc->setContent(&file);
@@ -29,7 +30,7 @@ Task *TaskDAL::getTaskById(QString id)
 
 QList<Task *> TaskDAL::getAllTask()
 {
-    QDir dir(taskPath);
+    QDir dir(OgmSetting::taskPath);
     dir.setFilter(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
     dir.setSorting(QDir::Time);
 
@@ -49,7 +50,7 @@ QList<Task *> TaskDAL::getAllTask()
 
 void TaskDAL::saveTask(Task *task)
 {
-    QString taskFileName=taskPath+"/"+task->uid+".task";
+    QString taskFileName=OgmSetting::taskPath+"/"+task->uid+".task";
     QFile file(taskFileName);
     if(!file.open(QIODevice::WriteOnly))
         return;
@@ -73,7 +74,7 @@ void TaskDAL::saveAsTask(Task *task, QString savePath)
 
 void TaskDAL::deleteTask(QString id)
 {
-    QString taskFileName=taskPath+"/"+id+".task";
+    QString taskFileName=OgmSetting::taskPath+"/"+id+".task";
     QFile file(taskFileName);
     if(file.exists()){
         file.remove();
@@ -130,7 +131,7 @@ QVariant TaskDAL::getDataTaskRecords(QString serverIp, QString instanceId, QStri
 
 ModelTaskConfig *TaskDAL::getStateInfo(QString serverIp, QString modelId)
 {
-    QString strRequest="http://"+serverIp+":8060/modelser/inputdata/json/"+modelId;
+    QString strRequest="http://"+serverIp+"/modelser/inputdata/json/"+modelId;
 
     QByteArray byteResult=OgmNetWork::get(strRequest);
 
@@ -139,7 +140,7 @@ ModelTaskConfig *TaskDAL::getStateInfo(QString serverIp, QString modelId)
 
 QString TaskDAL::getModelRunResultByModelFileId(QString serverIp, QString dataId)
 {
-    QString url="http://"+serverIp+":8060/geodata/"+dataId;
+    QString url="http://"+serverIp+"/geodata/"+dataId;
 
     QNetworkAccessManager net;
     QNetworkReply *reply=net.get(QNetworkRequest(url));
@@ -154,7 +155,7 @@ QString TaskDAL::getModelRunResultByModelFileId(QString serverIp, QString dataId
 
 QString TaskDAL::uploadFileToModelServer(QString serverIp, QString filePath)
 {
-    QString url="http://"+serverIp+":8060/geodata?type=file";
+    QString url="http://"+serverIp+"/geodata?type=file";
 
     //config upload data
     QByteArray data;
@@ -203,9 +204,55 @@ QString TaskDAL::uploadFileToModelServer(QString serverIp, QString filePath)
     return dataId;
 }
 
+QString TaskDAL::uploadFileStreamToModelServer(QString serverIp, QString fileStream)
+{
+    QString url="http://"+serverIp+"/geodata?type=file";
+
+    //config upload data
+    QByteArray data;
+    QString crlf="\r\n";
+    QString b=QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary="---------------------------"+b;
+    QString endBoundary=crlf+"--"+boundary+"--"+crlf;
+    QString contentType="multipart/form-data; boundary="+boundary;
+    boundary="--"+boundary+crlf;
+    QByteArray bond=boundary.toUtf8();
+
+    data.append(bond);
+    boundary = crlf + boundary;
+    bond = boundary.toUtf8();
+    data.append(QString("Content-Disposition: form-data; name=\"myfile\"; filename=\""+QString(" \""+crlf).toUtf8()));
+    data.append("Content-Type:application/xml""\r\n\r\n");
+    data.append(crlf.toUtf8());
+    data.append(fileStream.toUtf8());
+    data.append(endBoundary.toUtf8());
+
+    //config qt network
+    QNetworkAccessManager net;
+    QNetworkRequest request;
+    request.setUrl(QUrl(url));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, contentType);
+
+    QNetworkReply *reply=net.post(request, data);
+    QEventLoop eventLoop;
+
+    //config event loop
+    QObject::connect(reply, SIGNAL(finished()), &eventLoop, SLOT(quit()));
+    eventLoop.exec();
+
+    //result data
+    QByteArray result=reply->readAll();
+
+    QJsonParseError jsonError;
+    QJsonObject json=QJsonDocument::fromJson(result, &jsonError).object();
+    QString dataId=json.value("gd_id").toString();
+
+    return dataId;
+}
+
 QString TaskDAL::getModelRunInstanceId(QString serverIp, Task *task)
 {
-    QString url="http://"+serverIp+":8060/modelser/"+task->getModelTaskConfig()->modelId+"?ac=run&inputdata=[";
+    QString url="http://"+serverIp+"/modelser/"+task->getModelTaskConfig()->modelId+"?ac=run&inputdata=[";
     foreach(EventTaskConfig *event, task->getModelTaskConfig()->eventList){
         if(event->eventType=="response"){
             url.append("{\"StateId\":\""+task->getModelTaskConfig()->stateId+"\",");
@@ -234,7 +281,7 @@ QString TaskDAL::getModelRunInstanceId(QString serverIp, Task *task)
 
 double TaskDAL::getModelRunInstanceInfo(QString serverIp, QString msrId, Task *task)
 {
-    QString url="http://"+serverIp+":8060/modelserrun/json/"+msrId;
+    QString url="http://"+serverIp+"/modelserrun/json/"+msrId;
 
     QNetworkAccessManager net;
     QNetworkReply *reply=net.get(QNetworkRequest(url));
@@ -421,6 +468,14 @@ void TaskDAL::task2xml(Task *task, QDomDocument *doc)
             attr.setValue(modelTask->eventList.at(i)->dataType);
             eleData.setAttributeNode(attr);
 
+            attr=doc->createAttribute("dataServerId");
+            attr.setValue(modelTask->eventList.at(i)->dataServerId);
+            eleData.setAttributeNode(attr);
+
+            attr=doc->createAttribute("modelServerId");
+            attr.setValue(modelTask->eventList.at(i)->modelServerId);
+            eleData.setAttributeNode(attr);
+
             attr=doc->createAttribute("modelId");
             attr.setValue(modelTask->eventList.at(i)->dataFromModelId);
             eleData.setAttributeNode(attr);
@@ -508,6 +563,8 @@ void TaskDAL::xml2task(QDomDocument *doc, Task *task)
 
             QDomElement eleData=nodeEventList.at(i).toElement().firstChildElement();
             event->dataType=eleData.attributeNode("dataType").value();
+            event->dataServerId=eleData.attributeNode("dataServerId").value();
+            event->modelServerId=eleData.attributeNode("modelServerId").value();
             event->dataFromModelId=eleData.attributeNode("modelId").value();
             event->dataFromDataId=eleData.attributeNode("dataId").value();
             event->dataPath=eleData.attributeNode("dataPath").value();

@@ -289,7 +289,7 @@ void OgmServerTopWidget::initFavorWidget()
         popWidget->show();
         connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
             if(varResult.toBool()){
-                _favorBLL.data()->deleteOneFavorGroup(_serverId);
+                _favorBLL.data()->deleteOneFavorGroup(_favorId);
                 changeFavorManager(OgmSetting::defaultFavorId);
             }
         });

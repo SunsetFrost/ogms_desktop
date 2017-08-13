@@ -4,6 +4,8 @@
 #include "OgmCommon/ogmlisthelper.h"
 #include "ogmpopwidget.h"
 
+#include <QFileDialog>
+
 OgmMiniTopWidget::OgmMiniTopWidget(QString widgetType, QWidget *parent)
     : QWidget(parent)
     ,_ui(new Ui::OgmMiniTopWidget)
@@ -19,6 +21,9 @@ OgmMiniTopWidget::OgmMiniTopWidget(QString widgetType, QWidget *parent)
     }
     else if(widgetType=="Server"){
         initServerWidget();
+    }
+    else if(widgetType=="Visual"){
+        initVisualWidget();
     }
 }
 
@@ -38,10 +43,20 @@ void OgmMiniTopWidget::changeTaskType(QString taskType)
     emit signalChangeTaskList(taskList, taskType);
 }
 
+void OgmMiniTopWidget::changeVisual()
+{
+    emit signalClearList();;
+    emit signalChangeVisualList();
+}
+
 void OgmMiniTopWidget::initTaskWidget()
 {
+    _ui->widgetMiniTopTask->setHidden(false);
     _ui->widgetMiniTopServer->setHidden(true);
+    _ui->widgetMiniTopVisual->setHidden(true);
+
     _ui->btnOpenTaskMiniTop->setHidden(true);
+    _ui->btnNewTaskMiniTop->setHidden(true);
 
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnNewTaskMiniTop, 0xf055, "Aggragation task", 7);
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnOpenTaskMiniTop, 0xf07c, "Open task", 7);
@@ -84,7 +99,9 @@ void OgmMiniTopWidget::initTaskWidget()
 
 void OgmMiniTopWidget::initServerWidget()
 {
+    _ui->widgetMiniTopServer->setHidden(false);
     _ui->widgetMiniTopTask->setHidden(true);
+    _ui->widgetMiniTopVisual->setHidden(true);
 
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnNewServer, 0xf055, "Connect", 7);
 
@@ -135,6 +152,19 @@ void OgmMiniTopWidget::initServerWidget()
                 emit signalChangeServerList("DataServer");
             }
         });
+    });
+}
+
+void OgmMiniTopWidget::initVisualWidget()
+{
+    _ui->widgetMiniTopServer->setHidden(true);
+    _ui->widgetMiniTopTask->setHidden(true);
+    _ui->widgetMiniTopVisual->setHidden(false);
+
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnMiniTopAddVisual, 0xf055, "Add Visual Package ", 7);
+
+    connect(_ui->btnMiniTopAddVisual, &QToolButton::clicked, [=](){
+          QString filePath=QFileDialog::getOpenFileName(this, "choose upload data");
     });
 }
 

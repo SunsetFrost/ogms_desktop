@@ -4,6 +4,7 @@ SOURCES +=  \
     $$PWD/file.cpp \
     $$PWD/favor.cpp \
     $$PWD/task.cpp \
+    $$PWD/visual.cpp \
 
 
 HEADERS += \
@@ -12,3 +13,4 @@ HEADERS += \
     $$PWD/file.h \
     $$PWD/favor.h \
     $$PWD/task.h \
+    $$PWD/visual.h \

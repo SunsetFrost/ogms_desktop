@@ -8,6 +8,7 @@
 
 #include "OgmBLL/modelbll.h"
 #include "OgmBLL/databll.h"
+#include "OgmEntity/visual.h"
 
 class OgmServerSidebarWidget : public QWidget
 {
@@ -20,6 +21,8 @@ public:
     void changeDataServerUI();
 
     void changeDataFileUI();
+
+    void changeVisualFormat(Visual *visual);
 
 private:
     void initWidget();
@@ -38,6 +41,7 @@ signals:
     void signalChangeModelList(QString serverId);
     void signalChangeDataList(QString serverId);
     void signalChangeDataFileUI(QString serverId, QString parentFileId, QString checkType);
+    void signalChangeVisualConfigUI(Visual *visual, int formatIndex);
 };
 
 #endif // OGMSERVERSIDEBARWIDGET_H

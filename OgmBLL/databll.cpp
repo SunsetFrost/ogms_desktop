@@ -26,9 +26,9 @@ QList<DataService *> DataServiceBLL::getAllData(QString serverId)
 
 QList<DataService *> DataServiceBLL::getDataListByPage(QString serverId, int pageIndex)
 {
-    QEventLoop timeLoop;
-    QTimer::singleShot(1000, &timeLoop, SLOT(quit()));
-    timeLoop.exec();
+//    QEventLoop timeLoop;
+//    QTimer::singleShot(500, &timeLoop, SLOT(quit()));
+//    timeLoop.exec();
 
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
     QList<DataService*> dsList=_dataServiceDAL.data()->getDataListByPage(dataServer, OgmListHelper::pageAmount, pageIndex);
@@ -49,6 +49,16 @@ DataServerBLL::DataServerBLL()
 
 QList<DataServer *> DataServerBLL::getAllServer()
 {
+    QList<DataServer*> serverList=_dataServerDAL.data()->getAllServer();
+    return serverList;
+}
+
+QList<DataServer *> DataServerBLL::getAllServerDelayed()
+{
+    QEventLoop timeLoop;
+    QTimer::singleShot(500, &timeLoop, SLOT(quit()));
+    timeLoop.exec();
+
     QList<DataServer*> serverList=_dataServerDAL.data()->getAllServer();
     return serverList;
 }
@@ -92,9 +102,9 @@ QList<DataMapping *> DataMappingBLL::getAllDataMapping(QString serverId)
 
 QList<DataMapping *> DataMappingBLL::getDataMappingByPage(QString serverId, int pageIndex)
 {
-    QEventLoop timeLoop;
-    QTimer::singleShot(1000, &timeLoop, SLOT(quit()));
-    timeLoop.exec();
+//    QEventLoop timeLoop;
+//    QTimer::singleShot(500, &timeLoop, SLOT(quit()));
+//    timeLoop.exec();
 
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
     QList<DataMapping*> dsList=_dataMappingDAL.data()->getDataMappingListByPage(dataServer, OgmListHelper::pageAmount, pageIndex);
@@ -130,9 +140,9 @@ QList<DataRefactor *> DataRefactorBLL::getAllDataRefactor(QString serverId)
 
 QList<DataRefactor *> DataRefactorBLL::getDataRefactorByPage(QString serverId, int pageIndex)
 {
-    QEventLoop timeLoop;
-    QTimer::singleShot(1000, &timeLoop, SLOT(quit()));
-    timeLoop.exec();
+//    QEventLoop timeLoop;
+//    QTimer::singleShot(500, &timeLoop, SLOT(quit()));
+//    timeLoop.exec();
 
     DataServer* dataServer=_dataServerDAL.data()->getServerById(serverId);
     QList<DataRefactor*> dsList=_dataRefactorDAL.data()->getDataRefactorListByPage(dataServer, OgmListHelper::pageAmount, pageIndex);

@@ -1,8 +1,10 @@
 #include "taskbll.h"
 #include "OgmCommon/ogmlisthelper.h"
+#include "OgmCommon/ogmsetting.h"
 
 #include <QTimer>
 #include <QEventLoop>
+#include <QDateTime>
 
 TaskBLL::TaskBLL()
 {
@@ -12,6 +14,7 @@ TaskBLL::TaskBLL()
     _dataServerDAL=QSharedPointer<DataServerDAL>(new DataServerDAL);
     _datamapDAL=QSharedPointer<DataMappingDAL>(new DataMappingDAL);
     _datarefactorDAL=QSharedPointer<DataRefactorDAL>(new DataRefactorDAL);
+    _fileDataDAL=QSharedPointer<DataFileDAL>(new DataFileDAL);
 }
 
 Task *TaskBLL::getTaskById(QString id)
@@ -122,37 +125,45 @@ QString TaskBLL::runDataRefactorTask(Task *task)
 
 QString TaskBLL::runModelTask(Task *task)
 {
-    ModelServer *server=_modelServerDAL.data()->getServerById(task->getModelTaskConfig()->serverId);
+    ModelServer *modelServer=_modelServerDAL.data()->getServerById(task->getModelTaskConfig()->serverId);
+    DataServer *dataServer=_dataServerDAL.data()->getServerById(OgmSetting::defaultDataServerId);
 
     //upload data
     for(int i=0; i<task->getModelTaskConfig()->eventList.count(); ++i){
         if(task->getModelTaskConfig()->eventList.at(i)->eventType=="response"){
-            task->getModelTaskConfig()->eventList.at(i)->dataFromModelId=_taskDAL.data()->uploadFileToModelServer(server->ip ,task->getModelTaskConfig()->eventList.at(i)->dataPath);
+            if(task->getModelTaskConfig()->eventList.at(i)->dataType=="local"){
+                            task->getModelTaskConfig()->eventList.at(i)->dataFromModelId=_taskDAL.data()->uploadFileToModelServer(modelServer->ip ,task->getModelTaskConfig()->eventList.at(i)->dataPath);
+            }
+            else if(task->getModelTaskConfig()->eventList.at(i)->dataType=="remote"){
+                QString fileStream=_fileDataDAL.data()->download(dataServer, task->getModelTaskConfig()->eventList.at(i)->dataFromDataId, OgmSetting::dataServerUserName);
+                task->getModelTaskConfig()->eventList.at(i)->dataFromModelId=_taskDAL.data()->uploadFileStreamToModelServer(modelServer->ip, fileStream);
+            }
+
         }
     }
     //run model  get instanceId
-    QString instanceId=_taskDAL.data()->getModelRunInstanceId(server->ip, task);
+    QString instanceId=_taskDAL.data()->getModelRunInstanceId(modelServer->ip, task);
     //polling until model finish
     double runTime=0;
     while(runTime<0.0001){
         QEventLoop timeLoop;
         QTimer::singleShot(3000, &timeLoop, SLOT(quit()));
         timeLoop.exec();
-        runTime=_taskDAL.data()->getModelRunInstanceInfo(server->ip, instanceId, task);
+        runTime=_taskDAL.data()->getModelRunInstanceInfo(modelServer->ip, instanceId, task);
     }
     //get result
     QList<QString> resultList;
     for(int i=0; i<task->getModelTaskConfig()->eventList.count(); ++i){
         if(task->getModelTaskConfig()->eventList.at(i)->eventType=="noresponse"){
-            QString result=_taskDAL.data()->getModelRunResultByModelFileId(server->ip, task->getModelTaskConfig()->eventList.at(i)->dataFromModelId);
+            QString result=_taskDAL.data()->getModelRunResultByModelFileId(modelServer->ip, task->getModelTaskConfig()->eventList.at(i)->dataFromModelId);
             resultList.append(result);
 
-            QString filePath=QDir::currentPath()+"/result/"+task->getModelTaskConfig()->eventList.at(i)->dataFromModelId+task->uid+".xml";
-            QFile file(filePath);
-            file.open(QIODevice::WriteOnly | QIODevice::Append );
-            QTextStream ts(&file);
-            ts<<result<<endl;
-            file.close();
+            //add task result folder
+            QString folderId=_fileDataDAL.data()->addFolder(dataServer, "599023d478983d271073c108", task->name, QDateTime::currentDateTime().toString("yyyy-MM-dd"), OgmSetting::dataServerUserName);
+            folderId=folderId.split("|").at(1);
+
+            //upload result to default data server
+            _fileDataDAL.data()->uploadFile(dataServer, folderId, result, task->getModelTaskConfig()->eventList.at(i)->eventName, OgmSetting::dataServerUserName);
         }
     }
 
@@ -175,7 +186,7 @@ bool TaskBLL::isRunningTaskFinish(QString serverIp, QString instanceId, QString 
         return true;
 }
 
-bool TaskBLL::isTaskInfoComplete(Task *task)
+bool TaskBLL::isTaskConfigInfoComplete(Task *task)
 {
     if(task->type=="DataMap"){
         if(task->getDataMapTaskConfig()->calltype=="" || task->getDataMapTaskConfig()->inputId=="" || task->getDataMapTaskConfig()->outputFilename==""){
@@ -194,7 +205,7 @@ bool TaskBLL::isTaskInfoComplete(Task *task)
     }
     if(task->type=="Model"){
         for(int i=0; i<task->getModelTaskConfig()->eventList.count(); ++i){
-            if(task->getModelTaskConfig()->eventList.at(i)->eventType=="response" && task->getModelTaskConfig()->eventList.at(i)->dataPath==""){
+            if(task->getModelTaskConfig()->eventList.at(i)->eventType=="response" && task->getModelTaskConfig()->eventList.at(i)->dataType==""){
                 return false;
             }
         }
@@ -212,6 +223,17 @@ QString TaskBLL::getDataRefactorParamSchema(QString serverId, QString refactorId
 {
     DataServer *server=_dataServerDAL.data()->getServerById(serverId);
     return _datarefactorDAL.data()->getDataRefactorParamSchema(server, refactorId, schemaName, ioType);
+}
+
+QString TaskBLL::uploadDataFileToModelServer(QString dataServerId, QString dataFileId, QString modelServerId)
+{
+    DataServer *dataServer=_dataServerDAL.data()->getServerById(dataServerId);
+    ModelServer *modelServer=_modelServerDAL.data()->getServerById(modelServerId);
+
+    QString dataStream=_fileDataDAL.data()->download(dataServer, dataFileId, OgmSetting::dataServerUserName);
+    QString modelFileId=_taskDAL.data()->uploadFileStreamToModelServer(modelServer->ip, dataStream);
+
+    return modelFileId;
 }
 
 

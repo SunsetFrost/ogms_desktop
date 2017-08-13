@@ -26,6 +26,7 @@ public:
     ModelServerBLL();
 
     QList<ModelServer*> getAllServer();
+    QList<ModelServer*> getAllServerDelayed();
 
     ModelServer* getServerId(QString serverId);
 

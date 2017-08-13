@@ -70,6 +70,7 @@ public:
     DataServerBLL();
 
     QList<DataServer*> getAllServer();
+    QList<DataServer*> getAllServerDelayed();
 
     DataServer* getServerId(QString serverId);
 

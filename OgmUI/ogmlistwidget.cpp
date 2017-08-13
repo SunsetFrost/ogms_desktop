@@ -24,6 +24,7 @@ OgmListWidget::OgmListWidget(QWidget *parent) : QWidget(parent)
     _dataFileBLL=     QSharedPointer<DataFileBll>     (new DataFileBll);
     _taskBLL=         QSharedPointer<TaskBLL>         (new TaskBLL);
     _favorBLL=        QSharedPointer<FavorBLL>        (new FavorBLL);
+    _visualBLL=       QSharedPointer<VisualBLL>       (new VisualBLL);
 
     initWidget();
 }
@@ -134,19 +135,33 @@ void OgmListWidget::changeServerListUI(QString serverType)
     _listType="Server";
     _currentPageIndex=0;
     //clearList();
-    _widgetLoading->setHidden(true);
+
 
     QList<QVariant> varList;
 
     if(serverType=="ModelServer"){
-        QList<ModelServer*> serverList=_modelServerBLL.data()->getAllServer();
+        QList<ModelServer*> serverList=_modelServerBLL.data()->getAllServerDelayed();
         varList=OgmHelper::toVarList(serverList);
     }
     else if(serverType=="DataServer"){
-        QList<DataServer*> serverList=_dataServerBLL.data()->getAllServer();
+        QList<DataServer*> serverList=_dataServerBLL.data()->getAllServerDelayed();
         varList=OgmHelper::toVarList(serverList);
     }
 
+    _widgetLoading->setHidden(true);
+
+    listPaging(varList, 25);
+}
+
+void OgmListWidget::changeVisualListUI()
+{
+    _listType="Visual";
+    _currentPageIndex=0;
+
+    QList<Visual*> visualList=_visualBLL.data()->getAllVisual();
+    QList<QVariant> varList=OgmHelper::toVarList(visualList);
+
+    _widgetLoading->setHidden(true);
     listPaging(varList, 25);
 }
 
@@ -296,6 +311,7 @@ void OgmListWidget::clearList()
             delete space;
         }
     }
+
     _widgetLoading->setHidden(false);
 }
 
@@ -386,6 +402,10 @@ void OgmListWidget::addListIntelligent(QVariant var, QString style)
     else if(typeName=="DataServer*"){
         DataServer *server=var.value<DataServer*>();
         addOneServerOnUI(server,style);
+    }
+    else if(typeName=="Visual*"){
+        Visual *visual=var.value<Visual*>();
+        addOneVisualOnUI(visual, style);
     }
 }
 
@@ -503,13 +523,15 @@ void OgmListWidget::addOneDataMappingOnUI(DataMapping *data, QString style)
     listItemBtnDetail.objectName="btnDataMappingDetail|"+data->id;
     listItemList.append(listItemBtnDetail);
 
-    LISTCHILD listItemBtnInvoke;
-    listItemBtnInvoke.typeValue=ItemType::ToolButton;
-    listItemBtnInvoke.iconValue=0xf04b;
-    listItemBtnInvoke.styleName="btn-light";
-    listItemBtnInvoke.toolTipValue="invoke data mapping service";
-    listItemBtnInvoke.objectName="btnDataMappingInvoke|"+data->id;
-    listItemList.append(listItemBtnInvoke);
+    if(_listType=="FavorDataMapping"){
+        LISTCHILD listItemBtnInvoke;
+        listItemBtnInvoke.typeValue=ItemType::ToolButton;
+        listItemBtnInvoke.iconValue=0xf013;
+        listItemBtnInvoke.styleName="btn-light";
+        listItemBtnInvoke.toolTipValue="config data mapping service";
+        listItemBtnInvoke.objectName="btnDataMappingInvoke|"+data->id;
+        listItemList.append(listItemBtnInvoke);
+    }
 
     if(_listType=="DataMapping"){
         LISTCHILD listItemBtnFavor;
@@ -597,13 +619,15 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
     listItemBtnDetail.objectName="btnDataRefactorDetail|"+data->id;
     listItemList.append(listItemBtnDetail);
 
-    LISTCHILD listItemBtnDownload;
-    listItemBtnDownload.typeValue=ItemType::ToolButton;
-    listItemBtnDownload.iconValue=0xf04b;
-    listItemBtnDownload.styleName="btn-light";
-    listItemBtnDownload.toolTipValue="run data refactor method";
-    listItemBtnDownload.objectName="btnDataRefactorRun|"+data->id;
-    listItemList.append(listItemBtnDownload);
+    if(_listType=="FavorDataRefactor"){
+        LISTCHILD listItemBtnDownload;
+        listItemBtnDownload.typeValue=ItemType::ToolButton;
+        listItemBtnDownload.iconValue=0xf013;
+        listItemBtnDownload.styleName="btn-light";
+        listItemBtnDownload.toolTipValue="config data refactoring method";
+        listItemBtnDownload.objectName="btnDataRefactorRun|"+data->id;
+        listItemList.append(listItemBtnDownload);
+    }
 
     if(_listType=="DataRefactor"){
         LISTCHILD listItemBtnFavor;
@@ -642,7 +666,8 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
     QToolButton *btnRun=_widgetList->findChild<QToolButton*>("btnDataRefactorRun|"+data->id);
     connect(btnRun, &QToolButton::clicked, [=](){
         OgmPopWidget *pop=new OgmPopWidget("ChooseRefactorMethod");
-        pop->changeChooseRefactorMethod(_serverId, data->id);
+
+        pop->changeChooseRefactorMethod(data->serverId, data->id);
         connect(pop, &OgmPopWidget::signalSwitchPage, [=](QString pageType){
             emit signalSwitchPage(pageType);
         });
@@ -682,7 +707,7 @@ void OgmListWidget::addOneDataMethodOnUI(DataRefactorMethod *dataMethod, QString
     LISTCHILD listSpaceA=OgmListHelper::createSpaceChild();
     list.append(listSpaceA);
 
-    LISTCHILD listRun=OgmListHelper::createButtonChild(0xf04b, "btnRefactorMethodRun|"+dataMethod->name, "btn-light", "choose this method");
+    LISTCHILD listRun=OgmListHelper::createButtonChild(0xf013, "btnRefactorMethodRun|"+dataMethod->name, "btn-light", "select this method");
     list.append(listRun);
 
     LISTCHILD listSpaceB=OgmListHelper::createSpaceChild();
@@ -727,10 +752,12 @@ void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
     listItemBtnDetail.objectName="btnDataDetail|"+model->id;
     listItemList.append(listItemBtnDetail);
 
-    LISTCHILD listItemBtnRun=OgmListHelper::createButtonChild(0xf144, "btnModelRun|"+model->id, "btn-light", "run this model");
-    listItemList.append(listItemBtnRun);
+
 
     if(_listType=="FavorModel"){
+        LISTCHILD listItemBtnRun=OgmListHelper::createButtonChild(0xf013, "btnModelRun|"+model->id, "btn-light", "config this model");
+        listItemList.append(listItemBtnRun);
+
         LISTCHILD listItemBtnDelete=OgmListHelper::createButtonChild(0xf1f8, "btnModelDelete|"+model->id, "btn-light", "delete from group");
         listItemList.append(listItemBtnDelete);
     }
@@ -778,6 +805,7 @@ void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
                 service.serviceType="Model";
                 _favorBLL.data()->deleteOneFavorService(service, _favorId);
                 //change ui
+                clearList();
                 Favor *favor=_favorBLL.data()->getFavorGroupById(_favorId);
                 QList<ModelService*> msList=_favorBLL.data()->favor2modelServiceList(favor);
                 changeModelListUI(msList, "FavorModel");
@@ -1049,6 +1077,7 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
                     }
                 }
             });
+            return;
         }
 
         //change run state
@@ -1137,7 +1166,7 @@ void OgmListWidget::addRunningTaskOnUI(Task *task)
 
     QLabel *lblName=new QLabel();
     lblName->setText(task->name);
-    lblName->setWindowTitle("lbl-lightdark");
+    lblName->setWindowTitle("lbl-white");
     lblName->setFixedWidth(220);
     layoutTask->addWidget(lblName);
     layoutTask->addStretch();
@@ -1154,14 +1183,14 @@ void OgmListWidget::addRunningTaskOnUI(Task *task)
     QLabel *lblTaskTag=new QLabel();
     lblTaskTag->setText(task->type);
     lblTaskTag->setFixedWidth(100);
-    lblTaskTag->setWindowTitle("lbl-light");
+    lblTaskTag->setWindowTitle("lbl-white");
     layoutTask->addWidget(lblTaskTag);
     layoutTask->addStretch();
 
     QLabel *lblTaskTime=new QLabel();
     lblTaskTime->setText(task->createTime);
     lblTaskTime->setFixedWidth(80);
-    lblTaskTime->setWindowTitle("lbl-light");
+    lblTaskTime->setWindowTitle("lbl-white");
     layoutTask->addWidget(lblTaskTime);
     layoutTask->addSpacing(5);
 }
@@ -1176,7 +1205,7 @@ void OgmListWidget::addOneServerOnUI(ModelServer *modelServer, QString style)
     LISTCHILD listSpaceA=OgmListHelper::createSpaceChild();
     list.append(listSpaceA);
 
-    LISTCHILD listServices=OgmListHelper::createButtonChild(0xf04b, "btnModelServerServices|"+modelServer->id, "btn-light", "browse model services in server");
+    LISTCHILD listServices=OgmListHelper::createButtonChild(0xf090, "btnModelServerServices|"+modelServer->id, "btn-light", "browse model services in server");
     list.append(listServices);
 
     LISTCHILD listRun=OgmListHelper::createButtonChild(0xf05a, "btnModelServerDetail|"+modelServer->id, "btn-light", "server detail information");
@@ -1233,7 +1262,7 @@ void OgmListWidget::addOneServerOnUI(DataServer *dataServer, QString style)
     LISTCHILD listSpaceA=OgmListHelper::createSpaceChild();
     list.append(listSpaceA);
 
-    LISTCHILD listServices=OgmListHelper::createButtonChild(0xf04b, "btnDataServerServices|"+dataServer->id, "btn-light", "browse data services in server");
+    LISTCHILD listServices=OgmListHelper::createButtonChild(0xf090, "btnDataServerServices|"+dataServer->id, "btn-light", "browse data services in server");
     list.append(listServices);
 
     LISTCHILD listRun=OgmListHelper::createButtonChild(0xf05a, "btnDataServerDetail|"+dataServer->id, "btn-light", "server detail information");
@@ -1272,6 +1301,40 @@ void OgmListWidget::addOneServerOnUI(DataServer *dataServer, QString style)
 
 
         //changeDataListUI(dataServer->id, "Data",0);
+    });
+}
+
+void OgmListWidget::addOneVisualOnUI(Visual *visual, QString style)
+{
+    QList<LISTCHILD> list;
+
+    LISTCHILD listName=OgmListHelper::createLableChild("lbl-lightdark", 220, visual->name);
+    list.append(listName);
+
+    LISTCHILD listSpaceA=OgmListHelper::createSpaceChild();
+    list.append(listSpaceA);
+
+    LISTCHILD listServices=OgmListHelper::createButtonChild(0xf013, "btnVisualRun|"+visual->id, "btn-light", "config this visual method");
+    list.append(listServices);
+
+    LISTCHILD listRun=OgmListHelper::createButtonChild(0xf05a, "btnVisualDetail|"+visual->id, "btn-light", "visual detail information");
+    list.append(listRun);
+
+//    LISTCHILD listDelete=OgmListHelper::createButtonChild(0xf1f8, "btnDataServerDelete|"+dataServer->id, "btn-light", "delete server");
+//    list.append(listDelete);
+
+    LISTCHILD listSpaceB=OgmListHelper::createSpaceChild();
+    list.append(listSpaceB);
+
+    LISTCHILD listDesc=OgmListHelper::createLableChild("lbl-light", 150, visual->desc);
+    list.append(listDesc);
+
+    OgmListHelper::addListItem(_widgetList, "btnListVisual"+visual->id, style, "btn", list);
+
+    QToolButton *btnVisualRun=_widgetList->findChild<QToolButton*>("btnVisualRun|"+visual->id);
+    connect(btnVisualRun, &QToolButton::clicked, [=](){
+        emit signalSwitchPage("VisualConfig");
+        emit signalchangeVisualConfigUI(visual, 0);
     });
 }
 

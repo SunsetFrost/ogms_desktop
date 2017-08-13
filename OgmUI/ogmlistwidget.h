@@ -10,6 +10,7 @@
 #include "OgmBLL/filebll.h"
 #include "OgmBLL/favorbll.h"
 #include "OgmBLL/taskbll.h"
+#include "OgmBLL/visualbll.h"
 
 class OgmListWidget : public QWidget
 {
@@ -37,6 +38,7 @@ public:
 
     void changeServerListUI(QString serverType);
 
+    void changeVisualListUI();
 
     //data file choose
     void setFileListState(QString state);
@@ -77,6 +79,8 @@ private:
     void addOneServerOnUI(ModelServer *modelServer, QString style);
     void addOneServerOnUI(DataServer *dataServer, QString style);
 
+    void addOneVisualOnUI(Visual *visual, QString style);
+
     //turn page type first firstFull last middle
     void initTurnPage(QString turnPageType);
     void btnTurnPageClicked();
@@ -107,6 +111,7 @@ private:
     QSharedPointer<DataFileBll> _dataFileBLL;
     QSharedPointer<FavorBLL> _favorBLL;
     QSharedPointer<TaskBLL> _taskBLL;
+    QSharedPointer<VisualBLL> _visualBLL;
 
 
 
@@ -128,6 +133,7 @@ signals:
     void signalChangeDataRefactorTaskConfigUIByTask(Task *task);
     void signalChangeModelTaskConfigUI(QString serverId, QString modelId);
     void signalChangeModelTaskConfigUIByTask(Task *task);
+    void signalchangeVisualConfigUI(Visual *visual, int formatIndex);
 
 
 

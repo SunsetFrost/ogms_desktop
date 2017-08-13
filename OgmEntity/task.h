@@ -15,6 +15,8 @@ public:
     QString eventDes;
 
     QString dataType;
+    QString modelServerId;
+    QString dataServerId;
     QString dataFromModelId;
     QString dataFromDataId;
     QString dataPath;

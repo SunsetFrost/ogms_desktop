@@ -9,7 +9,7 @@
 #include <OgmEntity/favor.h>
 #include <OgmEntity/file.h>
 #include <OgmEntity/task.h>
-
+#include <OgmEntity/visual.h>
 
 
 class OgmHelper
@@ -33,6 +33,7 @@ public:
     static QList<QVariant> toVarList(QList<Favor*> favorList);
 
     static QList<QVariant> toVarList(QList<Task*> taskList);
+    static QList<QVariant> toVarList(QList<Visual*> visualList);
 
     //xml
     static QString getXmlStringByPath(QString filePath);

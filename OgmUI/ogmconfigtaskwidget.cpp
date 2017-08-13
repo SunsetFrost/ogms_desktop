@@ -14,6 +14,7 @@ OgmConfigTaskWidget::OgmConfigTaskWidget(QString taskType, QWidget *parent)
 {
     _taskBLL=QSharedPointer<TaskBLL>(new TaskBLL);
     _dataRefactorBLL=QSharedPointer<DataRefactorBLL>(new DataRefactorBLL);
+    _visualBLL=QSharedPointer<VisualBLL>(new VisualBLL);
 
     if(taskType=="DataMap"){
         initDataMapTaskConfig();
@@ -23,6 +24,12 @@ OgmConfigTaskWidget::OgmConfigTaskWidget(QString taskType, QWidget *parent)
     }
     else if(taskType=="Model"){
         initModelTaskConfig();
+    }
+    else if(taskType=="Visual"){
+        initVisualConfig();
+    }
+    else if(taskType=="Aggragation"){
+        initAggregationConfig();
     }
 }
 
@@ -230,6 +237,69 @@ void OgmConfigTaskWidget::changeModelTaskByTask(Task *task)
     _webView->page()->runJavaScript(initJson);
 }
 
+void OgmConfigTaskWidget::changeVisual(Visual *visual, int formatIndex)
+{
+    _visualFormatIndex=formatIndex;
+    _visualParamIndex=0;
+    _serverId=OgmSetting::defaultDataServerId;
+
+    _visual=visual;
+
+    //ui
+
+    //clear btn
+    while (_uiVisual->widgetBtnParamsGroup->layout()->count()>0) {
+        QWidget *widgetDel=_uiVisual->widgetBtnParamsGroup->layout()->itemAt(0)->widget();
+        _uiVisual->widgetBtnParamsGroup->layout()->removeWidget(widgetDel);
+        delete widgetDel;
+    }
+
+    _uiVisual->lblRefactorName->setText(_visual->name);
+    _uiVisual->lblRefactorDesc->setText(_visual->desc);
+
+    for(int i=0; i<_visual->formatList.at(_visualFormatIndex)->pramaList.count(); ++i){
+        QToolButton *btnParam=new QToolButton(_uiVisual->widgetBtnParamsGroup);
+        btnParam->setText(_visual->formatList.at(_visualFormatIndex)->pramaList.at(i)->name);
+        btnParam->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+        btnParam->setWindowTitle("btn-miniTopLeft");
+        btnParam->setCheckable(true);
+        btnParam->setAccessibleDescription(QString::number(i));
+
+        ///////btn function
+        connect(btnParam, &QToolButton::clicked, [=](){
+            //btn check state
+            _visualParamIndex=btnParam->accessibleDescription().toInt();
+
+            QList<QToolButton*> btns=_uiVisual->widgetBtnParamsGroup->findChildren<QToolButton*>();
+            foreach(QToolButton *mBtn, btns){
+                if(mBtn==btnParam){
+                    mBtn->setChecked(true);
+                }
+                else{
+                    mBtn->setChecked(false);
+                }
+            }
+
+            _uiVisual->lblParamName->setText(_visual->formatList.at(_visualFormatIndex)->pramaList.at(i)->name);
+            _uiVisual->lblParamType->setText(_visual->formatList.at(_visualFormatIndex)->pramaList.at(i)->type);
+            _uiVisual->lblParamDescription->setText(_visual->formatList.at(_visualFormatIndex)->pramaList.at(i)->desc);
+            _uiVisual->txtRefactorTaskConfigInput->setText(_visual->formatList.at(_visualFormatIndex)->pramaList.at(i)->fileName);
+        });
+        _uiVisual->widgetBtnParamsGroup->layout()->addWidget(btnParam);
+    }
+    //init param
+    QList<QToolButton*> btnList=_uiVisual->widgetBtnParamsGroup->findChildren<QToolButton*>();
+    for(int i=0; i<btnList.count(); ++i){
+        if(btnList.at(i)->accessibleDescription()=="0")
+            btnList.at(i)->click();
+    }
+}
+
+void OgmConfigTaskWidget::changeAggregationConfig(QString url)
+{
+    _webView->setUrl(QUrl(url));
+}
+
 void OgmConfigTaskWidget::initDataMapTaskConfig()
 {
     //init ui
@@ -286,36 +356,61 @@ void OgmConfigTaskWidget::initModelTaskConfig()
     connect(_uiModel->btnTaskConfigModelSave, &QToolButton::clicked, this, &OgmConfigTaskWidget::saveTask);
 }
 
+void OgmConfigTaskWidget::initVisualConfig()
+{
+    //init ui
+    _uiVisual=new Ui::DataRefactorTaskConfigUI();
+    _uiVisual->setupUi(this);
+
+    OgmUiHelper::Instance()->setButtonIcon(_uiVisual->btnRefactorTaskConfigInput, 0xf07c, "Choose", 6);
+
+    _uiVisual->btnRefactorTaskConfigSaveTask->setFixedWidth(150);
+    OgmUiHelper::Instance()->setButtonIcon(_uiVisual->btnRefactorTaskConfigSaveTask, 0xf0ec, "switch format", 6);
+    OgmUiHelper::Instance()->setButtonIcon(_uiVisual->btnRefactorTaskConfigSaveAsTask, 0xf2d5, "visual", 6);
+
+    //init function
+    connect(_uiVisual->btnRefactorTaskConfigInput, &QToolButton::clicked, this, &OgmConfigTaskWidget::chooseFile);
+    connect(_uiVisual->btnRefactorTaskConfigSaveTask, &QToolButton::clicked, [=](){
+        emit signalChangeVisualFormatSidebar(_visual);
+    });
+
+    connect(_uiVisual->btnRefactorTaskConfigSaveAsTask, &QToolButton::clicked, [=](){
+        emit signalGoVisual(_visualBLL.data()->getVisualUrl(_visual, _visualFormatIndex));
+        emit signalSwitchPage("Visual");
+    });
+}
+
 void OgmConfigTaskWidget::initAggregationConfig()
 {
     //init ui
     _uiModel=new Ui::TaskConfigModelUI();
     _uiModel->setupUi(this);
+    _uiModel->widget->setHidden(true);
+    this->layout()->setMargin(0);
 
-    _uiModel->lblTaskConfigModelName->setText("  Aggregation Model");
-    _uiModel->btnTaskConfigModelData->setFixedWidth(140);
-    _uiModel->btnTaskConfigModelSave->setFixedWidth(150);
-    _uiModel->btnTaskConfigModelSaveAs->setFixedWidth(120);
+//    _uiModel->lblTaskConfigModelName->setText("  Aggregation Model");
+//    _uiModel->btnTaskConfigModelData->setFixedWidth(140);
+//    _uiModel->btnTaskConfigModelSave->setFixedWidth(150);
+//    _uiModel->btnTaskConfigModelSaveAs->setFixedWidth(120);
 
-    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelData, 0xf0ae, "New solution", 6);
-    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelSave, 0xf0ae, "Query solution", 6);
-    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelSaveAs, 0xf0ae, "Query task", 6);
+//    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelData, 0xf0ae, "New solution", 6);
+//    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelSave, 0xf0ae, "Query solution", 6);
+//    OgmUiHelper::Instance()->setButtonIcon(_uiModel->btnTaskConfigModelSaveAs, 0xf0ae, "Query task", 6);
 
     //web diagram
     _webView=new QWebEngineView();
-    _webView->setUrl(QUrl(OgmSetting::urlAggragationNewSolution));
     _uiModel->widgetTaskConfigModelDiagram->layout()->addWidget(_webView);
 
     //init function
-    connect(_uiModel->btnTaskConfigModelData, &QToolButton::clicked, [=](){
-        _webView->setUrl(OgmSetting::urlAggragationNewSolution);
-    });
-    connect(_uiModel->btnTaskConfigModelSave, &QToolButton::clicked, [=](){
-        _webView->setUrl(OgmSetting::urlAggragationQuerySolution);
-    });
-    connect(_uiModel->btnTaskConfigModelSaveAs, &QToolButton::clicked, [=](){
-        _webView->setUrl(OgmSetting::urlAggragationQueryTask);
-    });
+//    connect(_uiModel->btnTaskConfigModelData, &QToolButton::clicked, [=](){
+//        _webView->setUrl(url);
+//    });
+//    connect(_uiModel->btnTaskConfigModelSave, &QToolButton::clicked, [=](){
+//        _webView->setUrl(OgmSetting::urlAggragationQuerySolution);
+//    });
+//    connect(_uiModel->btnTaskConfigModelSaveAs, &QToolButton::clicked, [=](){
+//        _webView->setUrl(OgmSetting::urlAggragationQueryTask);
+//    });
 }
 
 void OgmConfigTaskWidget::saveTask()
@@ -350,7 +445,7 @@ void OgmConfigTaskWidget::saveTask()
            _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].ioType="out";
        }
 
-       if(_taskBLL.data()->isTaskInfoComplete(_task)){
+       if(_taskBLL.data()->isTaskConfigInfoComplete(_task)){
            _task->runstate="ToRun";
        }
        else{
@@ -387,6 +482,13 @@ void OgmConfigTaskWidget::chooseFile()
             _task->getDataRefactorTaskConfig()->paramList[_paramIndex.toInt()].ioType="in";
 
             _uiDataRefactor->txtRefactorTaskConfigInput->setText(strList[1]);
+        }
+        else if(_taskType=="Visual"){
+            QStringList strList=varFileInfo.toStringList();
+            _visual->formatList[_visualFormatIndex]->pramaList[_visualParamIndex]->fileId=strList[0];
+            _visual->formatList[_visualFormatIndex]->pramaList[_visualParamIndex]->fileName=strList[1];
+
+            _uiVisual->txtRefactorTaskConfigInput->setText(strList[1]);
         }
     });
 }

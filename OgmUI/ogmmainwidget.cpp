@@ -3,6 +3,7 @@
 
 #include "OgmCommon/ogmuihelper.h"
 #include "OgmCommon/ogmsetting.h"
+#include "OgmUI/ogmpopwidget.h"
 
 OgmMainWidget::OgmMainWidget(QWidget *parent) :
     OgmWidget(false, true, parent),
@@ -26,13 +27,20 @@ OgmMainWidget::~OgmMainWidget()
 void OgmMainWidget::initStyle()
 {
     _ui->lblUserIconPic->setHidden(true);
+    _ui->lblTitle->setHidden(true);
+    _ui->widgetIntegration->setHidden(true);
+
+    QPixmap image(":/png/png/logo.png");
+    _ui->lblTitleIcon->setPixmap(image);
+    _ui->lblTitleIcon->setFixedSize(100, 30);
+    _ui->lblTitleIcon->setScaledContents(true);
 
     //btn navigation icon
-    OgmUiHelper::Instance()->setIcon(_ui->lblTitleIcon, QChar(0xf0c2));
+    //OgmUiHelper::Instance()->setIcon(_ui->lblTitleIcon, QChar(0xf0c2));
     OgmUiHelper::Instance()->setIcon(_ui->lblUserIcon, QChar(0xf2be));
 
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnHomeModel, 0xf0ac, "Model");
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnHomeData, 0xf1c0, "Data");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnHomeModel, 0xf0ac, "ModelRes");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnHomeData, 0xf1c0, "DataRes");
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnHomeServer, 0xf233, "Server");
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnHomeTool, 0xf00a, "Tool");
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceTask, 0xf0ae, "Task");
@@ -40,6 +48,9 @@ void OgmMainWidget::initStyle()
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceFavor, 0xf004, "Favor");
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceFileManager, 0xf07b, "FileManager");
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceVisual, 0xf2d5, "Visual");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceIntegrated, 0xf0e8, "Integrated");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceIntegratedSolution, 0xf0b1, "Solution");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceIntegratedTask, 0xf085, "Task");
 
     //btn main top icon
     OgmUiHelper::Instance()->setIcon(_ui->btnWidgetMainTopConfig, QChar(0xf013));
@@ -107,22 +118,22 @@ void OgmMainWidget::initFunction()
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeFavor, _widgetFavorSidebar, &OgmFavorSidebarWidget::changeFavorUI);
 
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeModelListByList, [=](QList<ModelService*> msList){
-        _widgetList->setFavorId(_widgetFavorTop->getCurrentServerId());
+        _widgetList->setFavorId(_widgetFavorTop->getCurrentFavorId());
         _widgetList->setPageIndex(0);
         _widgetList->changeModelListUI(msList, "FavorModel");
     });
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeDataListByList, [=](QList<DataService*> dsList){
-        _widgetList->setFavorId(_widgetFavorTop->getCurrentServerId());
+        _widgetList->setFavorId(_widgetFavorTop->getCurrentFavorId());
         _widgetList->setPageIndex(0);
         _widgetList->changeDataListUI(dsList, "FavorData");
     });
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeDataMappingListByList, [=](QList<DataMapping*> mappingList){
-        _widgetList->setFavorId(_widgetFavorTop->getCurrentServerId());
+        _widgetList->setFavorId(_widgetFavorTop->getCurrentFavorId());
         _widgetList->setPageIndex(0);
         _widgetList->changeDataListUI(mappingList, "FavorDataMapping");
     });
     connect(_widgetFavorTop, &OgmServerTopWidget::signalChangeDataRefactorListByList, [=](QList<DataRefactor*> refactorList){
-        _widgetList->setFavorId(_widgetFavorTop->getCurrentServerId());
+        _widgetList->setFavorId(_widgetFavorTop->getCurrentFavorId());
         _widgetList->setPageIndex(0);
         _widgetList->changeDataListUI(refactorList, "FavorDataRefactor");
     });
@@ -135,6 +146,10 @@ void OgmMainWidget::initFunction()
     connect(_widgetTaskTop, &OgmMiniTopWidget::signalSetListType, _widgetList, &OgmListWidget::setListType);
     connect(_widgetTaskTop, &OgmMiniTopWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
 
+    //visual top
+    connect(_widgetVisualTop, &OgmMiniTopWidget::signalClearList, _widgetList, &OgmListWidget::clearList);
+    connect(_widgetVisualTop, &OgmMiniTopWidget::signalChangeVisualList, _widgetList, &OgmListWidget::changeVisualListUI);
+
     //list
     connect(_widgetList, &OgmListWidget::signalAddFolderOnFileLink, _widgetFileServerTop, &OgmServerTopWidget::addOneFileLinkOnUI);
     connect(_widgetList, &OgmListWidget::signalAddFavorSidebar, _widgetFavorSidebar, &OgmFavorSidebarWidget::changeChooseFavorUI);
@@ -145,6 +160,7 @@ void OgmMainWidget::initFunction()
     connect(_widgetList, &OgmListWidget::signalChangeDataRefactorTaskConfigUIByTask, _widgetDataRefactorTaskConfig, &OgmConfigTaskWidget::changeDataRefactorTaskByTask);
     connect(_widgetList, &OgmListWidget::signalChangeModelTaskConfigUI, _widgetModelTaskConfig, &OgmConfigTaskWidget::changeModelTask);
     connect(_widgetList, &OgmListWidget::signalChangeModelTaskConfigUIByTask, _widgetModelTaskConfig, &OgmConfigTaskWidget::changeModelTaskByTask);
+    connect(_widgetList, &OgmListWidget::signalchangeVisualConfigUI, _widgetVisualConfig, &OgmConfigTaskWidget::changeVisual);
 
     connect(_widgetList, &OgmListWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
 
@@ -166,6 +182,7 @@ void OgmMainWidget::initFunction()
         _widgetFileServerTop->changeFileManager(serverId);
         //_widgetList->changeFileListUIByParentId(serverId, fileParentId, fileCheckType);
     });
+    connect(_widgetServerSidebar, &OgmServerSidebarWidget::signalChangeVisualConfigUI, _widgetVisualConfig, &OgmConfigTaskWidget::changeVisual);
 
     //favor sidebar
     connect(_widgetFavorSidebar, &OgmFavorSidebarWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
@@ -173,7 +190,11 @@ void OgmMainWidget::initFunction()
 
     //task config
     connect(_widgetDataMapTaskConfig, &OgmConfigTaskWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
-
+    connect(_widgetDataRefactorTaskConfig, &OgmConfigTaskWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
+    connect(_widgetModelTaskConfig, &OgmConfigTaskWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
+    connect(_widgetVisualConfig, &OgmConfigTaskWidget::signalSwitchPage, this, &OgmMainWidget::switchPage);
+    connect(_widgetVisualConfig, &OgmConfigTaskWidget::signalGoVisual, _widgetVisual, &OgmVisualWidget::changeVisualUrl);
+    connect(_widgetVisualConfig, &OgmConfigTaskWidget::signalChangeVisualFormatSidebar, _widgetServerSidebar, &OgmServerSidebarWidget::changeVisualFormat);
 
 
     switchPage("Home");
@@ -218,6 +239,9 @@ void OgmMainWidget::initChildWidget()
     _widgetModelTaskConfig=new OgmConfigTaskWidget("Model", widgetListPage);
     _ui->widgetContent->layout()->addWidget(_widgetModelTaskConfig);
 
+    _widgetVisualConfig=new OgmConfigTaskWidget("Visual", widgetListPage);
+    _ui->widgetContent->layout()->addWidget(_widgetVisualConfig);
+
     _widgetAggragationConfig=new OgmConfigTaskWidget("Aggragation", widgetListPage);
     _ui->widgetContent->layout()->addWidget(_widgetAggragationConfig);
 
@@ -249,6 +273,9 @@ void OgmMainWidget::initChildWidget()
     _widgetServerTop=new OgmMiniTopWidget("Server", widgetListPage);
     layoutListPage->addWidget(_widgetServerTop);
 
+    _widgetVisualTop=new OgmMiniTopWidget("Visual", widgetListPage);
+    layoutListPage->addWidget(_widgetVisualTop);
+
     //init list
     _widgetList=new OgmListWidget(widgetListPage);
     layoutListPage->addWidget(_widgetList);
@@ -261,6 +288,11 @@ void OgmMainWidget::btnSideBarClicked()
 {
     QToolButton* btn=(QToolButton*)sender();
     QString btnName=btn->objectName();
+
+    //integration
+    bool isIntegrationWidgetHide=_ui->widgetIntegration->isHidden();
+    _ui->widgetIntegration->setHidden(true);
+
 
     if(btnName=="btnHomeModel"){
         switchPage("ModelList");
@@ -293,10 +325,41 @@ void OgmMainWidget::btnSideBarClicked()
         switchPage("DataFileList");
     }
     else if(btnName=="btnSpaceVisual"){
-        switchPage("Visual");
+        switchPage("VisualList");
     }
+    else if(btnName=="btnSpaceIntegrated"){
+        btnCheckStateChange("btnSpaceIntegrated");
+
+        if(isIntegrationWidgetHide)
+            _ui->widgetIntegration->setHidden(false);
+        else
+            _ui->widgetIntegration->setHidden(true);
+    }
+    else if(btnName=="btnSpaceIntegratedSolution"){
+        _ui->widgetIntegration->setHidden(false);
+
+        btnCheckStateChange("btnSpaceIntegratedSolution");
+
+        OgmPopWidget *popWidget=new OgmPopWidget("CommonV2");
+        popWidget->setCommonV2WidgetInfo("Solution Type", "Create an new solution or start with exist solution", "New", "Exist");
+        popWidget->show();
+        connect(popWidget, &OgmPopWidget::signalOperationResult, [=](QVariant varResult){
+            if(varResult.toBool()){
+                switchPage("IntegratedSolutionNew");
+            }
+            else
+                switchPage("IntegratedSolutionQuery");
+        });
 
 
+    }
+    else if(btnName=="btnSpaceIntegratedTask"){
+        _ui->widgetIntegration->setHidden(false);
+
+        btnCheckStateChange("btnSpaceIntegratedTask");
+
+        switchPage("IntegratedTask");
+    }
 }
 
 void OgmMainWidget::btnCheckStateChange(QString btnName)
@@ -337,10 +400,18 @@ void OgmMainWidget::switchPage(QString type)
     else if(type=="DataFileList"){
         btnCheckStateChange("btnSpaceFileManager");
     }
-    else if(type=="Visual"){
+    else if(type=="VisualList"){
         btnCheckStateChange("btnSpaceVisual");
     }
-
+    else if(type=="Integrated"){
+        btnCheckStateChange("btnSpaceIntegrated");
+    }
+    else if(type=="IntegratedSolution"){
+        btnCheckStateChange("btnSpaceIntegratedSolution");
+    }
+    else if(type=="IntegratedTask"){
+        btnCheckStateChange("btnSpaceIntegratedTask");
+    }
 
     _widgetServerSidebar->setHidden(true);
     _widgetFavorSidebar->setHidden(true);
@@ -354,13 +425,16 @@ void OgmMainWidget::switchPage(QString type)
     _widgetFavorTop->setHidden(true);
     _widgetTaskTop->setHidden(true);
     _widgetServerTop->setHidden(true);
+    _widgetVisualTop->setHidden(true);
 
     _widgetDataMapTaskConfig->setHidden(true);
     _widgetDataRefactorTaskConfig->setHidden(true);
     _widgetModelTaskConfig->setHidden(true);
+    _widgetVisualConfig->setHidden(true);
     _widgetAggragationConfig->setHidden(true);
 
     _widgetList->setHidden(true);
+
 
     if(type=="Home"){
     }
@@ -368,6 +442,7 @@ void OgmMainWidget::switchPage(QString type)
         _widgetTool->setHidden(false);
     }
     else if(type=="DataList"){
+        _widgetList->setListType("DataList");
         _widgetList->clearList();
 
         _widgetDataServerTop->setHidden(false);
@@ -378,15 +453,18 @@ void OgmMainWidget::switchPage(QString type)
         //_widgetList->changeDataListUI(_widgetDataServerTop->getCurrentServerId(), "Data", 0);
     }
     else if(type=="ModelList"){
+
+        _widgetList->setListType("ModelList");
         _widgetList->clearList();
 
         _widgetModelServerTop->setHidden(false);
         _widgetList->setHidden(false);
         _scrollArea->setHidden(false);
 
-        _widgetList->changeModelListUIByPage(_widgetModelServerTop->getCurrentServerId(), 0);
+        _widgetModelServerTop->changeModelServer(_widgetModelServerTop->getCurrentServerId());
     }
     else if(type=="ServerList"){
+        _widgetList->setListType("ServerList");
         _widgetList->clearList();
 
         _widgetServerTop->setHidden(false);
@@ -398,6 +476,7 @@ void OgmMainWidget::switchPage(QString type)
     }
     else if(type=="DataFileList"){
         //_widgetList->changeFileListUIByParentId(_widgetFileServerTop->getCurrentId(), _widgetFileServerTop->getCurrentFileId(), "File");
+        _widgetList->setListType("DataFileList");
         _widgetList->clearList();
 
         _widgetFileServerTop->setHidden(false);
@@ -407,6 +486,7 @@ void OgmMainWidget::switchPage(QString type)
         _widgetFileServerTop->changeFileManager(_widgetFileServerTop->getCurrentServerId());
     }
     else if(type=="FavorList"){
+        _widgetList->setListType("FavorList");
         _widgetList->clearList();
 
         _widgetFavorTop->setHidden(false);
@@ -419,6 +499,7 @@ void OgmMainWidget::switchPage(QString type)
         _widgetFavorTop->changeFavorManager(_widgetFavorTop->getCurrentFavorId());
     }
     else if(type=="TaskList"){
+        _widgetList->setListType("TaskList");
         _widgetList->clearList();
 
         _widgetTaskTop->changeTaskType("ToRun");
@@ -436,9 +517,31 @@ void OgmMainWidget::switchPage(QString type)
     else if(type=="ModelTaskConfig"){
         _widgetModelTaskConfig->setHidden(false);
     }
-    else if(type=="AggragationConfig"){
-        _widgetAggragationConfig->initAggregationConfig();
+    else if(type=="VisualConfig"){
+        _widgetVisualConfig->setHidden(false);
+    }
+    else if(type=="IntegratedSolutionNew"){
+        _widgetAggragationConfig->changeAggregationConfig(OgmSetting::urlAggragationNewSolution);
         _widgetAggragationConfig->setHidden(false);
+    }
+    else if(type=="IntegratedSolutionQuery"){
+        _widgetAggragationConfig->changeAggregationConfig(OgmSetting::urlAggragationQuerySolution);
+        _widgetAggragationConfig->setHidden(false);
+    }
+    else if(type=="IntegratedTask"){
+        _widgetAggragationConfig->changeAggregationConfig(OgmSetting::urlAggragationQueryTask);
+        _widgetAggragationConfig->setHidden(false);
+    }
+    else if(type=="VisualList"){
+        _widgetList->setListType("VisualList");
+        _widgetList->clearList();
+
+        _widgetVisualTop->setHidden(false);
+        _widgetList->setHidden(false);
+        _scrollArea->setHidden(false);
+
+        //_widgetList->changeServerListUI("ModelServer");
+        _widgetVisualTop->changeVisual();
     }
     else if(type=="Visual"){
         _widgetVisual->setHidden(false);

@@ -26,6 +26,11 @@ public:
     static QString urlAggragationNewSolution;
     static QString urlAggragationQuerySolution;
     static QString urlAggragationQueryTask;
+
+    static QString taskPath;
+    static QString visualPath;
+
+    static QString dataServerUserName;
 };
 
 #endif // OGMSETTING_H

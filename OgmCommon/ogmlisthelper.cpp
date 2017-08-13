@@ -117,7 +117,8 @@ LISTCHILD OgmListHelper::createLableChild(QString style, int width, QString text
     LISTCHILD lbl;
     lbl.typeValue=ItemType::Label;
     lbl.styleName=style;
-    lbl.textValue=text;
+    lbl.textValue=OgmHelper::getElidedText(text, width);
+    lbl.toolTipValue=text;
     lbl.fixWidth=width;
     lbl.iconValue=0;
 
@@ -365,6 +366,17 @@ QList<QVariant> OgmHelper::toVarList(QList<Task *> taskList)
     for(int i=0; i<taskList.count(); ++i){
         QVariant var;
         var.setValue(taskList[i]);
+        varList.append(var);
+    }
+    return varList;
+}
+
+QList<QVariant> OgmHelper::toVarList(QList<Visual *> visualList)
+{
+    QList<QVariant> varList;
+    for(int i=0; i<visualList.count(); ++i){
+        QVariant var;
+        var.setValue(visualList[i]);
         varList.append(var);
     }
     return varList;

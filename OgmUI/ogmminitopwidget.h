@@ -8,6 +8,7 @@
 #include "OgmBLL/taskbll.h"
 #include "OgmBLL/modelbll.h"
 #include "OgmBLL/databll.h"
+#include "OgmEntity/visual.h"
 
 namespace Ui{
 class OgmMiniTopWidget;
@@ -23,12 +24,16 @@ public:
 
     void changeTaskType(QString taskType);
 
+    void changeVisual();
+
 public:
 
 private:
     void initTaskWidget();
 
     void initServerWidget();
+
+    void initVisualWidget();
 
     void taskBtnCheckStateManage(QString taskType);
 
@@ -42,6 +47,8 @@ private:
 signals:
     void signalChangeTaskList(QList<Task*> taskList, QString taskRunState);
     void signalChangeServerList(QString serverType);
+    void signalChangeVisualList();
+
     void signalClearList();
     void signalSetListType(QString taskType);
     void signalSwitchPage(QString pageType);

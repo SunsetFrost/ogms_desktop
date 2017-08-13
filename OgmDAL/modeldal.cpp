@@ -14,7 +14,7 @@ ModelServiceDAL::ModelServiceDAL()
 
 QList<ModelService *> ModelServiceDAL::getAllModelService(ModelServer *server)
 {
-    QString request="http://"+server->ip+":8060/modelser/json/all";
+    QString request="http://"+server->ip+"/modelser/json/all";
 
     QByteArray byteResult=OgmNetWork::get(request);
 
@@ -23,7 +23,7 @@ QList<ModelService *> ModelServiceDAL::getAllModelService(ModelServer *server)
 
 QList<ModelService *> ModelServiceDAL::getModelServiceListByNumber(ModelServer *server, int start, int count)
 {
-    QString request="http://"+server->ip+":8060/modelser/json/all?start="+QString::number(start)+"&count="+QString::number(count);
+    QString request="http://"+server->ip+"/modelser/json/all?start="+QString::number(start)+"&count="+QString::number(count);
 
     QByteArray byteResult=OgmNetWork::get(request);
     return json2modelServiceList(byteResult, server->id);
@@ -34,8 +34,8 @@ ModelService *ModelServiceDAL::getOneModelServiceById(ModelServer *server, QStri
     QList<ModelService*> msList= getAllModelService(server);
 
     for(int i=0; i<msList.count(); ++i){
-        if(msList[i]->id==modelId){
-            return msList[i];
+        if(msList.at(i)->id==modelId){
+            return msList.at(i);
         }
     }
     ModelService *nullModel=new ModelService();

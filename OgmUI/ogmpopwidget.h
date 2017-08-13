@@ -23,11 +23,13 @@ public:
     void changeConfigModelTaskUI(Task *task);
 
     void setCommonWidgetInfo(QString title, QString content, QString btnText);
+    void setCommonV2WidgetInfo(QString title, QString content, QString btnTextLeft, QString btnTextRight);
 
     void setFileServerId(QString fileServerId);
 
 private:
     void initCommonWidget();
+    void initCommonV2Widget();
 
     void initNewFileWidget();
     void initReNameFileWidget();

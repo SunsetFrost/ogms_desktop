@@ -7,11 +7,11 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>1168</height>
+    <height>990</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,9 +19,12 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="statusTip">
+   <string/>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
-    <number>10</number>
+    <number>0</number>
    </property>
    <property name="leftMargin">
     <number>9</number>
@@ -56,7 +59,7 @@
       </size>
      </property>
      <property name="statusTip">
-      <string>widget-miniTop</string>
+      <string>widget-pop-title</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="spacing">
@@ -68,7 +71,7 @@
       <item>
        <widget class="QLabel" name="lblPopTitle">
         <property name="statusTip">
-         <string>lbl-f16-normal</string>
+         <string>lbl-pop-title</string>
         </property>
         <property name="text">
          <string>TextLabel</string>
@@ -102,14 +105,17 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>90</height>
+       <height>80</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>90</height>
+       <height>80</height>
       </size>
+     </property>
+     <property name="statusTip">
+      <string>widget-pop-content</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
@@ -142,6 +148,12 @@
    </item>
    <item>
     <widget class="QWidget" name="widgetPopNewServer" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -154,12 +166,18 @@
        <height>260</height>
       </size>
      </property>
+     <property name="statusTip">
+      <string>widget-pop-content</string>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_5">
+      <property name="spacing">
+       <number>8</number>
+      </property>
       <property name="topMargin">
-       <number>0</number>
+       <number>6</number>
       </property>
       <property name="bottomMargin">
-       <number>2</number>
+       <number>11</number>
       </property>
       <item>
        <widget class="QWidget" name="widget_8" native="true">
@@ -303,16 +321,22 @@
          </property>
          <item>
           <widget class="QTextEdit" name="txtPopNewServerDesc">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>340</width>
-             <height>60</height>
+             <height>0</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>340</width>
-             <height>60</height>
+             <height>16777215</height>
             </size>
            </property>
            <property name="statusTip">
@@ -344,6 +368,15 @@
    </item>
    <item>
     <widget class="QWidget" name="widgetPopChooseFile" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="statusTip">
+      <string>widget-pop-content</string>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <property name="spacing">
        <number>0</number>
@@ -466,6 +499,12 @@
    </item>
    <item>
     <widget class="QWidget" name="widgetPopSaveTask" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -478,8 +517,14 @@
        <height>160</height>
       </size>
      </property>
+     <property name="statusTip">
+      <string>widget-pop-content</string>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="spacing">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
        <number>12</number>
       </property>
       <item>
@@ -647,6 +692,9 @@
        <height>80</height>
       </size>
      </property>
+     <property name="statusTip">
+      <string>widget-pop-content</string>
+     </property>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
        <widget class="QLabel" name="lblPop">
@@ -666,6 +714,12 @@
    </item>
    <item>
     <widget class="QWidget" name="widgetPopConfigModelTaskData" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="minimumSize">
       <size>
        <width>0</width>
@@ -678,7 +732,13 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="statusTip">
+      <string>widget-pop-content</string>
+     </property>
      <layout class="QVBoxLayout" name="verticalLayout_6">
+      <property name="spacing">
+       <number>0</number>
+      </property>
       <property name="leftMargin">
        <number>15</number>
       </property>
@@ -984,6 +1044,9 @@
        <width>16777215</width>
        <height>50</height>
       </size>
+     </property>
+     <property name="statusTip">
+      <string>widget-pop-bottom</string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="spacing">

@@ -956,7 +956,7 @@
             <string>btn-miniTopLeft</string>
            </property>
            <property name="text">
-            <string>Data Refactor</string>
+            <string>Data Refactoring</string>
            </property>
            <property name="checkable">
             <bool>true</bool>
@@ -1083,7 +1083,7 @@
             <string>btn-miniTopLeft</string>
            </property>
            <property name="text">
-            <string>Data Refactor</string>
+            <string>Data Refactoring</string>
            </property>
            <property name="checkable">
             <bool>true</bool>

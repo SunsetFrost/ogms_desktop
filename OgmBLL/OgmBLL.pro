@@ -4,6 +4,7 @@ SOURCES +=  \
     $$PWD/modelbll.cpp \
     $$PWD/favorbll.cpp \
     $$PWD/taskbll.cpp \
+    $$PWD/visualbll.cpp \
 
 
 
@@ -14,4 +15,5 @@ HEADERS += \
     $$PWD/modelbll.h \
     $$PWD/favorbll.h \
     $$PWD/taskbll.h \
+    $$PWD/visualbll.h \
 

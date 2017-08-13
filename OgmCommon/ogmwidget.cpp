@@ -36,16 +36,16 @@ void OgmWidget::paintEvent(QPaintEvent *)
         //border shadow
         QPainterPath path;
         path.setFillRule(Qt::WindingFill);
-        path.addRect(10, 10, this->width()-20, this->height()-20);
+        path.addRect(9, 9, this->width()-18, this->height()-18);
 
         p.setRenderHint(QPainter::Antialiasing, true);
         p.fillPath(path, QBrush(Qt::white));
 
         QColor color(100, 100, 100, 50);
-        for(int i=0; i<10; ++i){
+        for(int i=0; i<9; ++i){
             QPainterPath path;
             path.setFillRule(Qt::WindingFill);
-            path.addRect(10-i, 10-i, this->width()-(10-i)*2, this->height()-(10-i)*2);
+            path.addRect(9-i, 9-i, this->width()-(9-i)*2, this->height()-(9-i)*2);
             color.setAlpha(150 - qSqrt(i)*50);
             p.setPen(color);
             p.drawPath(path);

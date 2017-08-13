@@ -14,6 +14,7 @@ public:
     static QByteArray get(QString request);
 
     static QByteArray postDataFile(QString request, QString filePath, QString parentId);
+    static QByteArray postDataFile(QString request, QString fileStream, QString fileName, QString parentId);
 };
 
 #endif // OGMNETWORK_H

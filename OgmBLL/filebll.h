@@ -20,6 +20,7 @@ public:
     void deleteData(QString serverId, QString id, QString type);
 
     void uploadFile(QString serverId, QString parentId, QString filePath);
+    void uploadFile(QString serverId, QString parentId, QString fileStream, QString fileName);
 
     void updateFileName(QString serverId, QString fileId, QString newName, QString newTime);
 

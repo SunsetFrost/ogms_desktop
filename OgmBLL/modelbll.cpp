@@ -19,9 +19,9 @@ QList<ModelService *> ModelServiceBLL::getAllModelService(QString serverId)
 
 QList<ModelService *> ModelServiceBLL::getModelServiceListByPage(QString serverId, int pageIndex)
 {
-    QEventLoop timeLoop;
-    QTimer::singleShot(1000, &timeLoop, SLOT(quit()));
-    timeLoop.exec();
+//    QEventLoop timeLoop;
+//    QTimer::singleShot(500, &timeLoop, SLOT(quit()));
+//    timeLoop.exec();
 
     ModelServer *modelServer=_modelServerDAL.data()->getServerById(serverId);
 
@@ -44,6 +44,16 @@ ModelServerBLL::ModelServerBLL()
 
 QList<ModelServer *> ModelServerBLL::getAllServer()
 {
+    QList<ModelServer*> serverList=_modelServerDAL.data()->getAllServer();
+    return serverList;
+}
+
+QList<ModelServer *> ModelServerBLL::getAllServerDelayed()
+{
+    QEventLoop timeLoop;
+    QTimer::singleShot(500, &timeLoop, SLOT(quit()));
+    timeLoop.exec();
+
     QList<ModelServer*> serverList=_modelServerDAL.data()->getAllServer();
     return serverList;
 }

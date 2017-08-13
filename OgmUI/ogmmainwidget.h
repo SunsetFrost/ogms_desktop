@@ -54,6 +54,7 @@ private:
 
     OgmMiniTopWidget *_widgetTaskTop;
     OgmMiniTopWidget *_widgetServerTop;
+    OgmMiniTopWidget *_widgetVisualTop;
 
     OgmServerSidebarWidget *_widgetServerSidebar;
     OgmFavorSidebarWidget *_widgetFavorSidebar;
@@ -61,7 +62,9 @@ private:
     OgmConfigTaskWidget *_widgetDataMapTaskConfig;
     OgmConfigTaskWidget *_widgetDataRefactorTaskConfig;
     OgmConfigTaskWidget *_widgetModelTaskConfig;
+    OgmConfigTaskWidget *_widgetVisualConfig;
     OgmConfigTaskWidget *_widgetAggragationConfig;
+
 
     OgmToolWidget *_widgetTool;
 

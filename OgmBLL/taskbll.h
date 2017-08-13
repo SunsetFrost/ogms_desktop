@@ -5,6 +5,7 @@
 
 #include "OgmDAL/modeldal.h"
 #include "OgmDAL/datadal.h"
+#include "OgmDAL/filedal.h"
 
 #include <QSharedPointer>
 
@@ -34,12 +35,16 @@ public:
     QString runModelTask(Task *task);
 
     bool isRunningTaskFinish(QString serverIp, QString instanceId, QString type);
-    bool isTaskInfoComplete(Task *task);
+//    bool isFinishTaskSuccess(QString )
+
+    bool isTaskConfigInfoComplete(Task *task);
 
     //get schema
     QString getDatamapSchema(QString serverId, QString datamapId);
     QString getDataRefactorParamSchema(QString serverId, QString refactorId, QString schemaName, QString ioType);
 
+    //return model file id
+    QString uploadDataFileToModelServer(QString dataServerId, QString dataFileId, QString modelServerId);
 
 private:
     QSharedPointer<TaskDAL> _taskDAL;
@@ -47,6 +52,7 @@ private:
     QSharedPointer<ModelServerDAL> _modelServerDAL;
     QSharedPointer<DataMappingDAL> _datamapDAL;
     QSharedPointer<DataRefactorDAL> _datarefactorDAL;
+    QSharedPointer<DataFileDAL> _fileDataDAL;
 };
 
 

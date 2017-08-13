@@ -130,6 +130,44 @@ void OgmServerSidebarWidget::changeDataFileUI()
     _layoutServer->addStretch();
 }
 
+void OgmServerSidebarWidget::changeVisualFormat(Visual *visual)
+{
+    this->setHidden(false);
+
+    while(_layoutServer->count()>0){
+        QWidget *widgetDel= _layoutServer->itemAt(0)->widget();
+        _layoutServer->removeWidget(widgetDel);
+        delete widgetDel;
+    }
+
+    for(int i=0; i<visual->formatList.count(); ++i){
+        QWidget *mChildWidget=new QWidget();
+        QHBoxLayout *layoutChildWidget=new QHBoxLayout();
+        layoutChildWidget->setMargin(0);
+
+        QToolButton *btnDictionaryName=new QToolButton();
+        btnDictionaryName->setWindowTitle("btn-sidebar");
+        btnDictionaryName->setCheckable(true);
+        btnDictionaryName->setFixedHeight(40);
+        btnDictionaryName->setFixedWidth(180);
+        OgmUiHelper::Instance()->setButtonIcon(btnDictionaryName, 0xf17a, visual->formatList.at(i)->name);
+        btnDictionaryName->setObjectName("btnHomeVisual|"+visual->formatList.at(i)->name);
+        //connect(btnDictionaryName, SIGNAL(clicked()), this, SLOT(onServerClicked()));
+        connect(btnDictionaryName, &QToolButton::clicked, [=](){
+            buttonCheck(btnDictionaryName);
+            this->setHidden(true);
+            emit signalChangeVisualConfigUI(visual, i);
+        });
+
+        //layoutChildWidget->addSpacing(10);
+        layoutChildWidget->addWidget(btnDictionaryName);
+        //layoutChildWidget->addStretch();
+        mChildWidget->setLayout(layoutChildWidget);
+        _layoutServer->addWidget(mChildWidget);
+    }
+    _layoutServer->addStretch();
+}
+
 void OgmServerSidebarWidget::initWidget()
 {
     this->setFixedWidth(180);

@@ -107,18 +107,18 @@ void OgmFavorSidebarWidget::changeChooseFavorUI(QString serverId, QString servic
     QLabel *lblTopIcon=new QLabel();
     lblTopIcon->setObjectName("lblStorageTopIcon");
     lblTopIcon->setWindowTitle("lbl-cGrey");
-    //NjUIHelper::Instance()->setIcon(lblTopIcon, QChar(0xf233));
+    OgmUiHelper::Instance()->setIcon(lblTopIcon, QChar(0xf233));
 
     QLabel *lblTop=new QLabel();
     lblTop->setObjectName("lblStorageTop");
     lblTop->setWindowTitle("lbl-cGrey");
     lblTop->setFixedWidth(200);
-    lblTop->setText("Choose");
+    lblTop->setText("Select Group");
 
     layoutH->addWidget(lblTopIcon);
     layoutH->addWidget(lblTop);
-    layoutH->addSpacing(50);
-    layoutH->setMargin(20);
+    layoutH->addStretch();
+    layoutH->setMargin(10);
 
     for(int i=0; i<groupList.count(); ++i){
         QWidget *widget=new QWidget();
@@ -182,7 +182,7 @@ void OgmFavorSidebarWidget::initWidget()
     this->setFixedWidth(180);
 
     QHBoxLayout *layoutContainer=new QHBoxLayout();
-    layoutContainer->setMargin(0);
+    layoutContainer->setContentsMargins(0, 5, 0, 0);
     this->setLayout(layoutContainer);
 
     QWidget *widgetStorage=new QWidget();

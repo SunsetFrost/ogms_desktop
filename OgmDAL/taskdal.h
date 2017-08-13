@@ -31,6 +31,7 @@ public:
     QString runModelTask(QString serverIp, Task *task);
     ModelTaskConfig* getStateInfo(QString serverIp, QString modelId);
     QString uploadFileToModelServer(QString serverIp, QString filePath);
+    QString uploadFileStreamToModelServer(QString serverIp, QString fileStream);
     QString getModelRunInstanceId(QString serverIp, Task *task);
     double getModelRunInstanceInfo(QString serverIp, QString msrId, Task *task);
     QString getModelRunResultByModelFileId(QString serverIp, QString dataId);
