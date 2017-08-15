@@ -15,6 +15,13 @@ Visual *VisualBLL::getVisualById(QString id)
     return _visualDAL.data()->getOneVisualById(id);
 }
 
+QString VisualBLL::getVisualSchema(Visual *visual, int formatIndex, int paramIndex)
+{
+    QString schemaName=visual->formatList.at(formatIndex)->pramaList.at(paramIndex)->schema;
+    QString schema=_visualDAL.data()->getVisualSchema(visual->id, schemaName);
+    return schema;
+}
+
 QString VisualBLL::getVisualUrl(Visual *visual, int formatIndex)
 {
     QString url="http://localhost:24689/visualization/"+visual->id+"/index.html?index="+QString::number(formatIndex);

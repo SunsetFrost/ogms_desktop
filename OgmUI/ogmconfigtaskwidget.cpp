@@ -15,6 +15,7 @@ OgmConfigTaskWidget::OgmConfigTaskWidget(QString taskType, QWidget *parent)
     _taskBLL=QSharedPointer<TaskBLL>(new TaskBLL);
     _dataRefactorBLL=QSharedPointer<DataRefactorBLL>(new DataRefactorBLL);
     _visualBLL=QSharedPointer<VisualBLL>(new VisualBLL);
+    _fileDataBll=QSharedPointer<DataFileBll>(new DataFileBll);
 
     if(taskType=="DataMap"){
         initDataMapTaskConfig();
@@ -46,9 +47,12 @@ void OgmConfigTaskWidget::changeDataMapTaskByService(QString serverId, QString d
     _task->getDataMapTaskConfig()->serverId=serverId;
 
     QString xml=_taskBLL.data()->getDatamapSchema(serverId, dataMapId);
+
+    _uiDataMap->txtDatamapTaskInput->setText(QString());
+    _uiDataMap->txtDatamapTaskOutput->setText(QString());
+
     _uiDataMap->txtDatamapTaskXML->setText(xml);
     _uiDataMap->txtDatamapTaskXML->setAutoFormatting(QTextEdit::AutoAll);
-
 }
 
 void OgmConfigTaskWidget::changeDataMapTaskByTask(Task *task)
@@ -284,6 +288,9 @@ void OgmConfigTaskWidget::changeVisual(Visual *visual, int formatIndex)
             _uiVisual->lblParamType->setText(_visual->formatList.at(_visualFormatIndex)->pramaList.at(i)->type);
             _uiVisual->lblParamDescription->setText(_visual->formatList.at(_visualFormatIndex)->pramaList.at(i)->desc);
             _uiVisual->txtRefactorTaskConfigInput->setText(_visual->formatList.at(_visualFormatIndex)->pramaList.at(i)->fileName);
+
+            _uiVisual->txtRefactorSchema->setText(_visualBLL.data()->getVisualSchema(_visual, _visualFormatIndex, _visualParamIndex));
+            _uiVisual->txtRefactorSchema->setAutoFormatting(QTextEdit::AutoAll);
         });
         _uiVisual->widgetBtnParamsGroup->layout()->addWidget(btnParam);
     }
@@ -297,7 +304,8 @@ void OgmConfigTaskWidget::changeVisual(Visual *visual, int formatIndex)
 
 void OgmConfigTaskWidget::changeAggregationConfig(QString url)
 {
-    _webView->setUrl(QUrl(url));
+    //_webView=new QWebEngineView();
+    _webView->load(QUrl(url));
 }
 
 void OgmConfigTaskWidget::initDataMapTaskConfig()
@@ -441,7 +449,12 @@ void OgmConfigTaskWidget::saveTask()
            int paramsCount= _task->getDataRefactorTaskConfig()->paramList.count();
            _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].oid=QString();
            _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].fileName=_uiDataRefactor->txtRefactorTaskConfigInput->text();
-           _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].pid=_task->getDataRefactorTaskConfig()->paramList[paramsCount-2].pid;
+
+           QString folderId=_fileDataBll.data()->addFolder(_task->getDataRefactorTaskConfig()->serverId, "599023d478983d271073c108", _task->name, QDateTime::currentDateTime().toString("yyyy-MM-dd"));
+
+           folderId=folderId.split("|").at(1);
+
+           _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].pid=folderId;
            _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].ioType="out";
        }
 

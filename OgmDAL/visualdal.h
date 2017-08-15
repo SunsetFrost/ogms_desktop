@@ -14,6 +14,8 @@ public:
     QList<Visual*> getAllVisual();
     Visual* getOneVisualById(QString visualId);
 
+    QString getVisualSchema(QString visualId, QString schemaName);
+
 private:
     void xml2visual(QDomDocument *doc, Visual* visual);
 };

@@ -42,6 +42,28 @@ ModelService *ModelServiceDAL::getOneModelServiceById(ModelServer *server, QStri
     return nullModel;
 }
 
+QString ModelServiceDAL::getExampleDataOfOneEvent(ModelServer *server, QString modelId, QString stateId, QString eventName)
+{
+    QString request="http://"+server->ip+"/modelser/testify/"+modelId;
+    QByteArray byteResult=OgmNetWork::get(request);
+
+    QJsonObject jsonRoot=QJsonDocument::fromJson(byteResult).object();
+    QJsonArray jsonTestifies=jsonRoot.value("testifies").toArray();
+
+    //TODO temp select first example data in array
+    QJsonObject jsonTestify=jsonTestifies.at(0).toObject();
+    QJsonArray jsonInputArray=jsonTestify.value("inputs").toArray();
+    for(int iArray=0; iArray<jsonInputArray.size(); ++iArray){
+        QString examepleStateId=jsonInputArray.at(iArray).toObject().value("StateId").toString();
+        QString exampleEventName=jsonInputArray.at(iArray).toObject().value("Event").toString();
+        QString exampleDataId=jsonInputArray.at(iArray).toObject().value("DataId").toString();
+        if(exampleEventName==eventName && examepleStateId==stateId){
+            return exampleDataId;
+        }
+    }
+    return QString();
+}
+
 QList<ModelService *> ModelServiceDAL::json2modelServiceList(QByteArray modelListJson, QString serverId)
 {
     QJsonParseError jsonError;

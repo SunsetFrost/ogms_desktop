@@ -12,6 +12,7 @@ public:
 
     QList<Visual*> getAllVisual();
     Visual* getVisualById(QString id);
+    QString getVisualSchema(Visual *visual, int formatIndex, int paramIndex);
 
     QString getVisualUrl(Visual *visual, int formatIndex);
 

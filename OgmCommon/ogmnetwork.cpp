@@ -1,6 +1,7 @@
 #include "ogmnetwork.h"
 
 #include <QFile>
+#include <QHttpPart>
 
 OgmNetWork::OgmNetWork()
 {
@@ -50,9 +51,9 @@ QByteArray OgmNetWork::postDataFile(QString request, QString filePath, QString p
     data.append(bond);
     boundary = crlf + boundary;
     bond = boundary.toUtf8();
-    data.append(QString("Content-Disposition: form-data; name=\"files\" ;  filename=\""+QString(fileNameWithoutPath+"\""+crlf).toUtf8()));
+    data.append(QString("Content-Disposition: form-data; name=\"files\" ;  filename="+fileNameWithoutPath+""+crlf).toUtf8());
     data.append("Content-Type:application/xml""\r\n\r\n");
-    data.append(crlf.toUtf8());
+    //data.append(crlf.toUtf8());
     data.append(file.readAll());
     data.append(endBoundary.toUtf8());
 
@@ -106,9 +107,9 @@ QByteArray OgmNetWork::postDataFile(QString request, QString fileStream, QString
     data.append(bond);
     boundary = crlf + boundary;
     bond = boundary.toUtf8();
-    data.append(QString("Content-Disposition: form-data; name=\"files\" ;  filename=\""+QString(fileName+"\""+crlf).toUtf8()));
+    data.append(QString("Content-Disposition: form-data; name=\"files\" ;  filename="+fileName+""+crlf).toUtf8());
     data.append("Content-Type:application/xml""\r\n\r\n");
-    data.append(crlf.toUtf8());
+    //data.append(crlf.toUtf8());
     data.append(fileStream.toUtf8());
     data.append(endBoundary.toUtf8());
 
@@ -130,4 +131,36 @@ QByteArray OgmNetWork::postDataFile(QString request, QString fileStream, QString
     QByteArray result=reply->readAll();
 
     return result;
+}
+
+QByteArray OgmNetWork::postDataZipFile(QString request, QString filePath, QString parentId)
+{
+//    //设置发送的数据
+//    QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
+
+//    QHttpPart tsPart;
+//    tsPart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant(QString("form-data; name=\"%1\"").arg("teacher_session")));
+//    tsPart.setBody(teacherSession.toLatin1());
+
+//    QHttpPart imagePart;
+//    imagePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant(QString("form-data; name=\"%1\"; filename=\"%2\"").arg("zipfile").arg(QFileInfo(zipfile).fileName())));
+//    QFile *file = new QFile(zipfile);
+//    file->open(QIODevice::ReadOnly);
+//    imagePart.setBodyDevice(file);
+//    file->setParent(multiPart); // we cannot delete the file now, so delete it with the multiPart
+
+//    multiPart->append(signaturePart);
+//    multiPart->append(utPart);
+//    multiPart->append(tiPart);
+//    multiPart->append(tsPart);
+//    multiPart->append(imagePart);
+
+//    //设置头信息
+//    QNetworkRequest networkRequest;
+//    networkRequest.setUrl(QUrl(QString("http://%1/tsp/uploadfile").arg(NetworkServerUtil::getStableIP())));
+
+//    //发送请求
+//    QNetworkReply *networkReply = m_networkManager->post(networkRequest, multiPart);
+//    multiPart->setParent(networkReply); // delete the multiPart with the reply
+    return QString().toUtf8();
 }

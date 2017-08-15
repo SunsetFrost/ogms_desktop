@@ -22,6 +22,7 @@ public:
 
     static QString webDiagramIP;
     static QString webDiagramPath;
+    static QString webDiagramLayout;
 
     static QString urlAggragationNewSolution;
     static QString urlAggragationQuerySolution;

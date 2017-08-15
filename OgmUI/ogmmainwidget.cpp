@@ -45,12 +45,12 @@ void OgmMainWidget::initStyle()
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnHomeTool, 0xf00a, "Tool");
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceTask, 0xf0ae, "Task");
 
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceFavor, 0xf004, "Favor");
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceFileManager, 0xf07b, "FileManager");
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceVisual, 0xf2d5, "Visual");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceFavor, 0xf004, "Solution");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceFileManager, 0xf07b, "FileRes");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceVisual, 0xf2d5, "Visualization");
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceIntegrated, 0xf0e8, "Integrated");
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceIntegratedSolution, 0xf0b1, "Solution");
-    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceIntegratedTask, 0xf085, "Task");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceIntegratedSolution, 0xf0b1, "IntegratedSolution");
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSpaceIntegratedTask, 0xf085, "IntegratedTask");
 
     //btn main top icon
     OgmUiHelper::Instance()->setIcon(_ui->btnWidgetMainTopConfig, QChar(0xf013));

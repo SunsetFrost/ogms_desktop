@@ -9,6 +9,7 @@
 #include "OgmBLL/taskbll.h"
 #include "OgmBLL/databll.h"
 #include "OgmBLL/visualbll.h"
+#include "OgmBLL/filebll.h"
 
 #include "ui_ogmdataserviceconfig.h"
 #include "ui_ogmrefactortaskconfigui.h"
@@ -80,6 +81,7 @@ private:
 
     QSharedPointer<TaskBLL> _taskBLL;
     QSharedPointer<DataRefactorBLL> _dataRefactorBLL;
+    QSharedPointer<DataFileBll> _fileDataBll;
     QSharedPointer<VisualBLL> _visualBLL;
 
 signals:

@@ -400,7 +400,11 @@ QString OgmHelper::getInitDiagramJson(QString modelId)
 
     QString result=QString::fromUtf8(OgmNetWork::get(strIp));
 
-    return result;
+    QFile file(OgmSetting::webDiagramLayout);
+    file.open(QIODevice::ReadOnly);
+    QString testLayout=file.readAll();
+
+    return testLayout;
 }
 
 QString OgmHelper::getElidedText(QString originalTxt, int width)

@@ -41,6 +41,7 @@ QList<Favor *> FavorDAL::getAllFavor()
 void FavorDAL::addOneFavor(Favor *favor)
 {
     QList<Favor*> favorList=getAllFavor();
+
     favorList.append(favor);
     setAllFavor(favorList);
 }

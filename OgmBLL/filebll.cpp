@@ -25,10 +25,10 @@ QList<DataFile *> DataFileBll::getFilesByParent(QString serverId, QString parent
     return fileList;
 }
 
-void DataFileBll::addFolder(QString serverId, QString parentId, QString folderName, QString addTime)
+QString DataFileBll::addFolder(QString serverId, QString parentId, QString folderName, QString addTime)
 {
     DataServer* server=_dataServerDAL.data()->getServerById(serverId);
-    _dataFileDAL.data()->addFolder(server, parentId, folderName, addTime, OgmSetting::dataServerUserName);
+    return _dataFileDAL.data()->addFolder(server, parentId, folderName, addTime, OgmSetting::dataServerUserName);
 }
 
 void DataFileBll::deleteData(QString serverId, QString id, QString type)

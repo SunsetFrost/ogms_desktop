@@ -12,6 +12,8 @@ TaskBLL::TaskBLL()
 
     _modelServerDAL=QSharedPointer<ModelServerDAL>(new ModelServerDAL);
     _dataServerDAL=QSharedPointer<DataServerDAL>(new DataServerDAL);
+
+    _modelServiceDAL=QSharedPointer<ModelServiceDAL>(new ModelServiceDAL);
     _datamapDAL=QSharedPointer<DataMappingDAL>(new DataMappingDAL);
     _datarefactorDAL=QSharedPointer<DataRefactorDAL>(new DataRefactorDAL);
     _fileDataDAL=QSharedPointer<DataFileDAL>(new DataFileDAL);
@@ -89,7 +91,11 @@ QString TaskBLL::runDatamapTask(Task *task)
 {
     DataServer *server=_dataServerDAL.data()->getServerById(task->getDataMapTaskConfig()->serverId);
 
-    QString instanceId= _taskDAL.data()->runDatamapTask(server->ip, task->getDataMapTaskConfig()->id, task->getDataMapTaskConfig()->inputId, task->getDataMapTaskConfig()->inputFilename, task->getDataMapTaskConfig()->outputDirId, task->getDataMapTaskConfig()->outputFilename, task->getDataMapTaskConfig()->calltype);
+    //add task result folder
+    QString folderId=_fileDataDAL.data()->addFolder(server, "599023d478983d271073c108", task->name, QDateTime::currentDateTime().toString("yyyy-MM-dd"), OgmSetting::dataServerUserName);
+    folderId=folderId.split("|").at(1);
+
+    QString instanceId= _taskDAL.data()->runDatamapTask(server->ip, task->getDataMapTaskConfig()->id, task->getDataMapTaskConfig()->inputId, task->getDataMapTaskConfig()->inputFilename, folderId, task->getDataMapTaskConfig()->outputFilename, task->getDataMapTaskConfig()->calltype);
 
     //polling model run info until model run finish
     bool isFinish=false;
@@ -234,6 +240,12 @@ QString TaskBLL::uploadDataFileToModelServer(QString dataServerId, QString dataF
     QString modelFileId=_taskDAL.data()->uploadFileStreamToModelServer(modelServer->ip, dataStream);
 
     return modelFileId;
+}
+
+QString TaskBLL::getExampleDataId(QString serverId, QString modelId, QString stateId, QString eventName)
+{
+    ModelServer *modelServer=_modelServerDAL.data()->getServerById(serverId);
+    return _modelServiceDAL.data()->getExampleDataOfOneEvent(modelServer, modelId, stateId, eventName);
 }
 
 

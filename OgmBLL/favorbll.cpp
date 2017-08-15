@@ -40,6 +40,14 @@ bool FavorBLL::deleteOneFavorGroup(QString favorId)
 bool FavorBLL::addOneFavorService(SERVICEITEM service, QString favorId)
 {
     Favor *favor=_favorDAL.data()->getFavorById(favorId);
+
+    //judge repitition
+    foreach(SERVICEITEM item, favor->serviceList){
+        if(item.serverId==service.serverId && item.serviceId==service.serviceId){
+            return false;
+        }
+    }
+
     bool isSuccess=_favorDAL.data()->addOneServiceToOneFavor(service, favor);
     return isSuccess;
 }

@@ -90,7 +90,7 @@ void TaskDAL::changeTaskRunState(QString taskId, QString taskRunState)
 
 QString TaskDAL::runDatamapTask(QString serverIp, QString datamapId, QString inputId, QString inputName, QString outputPId, QString outputName, QString callType)
 {
-    QString request="http://"+serverIp+"/datamap/use/call?id="+datamapId+"&in_oid="+inputId+"&in_filename="+inputName+"&out_dir="+outputPId+"&out_filename="+outputName+"&callType="+callType+"&username=admin";
+    QString request="http://"+serverIp+"/datamap/use/call?id="+datamapId+"&in_oid="+inputId+"&in_filename="+inputName+"&out_dir="+outputPId+"&out_filename="+outputName+"&callType="+callType+"&username=Bowen";
     QByteArray result=OgmNetWork::get(request);
 
     QString strResult=result;
@@ -99,7 +99,7 @@ QString TaskDAL::runDatamapTask(QString serverIp, QString datamapId, QString inp
 
 QString TaskDAL::runDataRefactorTask(QString serverIp, Task *task)
 {
-    QString request="http://"+serverIp+"/refactor/call?id="+task->getDataRefactorTaskConfig()->id+"&method="+task->getDataRefactorTaskConfig()->methodName+"&username=admin";
+    QString request="http://"+serverIp+"/refactor/call?id="+task->getDataRefactorTaskConfig()->id+"&method="+task->getDataRefactorTaskConfig()->methodName+"&username=Bowen";
     for(int i=0; i<task->getDataRefactorTaskConfig()->paramList.count(); ++i){
         request.append("&params[]={\"oid\":\""+task->getDataRefactorTaskConfig()->paramList[i].oid+"\",\"filename\":\""+task->getDataRefactorTaskConfig()->paramList.at(i).fileName+"\",\"pid\":\""+task->getDataRefactorTaskConfig()->paramList.at(i).pid+"\",\"iotype\":\""+task->getDataRefactorTaskConfig()->paramList.at(i).ioType+"\"}");
     }

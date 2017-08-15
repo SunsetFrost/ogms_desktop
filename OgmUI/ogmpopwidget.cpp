@@ -124,6 +124,9 @@ void OgmPopWidget::changeConfigModelTaskUI(Task *task)
                 if(dataType=="remote"){
                     _ui->txtPopEventFileName->setText("remote data");
                 }
+                if(dataType=="example"){
+                    _ui->txtPopEventFileName->setText("example data");
+                }
                 else{
                     if(dataPath=="")
                         _ui->txtPopEventFileName->setText(QString());
@@ -133,7 +136,6 @@ void OgmPopWidget::changeConfigModelTaskUI(Task *task)
                         _ui->txtPopEventFileName->setText(fileName);
                     }
                 }
-
 
                 QList<QToolButton*> btns=_ui->widgetPopTaskModelBtnGroup->findChildren<QToolButton*>();
                 foreach(QToolButton *mBtn, btns){
@@ -197,22 +199,24 @@ void OgmPopWidget::initCommonWidget()
 void OgmPopWidget::initCommonV2Widget()
 {
     //style
-    this->setFixedHeight(200);
+    this->setFixedHeight(190);
     _ui->widgetPopDeleteFile->setHidden(false);
 
     //function
     connect(_ui->btnPopA, &QToolButton::clicked, [=](){
         bool isConfirm=true;
         QVariant result(isConfirm);
-        this->close();
+
         emit signalOperationResult(result);
+        this->close();
 
     });
     connect(_ui->btnPopB, &QToolButton::clicked, [=](){
         bool isConfirm=false;
         QVariant result(isConfirm);
-        this->close();
+
         emit signalOperationResult(result);
+        this->close();
     });
 }
 
@@ -364,11 +368,11 @@ void OgmPopWidget::initChooseDataFile()
     scrollArea->setWidgetResizable(widgetListPage);
 
     QVBoxLayout *layoutListPage=new QVBoxLayout();
-    layoutListPage->setContentsMargins(0, 0, 0, 0);
     layoutListPage->setSpacing(0);
     widgetListPage->setLayout(layoutListPage);
 
     OgmListWidget *listWidget=new OgmListWidget(_ui->widgetPopFileList);
+    listWidget->layout()->setContentsMargins(5, 0, 0, 0);
     listWidget->setObjectName("mPopListWidget");
     listWidget->changeFileListUI(_fileServerId, "Data", "FileCheck");
     listWidget->setFileListState("chooseDataFile");
@@ -499,6 +503,7 @@ void OgmPopWidget::initConfigModelTask()
 
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnPopUploadLocalData, 0xf07c, "Local", 6);
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnUploadRemoteData, 0xf07c, "Remote", 6);
+    OgmUiHelper::Instance()->setButtonIcon(_ui->btnSelectDefaultData, 0xf15b, "Example", 6);
 
     connect(_ui->btnPopUploadLocalData, &QToolButton::clicked, [=](){
         QString filePath=QFileDialog::getOpenFileName(this, "choose upload data");
@@ -526,6 +531,19 @@ void OgmPopWidget::initConfigModelTask()
             _ui->txtPopEventFileName->setText(strList[1]);
         });
 
+    });
+    //example data
+    connect(_ui->btnSelectDefaultData, &QToolButton::clicked, [=](){
+        TaskBLL *taskBll=new TaskBLL();
+        QString exampleDataId=taskBll->getExampleDataId(_task->getModelTaskConfig()->serverId, _task->getModelTaskConfig()->modelId, _task->getModelTaskConfig()->stateId, _task->getModelTaskConfig()->eventList.at(_eventIndex.toInt())->eventName);
+        delete taskBll;
+        if(exampleDataId=="")
+            _ui->txtPopEventFileName->setText("No example data");
+        else{
+            _task->getModelTaskConfig()->eventList.at(_eventIndex.toInt())->dataType="example";
+            _task->getModelTaskConfig()->eventList.at(_eventIndex.toInt())->dataFromModelId=exampleDataId;
+            _ui->txtPopEventFileName->setText("Example data");
+        }
     });
 
     connect(_ui->btnPopA, &QToolButton::clicked, [=](){

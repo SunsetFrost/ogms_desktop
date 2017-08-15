@@ -6,6 +6,7 @@
 #include "OgmEntity/task.h"
 
 #include <QVariant>
+#include <QSharedPointer>
 
 namespace Ui{
 class OgmPopUI;

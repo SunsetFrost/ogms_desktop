@@ -42,6 +42,15 @@ Visual *VisualDAL::getOneVisualById(QString visualId)
     return visual;
 }
 
+QString VisualDAL::getVisualSchema(QString visualId, QString schemaName)
+{
+    QString schemaPath=OgmSetting::visualPath+"/"+visualId+"/"+schemaName;
+    QFile file(schemaPath);
+    file.open(QIODevice::ReadOnly);
+    QString result=QString::fromUtf8(file.readAll());
+    return result;
+}
+
 void VisualDAL::xml2visual(QDomDocument *doc, Visual *visual)
 {
     QDomElement eleVisual=doc->documentElement();
@@ -72,7 +81,7 @@ void VisualDAL::xml2visual(QDomDocument *doc, Visual *visual)
         QDomNodeList nodeListParam=nodeListFormat.at(i).childNodes();
         QList<VisualPrama*> paramList;
         for(int j=0; j<nodeListParam.size(); ++j){
-            QDomElement eleParam=nodeListParam.at(i).toElement();
+            QDomElement eleParam=nodeListParam.at(j).toElement();
 
             VisualPrama *param=new VisualPrama();
             param->name=eleParam.attributeNode("name").value();

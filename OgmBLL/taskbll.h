@@ -43,13 +43,16 @@ public:
     QString getDatamapSchema(QString serverId, QString datamapId);
     QString getDataRefactorParamSchema(QString serverId, QString refactorId, QString schemaName, QString ioType);
 
-    //return model file id
+    //trans dataid to modelId
     QString uploadDataFileToModelServer(QString dataServerId, QString dataFileId, QString modelServerId);
+
+    QString getExampleDataId(QString serverId, QString modelId, QString stateId, QString eventName);
 
 private:
     QSharedPointer<TaskDAL> _taskDAL;
     QSharedPointer<DataServerDAL> _dataServerDAL;
     QSharedPointer<ModelServerDAL> _modelServerDAL;
+    QSharedPointer<ModelServiceDAL> _modelServiceDAL;
     QSharedPointer<DataMappingDAL> _datamapDAL;
     QSharedPointer<DataRefactorDAL> _datarefactorDAL;
     QSharedPointer<DataFileDAL> _fileDataDAL;

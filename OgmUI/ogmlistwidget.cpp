@@ -448,7 +448,7 @@ void OgmListWidget::addOneDataOnUI(DataService *data, QString style)
         listItemBtnFavor.typeValue=ItemType::ToolButton;
         listItemBtnFavor.iconValue=0xf004;
         listItemBtnFavor.styleName="btn-light";
-        listItemBtnFavor.toolTipValue="add to my favor";
+        listItemBtnFavor.toolTipValue="add to solution";
         listItemBtnFavor.objectName="btnDataFavor|"+data->id;
         listItemList.append(listItemBtnFavor);
     }
@@ -538,7 +538,7 @@ void OgmListWidget::addOneDataMappingOnUI(DataMapping *data, QString style)
         listItemBtnFavor.typeValue=ItemType::ToolButton;
         listItemBtnFavor.iconValue=0xf004;
         listItemBtnFavor.styleName="btn-light";
-        listItemBtnFavor.toolTipValue="add to my favor";
+        listItemBtnFavor.toolTipValue="add to solution";
         listItemBtnFavor.objectName="btnDataMappingFavor|"+data->id;
         listItemList.append(listItemBtnFavor);
     }
@@ -634,7 +634,7 @@ void OgmListWidget::addOneDataRefactorOnUI(DataRefactor *data, QString style)
         listItemBtnFavor.typeValue=ItemType::ToolButton;
         listItemBtnFavor.iconValue=0xf004;
         listItemBtnFavor.styleName="btn-light";
-        listItemBtnFavor.toolTipValue="add to my favor";
+        listItemBtnFavor.toolTipValue="add to solution";
         listItemBtnFavor.objectName="btnDataRefactorFavor|"+data->id;
         listItemList.append(listItemBtnFavor);
     }
@@ -733,9 +733,9 @@ void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
     LISTCHILD listItemDataName;
     listItemDataName.typeValue=ItemType::Label;
     listItemDataName.objectName="lblListName"+model->id;
-    listItemDataName.textValue=OgmHelper::getElidedText(model->mName, 220);
+    listItemDataName.textValue=OgmHelper::getElidedText(model->mName, 300);
     listItemDataName.styleName="lbl-lightdark";
-    listItemDataName.fixWidth=220;
+    listItemDataName.fixWidth=300;
     listItemDataName.iconValue=0;
     listItemDataName.toolTipValue=model->mName;
     listItemList.append(listItemDataName);
@@ -762,7 +762,7 @@ void OgmListWidget::addOneModelServiceOnUI(ModelService *model, QString style)
         listItemList.append(listItemBtnDelete);
     }
     else{
-        LISTCHILD listItemBtnFavor=OgmListHelper::createButtonChild(0xf004, "btnModelFavor|"+model->id, "btn-light", "add to my favor group");
+        LISTCHILD listItemBtnFavor=OgmListHelper::createButtonChild(0xf004, "btnModelFavor|"+model->id, "btn-light", "add to my solution");
         listItemList.append(listItemBtnFavor);
     }
 
@@ -1019,15 +1019,15 @@ void OgmListWidget::addOneTaskOnUI(Task *task, QString style)
     listItemBtnDelete.objectName="btnTaskDel|"+task->uid;
     listItemList.append(listItemBtnDelete);
 
-    if(task->runstate=="Finish"){
-        LISTCHILD listItemBtnVisual;
-        listItemBtnVisual.typeValue=ItemType::ToolButton;
-        listItemBtnVisual.iconValue=0xf0ac;
-        listItemBtnVisual.styleName="btn-light";
-        listItemBtnVisual.toolTipValue="view result";
-        listItemBtnVisual.objectName="btnTaskView|"+task->uid;
-        listItemList.append(listItemBtnVisual);
-    }
+//    if(task->runstate=="Finish"){
+//        LISTCHILD listItemBtnVisual;
+//        listItemBtnVisual.typeValue=ItemType::ToolButton;
+//        listItemBtnVisual.iconValue=0xf0ac;
+//        listItemBtnVisual.styleName="btn-light";
+//        listItemBtnVisual.toolTipValue="view result";
+//        listItemBtnVisual.objectName="btnTaskView|"+task->uid;
+//        listItemList.append(listItemBtnVisual);
+//    }
 
     LISTCHILD listItemSpaceB;
     listItemSpaceB.typeValue=ItemType::SpaceItem;

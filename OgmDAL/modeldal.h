@@ -17,6 +17,8 @@ public:
 
     ModelService* getOneModelServiceById(ModelServer *server, QString modelId);
 
+    QString getExampleDataOfOneEvent(ModelServer *server, QString modelId, QString stateId, QString eventName);
+
 
 
 private:

@@ -15,7 +15,7 @@ public:
 
     QList<DataFile*> getFilesByParent(QString serverId, QString parentId);
 
-    void addFolder(QString serverId, QString parentId, QString folderName, QString addTime);
+    QString addFolder(QString serverId, QString parentId, QString folderName, QString addTime);
 
     void deleteData(QString serverId, QString id, QString type);
 

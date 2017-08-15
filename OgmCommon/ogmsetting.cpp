@@ -15,11 +15,12 @@ QString OgmSetting::dataServerFilePath=QDir::currentPath()+"/dataServer.config";
 
 QString OgmSetting::webDiagramIP="222.192.7.74";
 QString OgmSetting::webDiagramPath=QDir::currentPath()+"/web/ui/flowChartModelInfopage.html";
+QString OgmSetting::webDiagramLayout=QDir::currentPath()+"/web/ui/layout.xml";
 
 //QString OgmSetting::urlAggragationNewSolution="http://223.2.45.127:9990/aggregation/solution/new";
-QString OgmSetting::urlAggragationNewSolution="http://223.2.45.127:9990/aggregation/task/edit?_id=598ee16b36f1704214a09d20";
-QString OgmSetting::urlAggragationQuerySolution="http://223.2.45.127:9990/aggregation/solution/query";
-QString OgmSetting::urlAggragationQueryTask="http://223.2.45.127:9990/aggregation/task/query";
+QString OgmSetting::urlAggragationNewSolution="http://223.2.45.127:9990/integration/solution/new";
+QString OgmSetting::urlAggragationQuerySolution="http://223.2.45.127:9990/integration/solution/query";
+QString OgmSetting::urlAggragationQueryTask="http://223.2.45.127:9990/integration/task/query";
 
 QString OgmSetting::taskPath=QDir::currentPath()+"/task";
 QString OgmSetting::visualPath=QDir::currentPath()+"/visual/services";
