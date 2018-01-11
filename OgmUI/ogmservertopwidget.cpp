@@ -55,8 +55,8 @@ void OgmServerTopWidget::changeDataServer(QString serverId)
         _ui->lblServerDesContent->setHidden(true);
     }
 
-    setBtnCheckState(_ui->btnServerDataPage->objectName());
-    emit signalChangeDataList(_serverId);
+    setBtnCheckState(_ui->btnServerDataMappingPage->objectName());
+    emit signalChangeDataMappingList(_serverId);
 }
 
 void OgmServerTopWidget::changeModelServer(QString serverId)
@@ -204,6 +204,9 @@ void OgmServerTopWidget::initDataWidget()
     _serverId=OgmSetting::defaultDataServerId;
 
     //style
+    _ui->btnServerDataPage->setHidden(true);
+    _ui->lblServertopData->setHidden(true);
+
     OgmUiHelper::Instance()->setIcon(_ui->lblNameIcon, QChar(0xf17a));
     OgmUiHelper::Instance()->setIcon(_ui->lblServerLocationIcon, QChar(0xf041));
     OgmUiHelper::Instance()->setIcon(_ui->lblIcon, QChar(0xf1c0));
@@ -260,6 +263,9 @@ void OgmServerTopWidget::initFavorWidget()
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnTopNewFavor, 0xf055, "new", 6);
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnTopDeleteFavor, 0xf1f8, "delete", 6);
     OgmUiHelper::Instance()->setButtonIcon(_ui->btnTopSwitchFavor, 0xf0ec, "switch group", 6);
+
+    _ui->btnFavorToolData->setHidden(true);
+    _ui->lblServertopFavrData->setHidden(true);
 
     _ui->widgetServerTopBtnGroup->setVisible(false);
 

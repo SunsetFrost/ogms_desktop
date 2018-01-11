@@ -1,3 +1,4 @@
+QT       += core gui
 
 SOURCES += \
     $$PWD/ogmuihelper.cpp \

@@ -16,4 +16,5 @@ HEADERS += \
     $$PWD/favorbll.h \
     $$PWD/taskbll.h \
     $$PWD/visualbll.h \
+    $$PWD/test/1.h \
 

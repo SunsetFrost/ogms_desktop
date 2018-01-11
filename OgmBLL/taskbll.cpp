@@ -92,7 +92,7 @@ QString TaskBLL::runDatamapTask(Task *task)
     DataServer *server=_dataServerDAL.data()->getServerById(task->getDataMapTaskConfig()->serverId);
 
     //add task result folder
-    QString folderId=_fileDataDAL.data()->addFolder(server, "599023d478983d271073c108", task->name, QDateTime::currentDateTime().toString("yyyy-MM-dd"), OgmSetting::dataServerUserName);
+    QString folderId=_fileDataDAL.data()->addFolder(server, "599468d7c97b040e08f9b2a3", task->name, QDateTime::currentDateTime().toString("yyyy-MM-dd"), OgmSetting::dataServerUserName);
     folderId=folderId.split("|").at(1);
 
     QString instanceId= _taskDAL.data()->runDatamapTask(server->ip, task->getDataMapTaskConfig()->id, task->getDataMapTaskConfig()->inputId, task->getDataMapTaskConfig()->inputFilename, folderId, task->getDataMapTaskConfig()->outputFilename, task->getDataMapTaskConfig()->calltype);
@@ -165,7 +165,7 @@ QString TaskBLL::runModelTask(Task *task)
             resultList.append(result);
 
             //add task result folder
-            QString folderId=_fileDataDAL.data()->addFolder(dataServer, "599023d478983d271073c108", task->name, QDateTime::currentDateTime().toString("yyyy-MM-dd"), OgmSetting::dataServerUserName);
+            QString folderId=_fileDataDAL.data()->addFolder(dataServer, "599468d7c97b040e08f9b2a3", task->name, QDateTime::currentDateTime().toString("yyyy-MM-dd"), OgmSetting::dataServerUserName);
             folderId=folderId.split("|").at(1);
 
             //upload result to default data server

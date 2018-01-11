@@ -906,7 +906,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="lblServertopData">
            <property name="statusTip">
             <string>lbl-split</string>
            </property>
@@ -1033,7 +1033,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLabel" name="label_7">
+          <widget class="QLabel" name="lblServertopFavrData">
            <property name="statusTip">
             <string>lbl-split</string>
            </property>

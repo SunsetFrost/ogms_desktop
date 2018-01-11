@@ -450,7 +450,7 @@ void OgmConfigTaskWidget::saveTask()
            _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].oid=QString();
            _task->getDataRefactorTaskConfig()->paramList[paramsCount-1].fileName=_uiDataRefactor->txtRefactorTaskConfigInput->text();
 
-           QString folderId=_fileDataBll.data()->addFolder(_task->getDataRefactorTaskConfig()->serverId, "599023d478983d271073c108", _task->name, QDateTime::currentDateTime().toString("yyyy-MM-dd"));
+           QString folderId=_fileDataBll.data()->addFolder(_task->getDataRefactorTaskConfig()->serverId, "599468d7c97b040e08f9b2a3", _task->name, QDateTime::currentDateTime().toString("yyyy-MM-dd"));
 
            folderId=folderId.split("|").at(1);
 

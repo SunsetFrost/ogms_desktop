@@ -48,6 +48,7 @@ OgmPopWidget::OgmPopWidget(QString widgetType, QWidget *parent)
 
     setDragWidgetName("widgetPopTitle");
     this->setAttribute(Qt::WA_DeleteOnClose);
+    this->raise();
 }
 
 OgmPopWidget::OgmPopWidget(QString widgetType, QString serverId, QWidget *parent)
@@ -246,7 +247,7 @@ void OgmPopWidget::initNewFileWidget()
 void OgmPopWidget::initReNameFileWidget()
 {
     //style
-    this->setFixedHeight(200);
+    this->setFixedHeight(190);
     _ui->widgetPopFile->setHidden(false);
 
     _ui->lblPopTitle->setText("Rename file");
@@ -271,12 +272,12 @@ void OgmPopWidget::initNewFavorGroupWidget()
     this->setFixedHeight(260);
     _ui->widgetPopSaveTask->setHidden(false);
 
-    _ui->lblPopTitle->setText("New Favor Group");
+    _ui->lblPopTitle->setText("New Solution");
     _ui->btnPopA->setText("Confirm");
     _ui->btnPopB->setText("Cancel");
 
-    _ui->txtPopTaskName->setPlaceholderText("Please input group name");
-    _ui->txtPopTaskDesc->setPlaceholderText("Please input group description");
+    _ui->txtPopTaskName->setPlaceholderText("Please input solution name");
+    _ui->txtPopTaskDesc->setPlaceholderText("Please input solution description");
     _ui->txtPopTaskTag->setHidden(true);
 
     connect(_ui->btnPopA, &QToolButton::clicked, [=](){
@@ -320,7 +321,7 @@ void OgmPopWidget::initDeleteFavorWidget()
     this->setFixedHeight(190);
     _ui->widgetPopDeleteFile->setHidden(false);
 
-    _ui->lblPopTitle->setText("Delete Favor Group");
+    _ui->lblPopTitle->setText("Delete solution");
     _ui->btnPopA->setText("Delete");
     _ui->btnPopB->setText("Cancel");
 

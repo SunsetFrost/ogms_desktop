@@ -56,7 +56,7 @@ void OgmToolWidget::initWidget()
     });
     connect(_ui->btnToolBRun, &QToolButton::clicked, [=](){
         ModelServer *server=_modelServerBLL.data()->getServerId(OgmSetting::defaultModelServerId);
-        QDesktopServices::openUrl(QUrl("http://"+server->ip+":8060/index"));
+        QDesktopServices::openUrl(QUrl("http://"+server->ip+"/index"));
     });
     connect(_ui->btnToolDataRun, &QToolButton::clicked, [=](){
         DataServer *server=_dataServerBLL.data()->getServerId(OgmSetting::defaultDataServerId);

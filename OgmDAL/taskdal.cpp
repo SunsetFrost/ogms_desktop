@@ -90,7 +90,7 @@ void TaskDAL::changeTaskRunState(QString taskId, QString taskRunState)
 
 QString TaskDAL::runDatamapTask(QString serverIp, QString datamapId, QString inputId, QString inputName, QString outputPId, QString outputName, QString callType)
 {
-    QString request="http://"+serverIp+"/datamap/use/call?id="+datamapId+"&in_oid="+inputId+"&in_filename="+inputName+"&out_dir="+outputPId+"&out_filename="+outputName+"&callType="+callType+"&username=Bowen";
+    QString request="http://"+serverIp+"/datamap/use/call?id="+datamapId+"&in_oid="+inputId+"&in_filename="+inputName+"&out_dir="+outputPId+"&out_filename="+outputName+"&callType="+callType+"&username="+OgmSetting::dataServerUserName;
     QByteArray result=OgmNetWork::get(request);
 
     QString strResult=result;
@@ -99,7 +99,7 @@ QString TaskDAL::runDatamapTask(QString serverIp, QString datamapId, QString inp
 
 QString TaskDAL::runDataRefactorTask(QString serverIp, Task *task)
 {
-    QString request="http://"+serverIp+"/refactor/call?id="+task->getDataRefactorTaskConfig()->id+"&method="+task->getDataRefactorTaskConfig()->methodName+"&username=Bowen";
+    QString request="http://"+serverIp+"/refactor/call?id="+task->getDataRefactorTaskConfig()->id+"&method="+task->getDataRefactorTaskConfig()->methodName+"&username="+OgmSetting::dataServerUserName;
     for(int i=0; i<task->getDataRefactorTaskConfig()->paramList.count(); ++i){
         request.append("&params[]={\"oid\":\""+task->getDataRefactorTaskConfig()->paramList[i].oid+"\",\"filename\":\""+task->getDataRefactorTaskConfig()->paramList.at(i).fileName+"\",\"pid\":\""+task->getDataRefactorTaskConfig()->paramList.at(i).pid+"\",\"iotype\":\""+task->getDataRefactorTaskConfig()->paramList.at(i).ioType+"\"}");
     }
@@ -221,9 +221,8 @@ QString TaskDAL::uploadFileStreamToModelServer(QString serverIp, QString fileStr
     data.append(bond);
     boundary = crlf + boundary;
     bond = boundary.toUtf8();
-    data.append(QString("Content-Disposition: form-data; name=\"myfile\"; filename=\""+QString(" \""+crlf).toUtf8()));
+    data.append(QString("Content-Disposition: form-data; name=\"myfile\"; filename=test.xml"+crlf).toUtf8());
     data.append("Content-Type:application/xml""\r\n\r\n");
-    data.append(crlf.toUtf8());
     data.append(fileStream.toUtf8());
     data.append(endBoundary.toUtf8());
 
